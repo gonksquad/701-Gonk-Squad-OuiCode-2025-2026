@@ -1,37 +1,44 @@
 package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
 
-public class LemonLight extends LinearOpMode {
+public class LemonLight extends OpMode {
 
     private Limelight3A limelight;
 
     @Override
     //throws interrupted exception excluded
-    public void runOpMode() {
+    public void init() {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
         telemetry.setMsTransmissionInterval(11); //very frequent updates - every 11 ms
 
-        limelight.pipelineSwitch(0); //only pipeline we have now
+        limelight.pipelineSwitch(1);
 
+        /*
+        0 = apriltag (apriltag)
+        1 = greenblob (color/ retroreflective)
+        2 = detectartifacts (neural detector)
+        */
 
-        limelight.start(); //starts polling for data, needed to get results
+    }
 
-        while (opModeIsActive()) {
-            LLResult result = limelight.getLatestResult();
-            if (result != null) {
-                if (result.isValid()) {
-                    Pose3D botpose = result.getBotpose();
-                    telemetry.addData("tx", result.getTx());
-                    telemetry.addData("ty", result.getTy());
-                    telemetry.addData("Botpose", botpose.toString());
-                }
-            }
+    @Override
+    public void start() {
+        limelight.start();
+    }
+
+    @Override
+    public void loop() {
+        LLResult llResult = limelight.getLatestResult();
+        if (llResult != null & llResult.isValid()) {
+            telemetry.addData("Target X offset", llResult.getTx());
+            telemetry.addData("Target Y offset", llResult.getTy());
+            telemetry.addData("Target area offset", llResult.getTa());
         }
     }
 }
