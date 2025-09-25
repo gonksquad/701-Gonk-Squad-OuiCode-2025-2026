@@ -79,7 +79,7 @@ public class ChassisV1  extends LinearOpMode{
 
         frontRight.setPower(Math.max(-1,Math.min(1,(blue-turn)/2)));
         backLeft.setPower(Math.max(-1,Math.min(1,(blue+turn)/2)));
-
+        //(research smartDashboard.putNumber();
     }
 
 }
