@@ -13,9 +13,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class Constants {
-    // TODO: Add the mass of the robot
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(13.6);
+            .mass(13.2);
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
@@ -32,8 +31,8 @@ public class Constants {
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(148)
-            .strafePodX(-156)
+            .forwardPodY(149)
+            .strafePodX(-57)
             .distanceUnit(DistanceUnit.MM)
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
@@ -48,3 +47,4 @@ public class Constants {
                 .build();
     }
 }
+|
