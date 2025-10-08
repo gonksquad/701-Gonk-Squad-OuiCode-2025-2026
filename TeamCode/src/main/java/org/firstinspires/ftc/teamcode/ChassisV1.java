@@ -74,11 +74,11 @@ public class ChassisV1  extends LinearOpMode{
 
         //sets the powers based on an equation I chatgpt'd
         // ^^ WHY JACOB 😭😭😭  https://bluemoji.io/emoji/desperate
-        frontLeft.setPower(Math.max(-1,Math.min(1,(green+turn)/2)));
-        backRight.setPower(Math.max(-1,Math.min(1,(green-turn)/2)));
+        frontLeft.setPower(Math.max(-1,Math.min(1,(green+turn))));
+        backRight.setPower(Math.max(-1,Math.min(1,(green-turn))));
 
-        frontRight.setPower(Math.max(-1,Math.min(1,(blue-turn)/2)));
-        backLeft.setPower(Math.max(-1,Math.min(1,(blue+turn)/2)));
+        frontRight.setPower(Math.max(-1,Math.min(1,(blue-turn))));
+        backLeft.setPower(Math.max(-1,Math.min(1,(blue+turn))));
         //(research smartDashboard.putNumber();
     }
 
