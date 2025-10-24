@@ -3,27 +3,53 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp (name = "bestTeleOp")
 public class ChassisV1  extends LinearOpMode{
 
-    public DcMotor frontLeft, frontRight, backLeft, backRight;
+    //public DcMotor frontLeft, frontRight, backLeft, backRight;
+    public Servo axon;
+    public float axonPos = 0;
+
 
     public void runOpMode() {
-        frontLeft = hardwareMap.get(DcMotor.class, "fl");
-        frontRight = hardwareMap.get(DcMotor.class, "fr");
-        backLeft = hardwareMap.get(DcMotor.class, "bl");
-        backRight = hardwareMap.get(DcMotor.class, "br");
+        //frontLeft = hardwareMap.get(DcMotor.class, "fl");
+        //frontRight = hardwareMap.get(DcMotor.class, "fr");
+        //backLeft = hardwareMap.get(DcMotor.class, "bl");
+        //backRight = hardwareMap.get(DcMotor.class, "br");
+        axon = hardwareMap.get(Servo.class, "axon");
 
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        //frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        //backLeft.setDirection(DcMotor.Direction.REVERSE);
         waitForStart();
         while(opModeIsActive()) {
             chassisMovement();
-            telemetry.addData("Front Left", frontLeft.getPower());
-            telemetry.addData("Front Right", frontRight.getPower());
-            telemetry.addData("Back Left", backLeft.getPower());
-            telemetry.addData("Back Right", backRight.getPower());
+            //telemetry.addData("Front Left", frontLeft.getPower());
+            //telemetry.addData("Front Right", frontRight.getPower());
+            //telemetry.addData("Back Left", backLeft.getPower());
+            //telemetry.addData("Back Right", backRight.getPower());
+            telemetry.addData("servo position", axon.getPosition());
+
+            if(gamepad1.dpad_up) {
+                axonPos = Math.abs(axonPos-0.2f);
+                axon.setPosition(axonPos);
+                sleep(200);
+                axonPos = Math.abs(axonPos-0.2f);
+                axon.setPosition(axonPos);
+                sleep(300);
+
+            }
+            /*if (gamepad1.left_bumper) {
+                axonPos = (axonPos >= 0f) ? axonPos - 0.5f : 1;
+                telemetry.addData("pos", axonPos);
+                axon.setPosition(axonPos);
+                sleep(500);
+            }else if (gamepad1.right_bumper) {
+                axonPos = (axonPos <= 1f) ? axonPos + 0.5f : 0;
+                axon.setPosition(axonPos);
+                sleep(500);
+            }*/
 
             telemetry.update();
         }
@@ -74,11 +100,11 @@ public class ChassisV1  extends LinearOpMode{
 
         //sets the powers based on an equation I chatgpt'd
         // ^^ WHY JACOB 😭😭😭  https://bluemoji.io/emoji/desperate
-        frontLeft.setPower(Math.max(-1,Math.min(1,(green+turn))));
-        backRight.setPower(Math.max(-1,Math.min(1,(green-turn))));
+    //    frontLeft.setPower(Math.max(-1,Math.min(1,(green+turn))));
+    //    backRight.setPower(Math.max(-1,Math.min(1,(green-turn))));
 
-        frontRight.setPower(Math.max(-1,Math.min(1,(blue-turn))));
-        backLeft.setPower(Math.max(-1,Math.min(1,(blue+turn))));
+    //    frontRight.setPower(Math.max(-1,Math.min(1,(blue-turn))));
+    //    backLeft.setPower(Math.max(-1,Math.min(1,(blue+turn))));
         //(research smartDashboard.putNumber();
     }
 
