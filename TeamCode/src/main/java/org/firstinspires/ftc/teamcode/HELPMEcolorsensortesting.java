@@ -44,8 +44,6 @@ public class HELPMEcolorsensortesting extends LinearOpMode {
             return "purple";
         } else if(hue > 155 && hue < 175 && validColor) {
             return "green";
-        } else if(hue > 145 && hue < 155 && validColor) {
-            return "eamonn"; // stop this is real and you did write this not eamonn
         }
         return null;
     }
