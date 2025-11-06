@@ -8,33 +8,62 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import kotlin.math.UMathKt;
 
 
+@TeleOp(name="ProtoSorterLogic")
 public class ProtoSorterLogic extends LinearOpMode{
 
     ColorSensor colorSensor;
     int red, green, blue;
     float[] hsvValues = new float[3];
 
-    private ElapsedTime inouttakeTimer;
+    private ElapsedTime inouttakeTimer, changePosTimer = new ElapsedTime();
     Servo sortServo;
     DcMotor intakeMotor;
-    double[] intakePos = {0, 0.4, 8};
+    /// SET SERVO LIMIT TO 240
     double[] outtakePos = {1, 0.6, 0.2};
-    boolean[] posFilled = {false, false, false};
+    double[] intakePos = {0, 0.4, 0.8};
+    String[] currPos = {null, null, null};
     boolean intakePressed = false;
     boolean outtakePressed = false;
     int currentPos;
 
     public void runOpMode() {
-        sortServo = hardwareMap.get(Servo.class, "SorterServo");
+        sortServo = hardwareMap.get(Servo.class, "SortServo");
+        colorSensor = hardwareMap.get(ColorSensor.class, "inColorSens");
         waitForStart();
+        currentPos = 1;
+        sortServo.setPosition(intakePos[1]);
 
-        red = colorSensor.red();
-        green = colorSensor.green();
-        blue = colorSensor.blue();
-        Color.RGBToHSV(red, green, blue, hsvValues);
+        int index = 0;
+        while(opModeIsActive()) {
+            /// testing sortservo positions
+            /*if((gamepad1.right_bumper || gamepad1.left_bumper) && inouttakeTimer.milliseconds() >= 250) {
+                index = (index+1)%outtakePos.length;
+                inouttakeTimer.reset();
+            }
+            if(gamepad1.right_bumper) {
+                sortServo.setPosition(intakePos[index]);
+                telemetry.addData("Pos", sortServo.getPosition());
+                telemetry.addData("Index", index);
+            }*/
+            detectFilled();
+            if(currPos[getCurrentPos()] != null && changePosTimer.milliseconds() >= 5000) {
+                moveToEmptyPos();
+                changePosTimer.reset();
+            }
+            telemetry.addData("timer", Math.round(changePosTimer.milliseconds()));
 
+            telemetry.addData("current pos", getCurrentPos());
+            telemetry.addData("servo pos", sortServo.getPosition());
+
+            telemetry.addData("pos 0", currPos[0]);
+            telemetry.addData("pos 1", currPos[1]);
+            telemetry.addData("pos 2", currPos[2]);
+
+            telemetry.update();
+        }
 
     }
 
@@ -74,20 +103,36 @@ public class ProtoSorterLogic extends LinearOpMode{
             moveToEmptyPos();
         }
 
-        if(intakePressed && !posFilled[currentPos]) {
+        if(intakePressed && currPos[currentPos] == null) { // if intaking and at an empty spot
+            moveToEmptyPos(); // make sure you're at an empty spot
+            detectFilled();
+            intakeMotor.setPower(0.8); // start intaking
+        } else if (intakePressed && currPos[currentPos] != null) { // if the position gets filled
+            intakePressed = false; // stop intaking
+            intakeMotor.setPower(0);
             moveToEmptyPos();
-            intakeMotor.setPower(0.8);
-        } else if (intakePressed && posFilled[currentPos]) {
-            intakePressed = false;
         }
+
+
     }
 
     public void moveToEmptyPos() {
         currentPos = getCurrentPos();
 
-        if (posFilled[currentPos]) {
+        if (currPos[currentPos] != null) {
             for (int i=0; i<3; i++) {
-                if(!posFilled[i]) {
+                if(currPos[i] == null) {
+                    sortServo.setPosition(intakePos[i]);
+                }
+            }
+        }
+    }
+    public void moveToFilledPos() {
+        currentPos = getCurrentPos();
+
+        if (currPos[currentPos] == null) {
+            for (int i=0; i<3; i++) {
+                if(currPos[i] != null) {
                     sortServo.setPosition(intakePos[i]);
                 }
             }
@@ -95,23 +140,30 @@ public class ProtoSorterLogic extends LinearOpMode{
     }
     public int getCurrentPos() {
         for (int i=0; i<3;i++) {
-            if(Math.abs(sortServo.getPosition() - intakePos[i]) <= 0.05) {
-                return i;
-            } else if (Math.abs(sortServo.getPosition() - outtakePos[i]) <= 0.05) {
+            if(sortServo.getPosition() == intakePos[i] || sortServo.getPosition() == outtakePos[i]) {
                 return i;
             }
         }
-        return -1;
+        return 1;
     }
+// Dany Reilleh Was Here
+    public void detectFilled() {
 
-    public String detectArtifactColor() {
+        red = colorSensor.red();
+        green = colorSensor.green();
+        blue = colorSensor.blue();
+        Color.RGBToHSV(red, green, blue, hsvValues);
+
         boolean validColor = hsvValues[1] > 0.55;
         float hue = hsvValues[0];
         if(hue > 220 && hue < 230 && validColor) {
-            return "purple";
+            currPos[getCurrentPos()] = "purple";
+            telemetry.addData("found color",null);
         } else if(hue > 155 && hue < 175 && validColor) {
-            return "green";
+            currPos[getCurrentPos()] = "green";
+            telemetry.addData("found color", null);
+        } else {
+            //currPos[getCurrentPos()] = null;
         }
-        return null;
     }
 }
