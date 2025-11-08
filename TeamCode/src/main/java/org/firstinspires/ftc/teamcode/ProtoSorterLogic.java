@@ -3,10 +3,13 @@ import android.graphics.Color;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import kotlin.math.UMathKt;
 
@@ -17,24 +20,26 @@ public class ProtoSorterLogic extends LinearOpMode{
     ColorSensor colorSensor;
     int red, green, blue;
     float[] hsvValues = new float[3];
+    boolean nextPos = true;
 
     private ElapsedTime inouttakeTimer, changePosTimer = new ElapsedTime();
     Servo sortServo;
     DcMotor intakeMotor;
     /// SET SERVO LIMIT TO 240
+    //AnalogInput sortAngle;
     double[] outtakePos = {1, 0.6, 0.2};
     double[] intakePos = {0, 0.4, 0.8};
     String[] currPos = {null, null, null};
-    boolean intakePressed = false;
-    boolean outtakePressed = false;
+    boolean intakePressed, outtakePressed = false;
     int currentPos;
 
     public void runOpMode() {
         sortServo = hardwareMap.get(Servo.class, "SortServo");
         colorSensor = hardwareMap.get(ColorSensor.class, "inColorSens");
+        //sortAngle = hardwareMap.get(AnalogInput.class, "sortAnalog");
         waitForStart();
-        currentPos = 1;
-        sortServo.setPosition(intakePos[1]);
+        currentPos = 0;
+        sortServo.setPosition(intakePos[0]);
 
         int index = 0;
         while(opModeIsActive()) {
@@ -49,10 +54,10 @@ public class ProtoSorterLogic extends LinearOpMode{
                 telemetry.addData("Index", index);
             }*/
             detectFilled();
-            if(currPos[getCurrentPos()] != null && changePosTimer.milliseconds() >= 5000) {
-                moveToEmptyPos();
-                changePosTimer.reset();
+            if(changePosTimer.milliseconds() >= 1000) {
+                nextPos = true;
             }
+
             telemetry.addData("timer", Math.round(changePosTimer.milliseconds()));
 
             telemetry.addData("current pos", getCurrentPos());
@@ -61,28 +66,15 @@ public class ProtoSorterLogic extends LinearOpMode{
             telemetry.addData("pos 0", currPos[0]);
             telemetry.addData("pos 1", currPos[1]);
             telemetry.addData("pos 2", currPos[2]);
-
+            /*double angle = AngleUnit.normalizeDegrees(
+                    sortAngle.getVoltage() * 360.0 / 3.3
+            );*/
+            //telemetry.addData("angle", angle);
             telemetry.update();
         }
 
     }
 
-    ///////////////////////// psuedocode ////////////////////////////////
-    /// What i need to keep track of
-    // which pos is filled or not, which pos were at
-    //
-    // sorter stays in position to intake until outtake button is pressed
-    // in which case it moves to the closest filled position. after outtaking
-    // or intaking move to the closest free position, if no positions are free,
-    // dont allow intake to spin. Also, if all positions filled, keep at an
-    // outtake positon.
-
-    // resting and not full -> sorter not filled pos
-    // intake pressed and not full -> check if at intake pos then intake
-        // spin sorter to next not filled position once succesfully intake
-        /////////need to sense to check for successful intake
-    // if outtake clicked -> intake off, closest filled pos, shoot, set current pos to not filled
-    //
 
     public void sorterLogic() {
 
@@ -123,6 +115,7 @@ public class ProtoSorterLogic extends LinearOpMode{
             for (int i=0; i<3; i++) {
                 if(currPos[i] == null) {
                     sortServo.setPosition(intakePos[i]);
+                    changePosTimer.reset();
                 }
             }
         }
@@ -146,7 +139,7 @@ public class ProtoSorterLogic extends LinearOpMode{
         }
         return 1;
     }
-// Dany Reilleh Was Here
+// Dany Reilleh Was Not Here
     public void detectFilled() {
 
         red = colorSensor.red();
@@ -156,14 +149,18 @@ public class ProtoSorterLogic extends LinearOpMode{
 
         boolean validColor = hsvValues[1] > 0.55;
         float hue = hsvValues[0];
-        if(hue > 220 && hue < 230 && validColor) {
+        if(hue > 220 && hue < 230 && validColor && nextPos) {
             currPos[getCurrentPos()] = "purple";
+            moveToEmptyPos();
             telemetry.addData("found color",null);
-        } else if(hue > 155 && hue < 175 && validColor) {
+            nextPos = false;
+            changePosTimer.reset();
+        } else if(hue > 155 && hue < 175 && validColor && nextPos) {
             currPos[getCurrentPos()] = "green";
+            moveToEmptyPos();
             telemetry.addData("found color", null);
-        } else {
-            //currPos[getCurrentPos()] = null;
+            nextPos = false;
+            changePosTimer.reset();
         }
     }
 }
