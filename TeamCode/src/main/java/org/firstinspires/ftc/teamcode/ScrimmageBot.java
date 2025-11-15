@@ -3,13 +3,18 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name="ScrimmageTele")
 
 public class ScrimmageBot extends LinearOpMode {
 
     public DcMotor frontLeft, frontRight, backLeft, backRight;
-    public DcMotor intakeMotor1, intakeMotor2, outtakeMotor1, outtakeMotor2;
+    public DcMotor intakeMotor1, outtakeMotor1, outtakeMotor2;
+    public Servo transferServo;
+    public ElapsedTime transferTimer = new ElapsedTime();
 
     public void runOpMode() {
         frontLeft = hardwareMap.get(DcMotor.class, "fl");
@@ -18,13 +23,14 @@ public class ScrimmageBot extends LinearOpMode {
         backRight = hardwareMap.get(DcMotor.class, "br");
 
         intakeMotor1 = hardwareMap.get(DcMotor.class, "in1");
-        intakeMotor2 = hardwareMap.get(DcMotor.class, "in2");
-        outtakeMotor1 = hardwareMap.get(DcMotor.class, "in1");
+        outtakeMotor1 = hardwareMap.get(DcMotor.class, "out1");
         outtakeMotor2 = hardwareMap.get(DcMotor.class, "out2");
 
+        transferServo = hardwareMap.get(Servo.class, "servo");
 
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
+        outtakeMotor2.setDirection(DcMotor.Direction.REVERSE);
         waitForStart();
         while(opModeIsActive()) {
            chassisMovement();
@@ -75,7 +81,7 @@ public class ScrimmageBot extends LinearOpMode {
         green *= power;
         blue *= power;
 
-        //sets the powers based on an equation I chatgpt'd
+        //sets the powers based on an equation I came up with in my head (NOT CHATGPT)
         // ^^ WHY JACOB 😭😭😭  https://bluemoji.io/emoji/desperate
             frontLeft.setPower(Math.max(-1,Math.min(1,(green+turn))));
             backRight.setPower(Math.max(-1,Math.min(1,(green-turn))));
@@ -85,17 +91,15 @@ public class ScrimmageBot extends LinearOpMode {
     }
     public void inouttake() {
 
-        if(gamepad2.left_bumper) {
+        if(gamepad2.left_trigger>0.05) {
             double inSpeed = 1;
 
             intakeMotor1.setPower(inSpeed);
-            intakeMotor2.setPower(inSpeed);
         } else {
             intakeMotor1.setPower(0);
-            intakeMotor2.setPower(0);
         }
-        if(gamepad2.right_bumper) {
-            double outSpeed = 1;
+        if(gamepad2.right_trigger>0.05) {
+            double outSpeed = (gamepad2.right_trigger/5) + 0.8;
 
             outtakeMotor1.setPower(outSpeed);
             outtakeMotor2.setPower(outSpeed);
@@ -103,6 +107,12 @@ public class ScrimmageBot extends LinearOpMode {
             outtakeMotor1.setPower(0);
             outtakeMotor2.setPower(0);
         }
+
+        if(gamepad2.a && transferTimer.milliseconds() >= 250) {
+            transferServo.setPosition(Math.abs(transferServo.getPosition()-1));
+            transferTimer.reset();
+        }
+
     }
 
 }
