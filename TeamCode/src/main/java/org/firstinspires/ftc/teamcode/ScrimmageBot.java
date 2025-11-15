@@ -12,24 +12,24 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class ScrimmageBot extends LinearOpMode {
 
     public DcMotor frontLeft, frontRight, backLeft, backRight;
-    public DcMotor intakeMotor1, outtakeMotor1, outtakeMotor2;
+    public DcMotor intakeMotor, outtakeMotor1, outtakeMotor2;
     public Servo transferServo;
     public ElapsedTime transferTimer = new ElapsedTime();
 
     public void runOpMode() {
-        frontLeft = hardwareMap.get(DcMotor.class, "fl");
-        frontRight = hardwareMap.get(DcMotor.class, "fr");
-        backLeft = hardwareMap.get(DcMotor.class, "bl");
-        backRight = hardwareMap.get(DcMotor.class, "br");
+        frontLeft = hardwareMap.get(DcMotor.class, "fl"); //controlhub0
+        frontRight = hardwareMap.get(DcMotor.class, "fr"); // expanis ionhub0
+        backLeft = hardwareMap.get(DcMotor.class, "bl"); //ch1
+        backRight = hardwareMap.get(DcMotor.class, "br"); // eh1
 
-        intakeMotor1 = hardwareMap.get(DcMotor.class, "in1");
-        outtakeMotor1 = hardwareMap.get(DcMotor.class, "out1");
-        outtakeMotor2 = hardwareMap.get(DcMotor.class, "out2");
+        intakeMotor = hardwareMap.get(DcMotor.class, "in"); //ch2
+        outtakeMotor1 = hardwareMap.get(DcMotor.class, "out1"); //ch3
+        outtakeMotor2 = hardwareMap.get(DcMotor.class, "out2"); //eh2
 
-        transferServo = hardwareMap.get(Servo.class, "servo");
+        transferServo = hardwareMap.get(Servo.class, "servo"); //
 
-        frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        backLeft.setDirection(DcMotor.Direction.REVERSE);
+        //frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        //backLeft.setDirection(DcMotor.Direction.REVERSE);
         outtakeMotor2.setDirection(DcMotor.Direction.REVERSE);
         waitForStart();
         while(opModeIsActive()) {
@@ -90,27 +90,33 @@ public class ScrimmageBot extends LinearOpMode {
             backLeft.setPower(Math.max(-1,Math.min(1,(blue+turn))));
     }
     public void inouttake() {
+        double outSpeed = Math.round((gamepad2.right_trigger/5)*10)/10 + 0.8;
 
         if(gamepad2.left_trigger>0.05) {
             double inSpeed = 1;
 
-            intakeMotor1.setPower(inSpeed);
-        } else {
-            intakeMotor1.setPower(0);
+            intakeMotor.setPower(inSpeed);
+            outtakeMotor1.setPower(outSpeed);
+            outtakeMotor2.setPower(outSpeed);
+
+        } else if(gamepad2.right_trigger<=0.05 && gamepad2.right_trigger<=0.05) {
+            outtakeMotor1.setPower(0);
+            outtakeMotor2.setPower(0);
         }
         if(gamepad2.right_trigger>0.05) {
-            double outSpeed = (gamepad2.right_trigger/5) + 0.8;
 
             outtakeMotor1.setPower(outSpeed);
             outtakeMotor2.setPower(outSpeed);
-        } else {
+        } else if(gamepad2.right_trigger<=0.05 && gamepad2.right_trigger<=0.05){
             outtakeMotor1.setPower(0);
             outtakeMotor2.setPower(0);
         }
 
         if(gamepad2.a && transferTimer.milliseconds() >= 250) {
-            transferServo.setPosition(Math.abs(transferServo.getPosition()-1));
+            transferServo.setPosition(1);
             transferTimer.reset();
+        } else if(transferTimer.milliseconds() >= 500) {
+            transferServo.setPosition(0);
         }
 
     }
