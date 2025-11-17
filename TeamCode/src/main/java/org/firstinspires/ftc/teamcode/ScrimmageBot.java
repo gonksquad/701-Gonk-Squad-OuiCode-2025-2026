@@ -28,8 +28,8 @@ public class ScrimmageBot extends LinearOpMode {
 
         transferServo = hardwareMap.get(Servo.class, "servo"); //
 
-        //frontLeft.setDirection(DcMotor.Direction.REVERSE);
-        //backLeft.setDirection(DcMotor.Direction.REVERSE);
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
         outtakeMotor2.setDirection(DcMotor.Direction.REVERSE);
         waitForStart();
         while(opModeIsActive()) {
@@ -39,13 +39,13 @@ public class ScrimmageBot extends LinearOpMode {
     }
 
     public void chassisMovement() {
-        double x = gamepad1.left_stick_x;
+        double x = gamepad1.right_stick_x; //not normally correct joystick but code is cursed
         double y = gamepad1.left_stick_y;
 
         // how far the joystick is pushed
         double power = Math.hypot(x, y);
 
-        double turn = gamepad1.right_stick_x;
+        double turn = gamepad1.left_stick_x;  //not normally correct joystick but code is cursed
 
         // Naming blue based on GoBuilda mecanum wheel direction diagram
         double blue; // Motors front right and back left
@@ -83,11 +83,11 @@ public class ScrimmageBot extends LinearOpMode {
 
         //sets the powers based on an equation I came up with in my head (NOT CHATGPT)
         // ^^ WHY JACOB 😭😭😭  https://bluemoji.io/emoji/desperate
-            frontLeft.setPower(Math.max(-1,Math.min(1,(green+turn))));
+            frontLeft.setPower(Math.max(-1,Math.min(1,(green-turn))));
             backRight.setPower(Math.max(-1,Math.min(1,(green-turn))));
 
             frontRight.setPower(Math.max(-1,Math.min(1,(blue-turn))));
-            backLeft.setPower(Math.max(-1,Math.min(1,(blue+turn))));
+            backLeft.setPower(Math.max(-1,Math.min(1,(blue-turn))));
     }
     public void inouttake() {
         double outSpeed = Math.round((gamepad2.right_trigger/5)*10)/10 + 0.8;
