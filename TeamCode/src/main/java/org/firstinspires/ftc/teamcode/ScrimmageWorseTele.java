@@ -7,9 +7,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="ScrimmageTele")
+@TeleOp(name="ScrimmageWORSETele")
 
-public class ScrimmageBot extends LinearOpMode {
+public class ScrimmageWorseTele extends LinearOpMode {
 
     public DcMotor frontLeft, frontRight, backLeft, backRight;
     public DcMotor intakeMotor, outtakeMotor1, outtakeMotor2;
@@ -39,40 +39,32 @@ public class ScrimmageBot extends LinearOpMode {
     }
 
     public void chassisMovement() {
-        double x = gamepad1.right_stick_x; //not normally correct joystick but code is cursed
-        double y = gamepad1.left_stick_y;
 
         // how far the joystick is pushed
         double power = Math.hypot(x, y);
 
-        double turn = gamepad1.left_stick_x;  //not normally correct joystick but code is cursed
-
+        double turn = gamepad1.right_stick_x;  
         // Naming blue based on GoBuilda mecanum wheel direction diagram
         double blue; // Motors front right and back left
         double green; // motors front left and back right
 
-        // gets the angle the joystick is reletive to its resting position
-        // and converts from radians to degrees
-        double angle = Math.atan2(-y, x) * (180/Math.PI);
-        telemetry.addData("Angle", angle);
-
         // bunch of math that could be shortened with trig but lets you move in any direction p much
-        if(angle >= 0  && angle < 90) {
-            // top right
-            blue = angle/45 - 1;
-            green = 1;
-        } else if (angle >= 90  && angle < 180) {
-            // top left
+        if(gamepad1.dpad_up) {
+            // top
             blue = 1;
-            green = -((angle-180)/45 + 1);
-        } else if(angle >= -180  && angle < -90) {
-            // bottom left
-            blue = (Math.abs(angle) - 180)/45 + 1;
+            green = 1;
+        } else if (gamepad1.dpad_left) {
+            // left
+            blue = 1;
             green = -1;
-        } else if(angle >= -90  && angle < 0) {
-            // bottom right
+        } else if(gamepad1.dpad_down) {
+            // bottom
             blue = -1;
-            green = angle/45 + 1;
+            green = -1;
+        } else if(gamepad1.dpad_right) {
+            // right
+            blue = -1;
+            green = 1;
         } else {
             green = 0;
             blue = 0;
@@ -83,10 +75,10 @@ public class ScrimmageBot extends LinearOpMode {
 
         //sets the powers based on an equation I came up with in my head (NOT CHATGPT)
         // ^^ WHY JACOB 😭😭😭  https://bluemoji.io/emoji/desperate
-            frontLeft.setPower(Math.max(-1,Math.min(1,(green-turn))));
+            frontLeft.setPower(Math.max(-1,Math.min(1,(green+turn))));
             backRight.setPower(Math.max(-1,Math.min(1,(green-turn))));
 
-            frontRight.setPower(Math.max(-1,Math.min(1,(blue-turn))));
+            frontRight.setPower(Math.max(-1,Math.min(1,(blue+turn))));
             backLeft.setPower(Math.max(-1,Math.min(1,(blue-turn))));
     }
     public void inouttake() {
@@ -120,5 +112,6 @@ public class ScrimmageBot extends LinearOpMode {
         }
 
     }
+
 
 }
