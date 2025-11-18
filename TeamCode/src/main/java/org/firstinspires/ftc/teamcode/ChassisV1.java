@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp (name = "bestTeleOp")
+@Disabled
+//@TeleOp (name = "bestTeleOp")
 public class ChassisV1  extends LinearOpMode{
 
     //public DcMotor frontLeft, frontRight, backLeft, backRight;

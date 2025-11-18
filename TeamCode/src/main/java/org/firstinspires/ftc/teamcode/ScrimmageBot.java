@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="ScrimmageTele")
+@TeleOp(name="ScrimmageTeleMAIN")
 
 public class ScrimmageBot extends LinearOpMode {
 
@@ -39,13 +39,13 @@ public class ScrimmageBot extends LinearOpMode {
     }
 
     public void chassisMovement() {
-        double x = gamepad1.right_stick_x; //not normally correct joystick but code is cursed
+        double x = gamepad1.left_stick_x;
         double y = gamepad1.left_stick_y;
 
         // how far the joystick is pushed
         double power = Math.hypot(x, y);
 
-        double turn = gamepad1.left_stick_x;  //not normally correct joystick but code is cursed
+        double turn = gamepad1.right_stick_x;
 
         // Naming blue based on GoBuilda mecanum wheel direction diagram
         double blue; // Motors front right and back left
@@ -81,33 +81,34 @@ public class ScrimmageBot extends LinearOpMode {
         green *= power;
         blue *= power;
 
+        if(gamepad1.right_bumper) {
+            green *= 1.25;
+            blue *= 1.25;
+        }
+
+        green = (green > 1) ? 1 : green;
+        blue = (blue > 1) ? 1 : blue;
+
+
         //sets the powers based on an equation I came up with in my head (NOT CHATGPT)
         // ^^ WHY JACOB 😭😭😭  https://bluemoji.io/emoji/desperate
-            frontLeft.setPower(Math.max(-1,Math.min(1,(green-turn))));
+            frontLeft.setPower(Math.max(-1,Math.min(1,(green+turn))));
             backRight.setPower(Math.max(-1,Math.min(1,(green-turn))));
 
             frontRight.setPower(Math.max(-1,Math.min(1,(blue-turn))));
-            backLeft.setPower(Math.max(-1,Math.min(1,(blue-turn))));
+            backLeft.setPower(Math.max(-1,Math.min(1,(blue+turn))));
     }
     public void inouttake() {
-        double outSpeed = Math.round((gamepad2.right_trigger/5)*10)/10 + 0.8;
+        double outSpeed = (gamepad2.right_bumper) ? 0.75 : 1;
+        double inSpeed = 1;
 
-        if(gamepad2.left_trigger>0.05) {
-            double inSpeed = 1;
+        intakeMotor.setPower((((gamepad2.left_trigger > 0.5)? 1 : 0)-(gamepad2.y? 1 : 0)) * inSpeed);
 
-            intakeMotor.setPower(inSpeed);
-            outtakeMotor1.setPower(outSpeed);
-            outtakeMotor2.setPower(outSpeed);
-
-        } else if(gamepad2.right_trigger<=0.05 && gamepad2.right_trigger<=0.05) {
-            outtakeMotor1.setPower(0);
-            outtakeMotor2.setPower(0);
-        }
-        if(gamepad2.right_trigger>0.05) {
+        if(gamepad2.right_trigger>0.05 || gamepad2.right_bumper) {
 
             outtakeMotor1.setPower(outSpeed);
             outtakeMotor2.setPower(outSpeed);
-        } else if(gamepad2.right_trigger<=0.05 && gamepad2.right_trigger<=0.05){
+        } else {
             outtakeMotor1.setPower(0);
             outtakeMotor2.setPower(0);
         }
@@ -118,6 +119,7 @@ public class ScrimmageBot extends LinearOpMode {
         } else if(transferTimer.milliseconds() >= 500) {
             transferServo.setPosition(0);
         }
+
 
     }
 

@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 import android.graphics.Color;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 
-@TeleOp (name="colorSensing")
+@Disabled
+//@TeleOp (name="colorSensing")
 public class HELPMEcolorsensortesting extends LinearOpMode {
 
     private ColorSensor colorSensor;

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 import android.graphics.Color;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -13,7 +14,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import kotlin.math.UMathKt;
 
 
-@TeleOp(name="ProtoSorterLogic")
+@Disabled
+//@TeleOp(name="ProtoSorterLogic")
 public class ProtoSorterLogic extends LinearOpMode{
 
     ColorSensor colorSensor;
