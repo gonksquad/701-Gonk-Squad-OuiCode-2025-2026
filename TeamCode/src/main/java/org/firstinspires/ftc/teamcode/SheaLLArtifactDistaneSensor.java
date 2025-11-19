@@ -5,6 +5,7 @@ import com.qualcomm.hardware.limelightvision.LLStatus;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+//import org.firstinspires.ftc.teamcode.mechanisms.TestBench;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
@@ -12,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 @TeleOp(name = "LLArtifactDistanceSensor")
 public class SheaLLArtifactDistaneSensor extends LinearOpMode {
     Limelight3A limelight;
-    TestBench
+//    TestBench bench = new TestBench();
     private double distance;
 
     public void runOpMode() {
@@ -25,7 +26,7 @@ public class SheaLLArtifactDistaneSensor extends LinearOpMode {
 
         //telemetry.addData("Id", table.getEntry("tid").getDoubleArray(new double[6]));
         while (opModeIsActive()) {
-            YawPitchRollAngles orientation =
+            //YawPitchRollAngles orientation =
 
             LLResult result = limelight.getLatestResult();
             if(result != null && result.isValid()) {
@@ -33,6 +34,9 @@ public class SheaLLArtifactDistaneSensor extends LinearOpMode {
                 telemetry.addData("Calculated Distance:", result.getTx());
                 telemetry.addData("Target Y Offset:", result.getTy());
                 telemetry.addData("Target Area Offset:", result.getTa()); //%of field of view
+            }
+            else {
+                telemetry.addLine("No valid target detected.");
             }
             telemetry.update();
         }
