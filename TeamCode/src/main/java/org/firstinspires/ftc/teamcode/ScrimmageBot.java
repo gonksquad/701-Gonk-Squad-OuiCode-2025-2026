@@ -27,7 +27,6 @@ public class ScrimmageBot extends LinearOpMode {
         outtakeMotor2 = hardwareMap.get(DcMotor.class, "out2"); //eh2
 
         transferServo = hardwareMap.get(Servo.class, "servo"); //
-
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
         outtakeMotor2.setDirection(DcMotor.Direction.REVERSE);
