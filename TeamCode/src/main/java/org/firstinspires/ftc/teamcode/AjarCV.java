@@ -17,7 +17,7 @@ import org.firstinspires.ftc.vision.opencv.ImageRegion;
 
 import java.util.List;
 
-@TeleOp
+@Disabled
 public class AjarCV extends LinearOpMode {
     @Override
     public void runOpMode() {
