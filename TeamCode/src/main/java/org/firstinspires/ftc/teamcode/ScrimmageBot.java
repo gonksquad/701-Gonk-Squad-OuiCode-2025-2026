@@ -98,12 +98,12 @@ public class ScrimmageBot extends LinearOpMode {
             backLeft.setPower(Math.max(-1,Math.min(1,(blue+turn))));
     }
     public void inouttake() {
-        double outSpeed = (gamepad2.right_bumper) ? 0.75 : 1;
+        double outSpeed = ((gamepad2.right_bumper) ? 1 : 0.75) * ((gamepad2.x) ? -1 : 1);
         double inSpeed = 1;
 
         intakeMotor.setPower((((gamepad2.left_trigger > 0.5)? 1 : 0)-(gamepad2.y? 1 : 0)) * inSpeed);
 
-        if(gamepad2.right_trigger>0.05 || gamepad2.right_bumper) {
+        if(gamepad2.right_trigger>0.05 || gamepad2.right_bumper ) {
 
             outtakeMotor1.setPower(outSpeed);
             outtakeMotor2.setPower(outSpeed);
