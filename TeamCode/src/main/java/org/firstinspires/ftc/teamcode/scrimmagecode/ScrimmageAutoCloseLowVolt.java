@@ -1,12 +1,12 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.scrimmagecode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-
-@Autonomous (name="CloseHighVoltage")
-public class ScrimmageAutoCloseHighVolt extends LinearOpMode{
+@Disabled
+//@Autonomous (name="CloseLowVoltage")
+public class ScrimmageAutoCloseLowVolt extends LinearOpMode{
     public DcMotor frontLeft, frontRight, backLeft, backRight;
     public DcMotor intakeMotor, outtakeMotor1, outtakeMotor2;
     public Servo transferServo;
@@ -30,22 +30,23 @@ public class ScrimmageAutoCloseHighVolt extends LinearOpMode{
         outtakeMotor2.setDirection(DcMotor.Direction.REVERSE);
         waitForStart();
 
-        Move("Backward", 0.5, 1000);
-        Outtake(0.75);
+        Move("Backward", 0.5, 600);
+        Outtake(0.80);
         sleep(5000);
         Servo();
         sleep(500);
-        //Outtake(-0.25);
+        Outtake(-0.25);
         sleep(2000);
-        Intake(0.70);
+        Intake(0.75);
         sleep(2500);
-        Outtake(0.70);
+        Outtake(0.80);
         sleep(2000);
         Intake(0);
         sleep(1000);
         Servo();
         sleep(1000);
         Outtake(0);
+        Move("Right",0.5, 750);
     }
 
     public void Outtake(double speed){

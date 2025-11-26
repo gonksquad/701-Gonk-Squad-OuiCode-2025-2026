@@ -1,12 +1,12 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.scrimmagecode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@Autonomous (name="LongRange")
-public class ScrimmageAutoLongRange extends LinearOpMode{
+@Autonomous (name="CloseHighVoltage")
+public class ScrimmageAutoCloseHighVolt extends LinearOpMode{
     public DcMotor frontLeft, frontRight, backLeft, backRight;
     public DcMotor intakeMotor, outtakeMotor1, outtakeMotor2;
     public Servo transferServo;
@@ -30,26 +30,22 @@ public class ScrimmageAutoLongRange extends LinearOpMode{
         outtakeMotor2.setDirection(DcMotor.Direction.REVERSE);
         waitForStart();
 
-        Forward(150);
-        Outtake(1);
+        Move("Backward", 0.5, 1000);
+        Outtake(0.75);
         sleep(5000);
         Servo();
         sleep(500);
-        Outtake(-0.25);
+        //Outtake(-0.25);
         sleep(2000);
-        Intake(0.75);
+        Intake(0.70);
         sleep(2500);
-        Outtake(1);
+        Outtake(0.70);
         sleep(2000);
         Intake(0);
         sleep(1000);
         Servo();
         sleep(1000);
-        Intake(0);
         Outtake(0);
-        Forward(350);
-        Outtake(0);
-
     }
 
     public void Outtake(double speed){
@@ -67,11 +63,13 @@ public class ScrimmageAutoLongRange extends LinearOpMode{
         transferServo.setPosition(0);
     }
 
-    public void Forward(int time) {
-        frontLeft.setPower(0.5);
-        frontRight.setPower(0.5);
-        backLeft.setPower(0.5);
-        backRight.setPower(0.5);
+    public void Move(String dir, double power, int time) {
+        double vertical = (((dir=="Forward") ? 1 : 0 )+((dir=="Backward") ? -1 : 0)) * power;
+        double horizontal = (((dir=="Left") ? 1 : 0) + ((dir=="Right") ? -1 : 0)) * power;
+        frontLeft.setPower(vertical+horizontal);
+        frontRight.setPower(vertical-horizontal);
+        backLeft.setPower(vertical-horizontal);
+        backRight.setPower(vertical+horizontal);
         sleep(time);
         frontLeft.setPower(0);
         frontRight.setPower(0);

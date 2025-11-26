@@ -1,5 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -8,7 +15,14 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Hardware {
     // declare hardware
     public DcMotor frontLeft, frontRight, backLeft, backRight, launcherLeft, launcherRight, intake;
-    public Servo sorter, launcherTurn, shoulder, elbow, wrist;
+    public CRServo launcherTurn;
+    public Servo sorter, outtakeTransfer;
+    public Limelight3A limelight;
+    public ColorSensor colorSensor;
+    int red, green, blue;
+    float[] hsvValues = new float[3];
+    boolean nextPos = true;
+
 
     // initialize flags
     public boolean intaking = false;
@@ -25,15 +39,17 @@ public class Hardware {
 
         launcherLeft = hardwareMap.get(DcMotor.class, "launcherL");
         launcherRight = hardwareMap.get(DcMotor.class, "launcherR");
-        launcherTurn = hardwareMap.get(Servo.class, "launcherT");
+        launcherTurn = hardwareMap.get(CRServo.class, "launcherT");
 
         intake = hardwareMap.get(DcMotor.class, "intake");
 
         sorter = hardwareMap.get(Servo.class, "sorter");
 
-        shoulder = hardwareMap.get(Servo.class, "shoulder");
-        elbow = hardwareMap.get(Servo.class, "elbow");
-        wrist = hardwareMap.get(Servo.class, "wrist");
+        outtakeTransfer = hardwareMap.get(Servo.class, "transfer");
+
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+
+        colorSensor = hardwareMap.get(ColorSensor.class, "colorSens");
 
         launcherRight.setDirection(DcMotorSimple.Direction.REVERSE);
     }
@@ -156,4 +172,49 @@ public class Hardware {
         backLeft.setPower(blPwr / denominator);
         backRight.setPower(brPwr / denominator);
     }
+
+    public void detectFilled() {
+
+        red = colorSensor.red();
+        green = colorSensor.green();
+        blue = colorSensor.blue();
+        Color.RGBToHSV(red, green, blue, hsvValues);
+
+        boolean validColor = hsvValues[1] > 0.55; // make sure saturation is high so we don't detect gray or smth
+        float hue = hsvValues[0];
+        if (hue > 220 && hue < 230 && validColor && nextPos) { // purple
+            nextPos = false;
+            // set current position to purple
+            // move to new empty position as long as not all three are filled
+        } else if(hue > 155 && hue < 175 && validColor && nextPos) { // green
+            nextPos = false;
+            // set current position to green
+            // move to new empty position as long as not all three are filled
+        }
+    }
+
+    public void aimTurret(String side) {
+        switch (side) {
+            case "blue":
+                limelight.pipelineSwitch(0); // pretend this detects april tag id 20
+                break;
+            case "red":
+                limelight.pipelineSwitch(4); // pretend this detects april tag id 24
+                break;
+        }
+
+        LLResult result = limelight.getLatestResult();
+
+        if (result != null && result.isValid()) {
+            double tx = result.getTx();
+            if(tx > 4f) { // tag is on the right
+                launcherTurn.setPower(0.8);
+            } else if(tx < -4) { // tag is on the left
+                launcherTurn.setPower(-0.8);
+            } else { // tag is within left and right bounds
+                launcherTurn.setPower(0);
+            }
+        }
+    }
+
 }
