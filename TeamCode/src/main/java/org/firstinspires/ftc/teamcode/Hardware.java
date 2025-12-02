@@ -38,9 +38,9 @@ public class Hardware {
         backLeft = hardwareMap.get(DcMotor.class, "bl"); // c1
         backRight = hardwareMap.get(DcMotor.class, "br"); // e1
 
-        launcherLeft = hardwareMap.get(DcMotor.class, "launcherL");
-        launcherRight = hardwareMap.get(DcMotor.class, "launcherR");
-        launcherTurn = hardwareMap.get(CRServo.class, "launcherT");
+        launcherLeft = hardwareMap.get(DcMotor.class, "launcherL"); //
+        launcherRight = hardwareMap.get(DcMotor.class, "launcherR"); //c2
+        launcherTurn = hardwareMap.get(CRServo.class, "launcherT"); //c0
 
         intake = hardwareMap.get(DcMotor.class, "intake"); // e2
 
