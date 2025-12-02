@@ -34,7 +34,7 @@ public class TeleopFromHardware extends LinearOpMode {
             }
             hardware.tryLaunchGreen(gamepad2.x);
             hardware.tryLaunchPurple(gamepad2.b);
-            hardware.aimTurret("red"); // if were on red side (ID 24)
+            hardware.aimTurret("red"); // if we're on red side (ID 24)
             if (gamepad2.y && !(gamepad2.x || gamepad2.b)) {
                 hardware.stopLaunch();
             }

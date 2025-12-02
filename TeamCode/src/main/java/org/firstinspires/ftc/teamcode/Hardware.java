@@ -32,16 +32,17 @@ public class Hardware {
     // CONSTRUCTOR
     // assign hardware
     public Hardware(HardwareMap hardwareMap) {
-        frontLeft = hardwareMap.get(DcMotor.class, "fl");
-        frontRight = hardwareMap.get(DcMotor.class, "fr");
-        backLeft = hardwareMap.get(DcMotor.class, "bl");
-        backRight = hardwareMap.get(DcMotor.class, "br");
+        // e0 = expansion hub 0, c2 = control hub 2
+        frontLeft = hardwareMap.get(DcMotor.class, "fl"); // c0
+        frontRight = hardwareMap.get(DcMotor.class, "fr"); // e0
+        backLeft = hardwareMap.get(DcMotor.class, "bl"); // c1
+        backRight = hardwareMap.get(DcMotor.class, "br"); // e1
 
         launcherLeft = hardwareMap.get(DcMotor.class, "launcherL");
         launcherRight = hardwareMap.get(DcMotor.class, "launcherR");
         launcherTurn = hardwareMap.get(CRServo.class, "launcherT");
 
-        intake = hardwareMap.get(DcMotor.class, "intake");
+        intake = hardwareMap.get(DcMotor.class, "intake"); // e2
 
         sorter = hardwareMap.get(Servo.class, "sorter");
 
@@ -52,6 +53,8 @@ public class Hardware {
         colorSensor = hardwareMap.get(ColorSensor.class, "colorSens");
 
         launcherRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void tryIntake(boolean button) {
