@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class Hardware {
     // declare hardware
     public DcMotor frontLeft, frontRight, backLeft, backRight, launcherLeft, launcherRight, intake;
-    public CRServo launcherTurn;
+    public CRServo launcherTurn, limelightTurn;
     public Servo sorter, outtakeTransfer;
     public Limelight3A limelight;
     public ColorSensor colorSensor;
@@ -41,6 +41,7 @@ public class Hardware {
         launcherLeft = hardwareMap.get(DcMotor.class, "launcherL"); //
         launcherRight = hardwareMap.get(DcMotor.class, "launcherR"); //c2
         launcherTurn = hardwareMap.get(CRServo.class, "launcherT"); //c0
+        limelightTurn = hardwareMap.get(CRServo.class, "limelightT"); //c0
 
         intake = hardwareMap.get(DcMotor.class, "intake"); // e2
 
@@ -210,10 +211,13 @@ public class Hardware {
 
         if (result != null && result.isValid()) {
             double tx = result.getTx();
+            double ratio = 90d/270d; // approximate teeth of servo to teeth of launcher
             if(tx > 4f) { // tag is on the right
-                launcherTurn.setPower(0.8);
+                launcherTurn.setPower(0.8 * ratio);
+                limelightTurn.setPower(0.8);
             } else if(tx < -4) { // tag is on the left
-                launcherTurn.setPower(-0.8);
+                launcherTurn.setPower(-0.8 * ratio);
+                limelightTurn.setPower(-0.8);
             } else { // tag is within left and right bounds
                 launcherTurn.setPower(0);
             }
