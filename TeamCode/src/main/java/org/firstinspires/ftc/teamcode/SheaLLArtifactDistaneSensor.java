@@ -22,7 +22,7 @@ public class SheaLLArtifactDistaneSensor extends LinearOpMode {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         servo = hardwareMap.get(CRServo.class, "servo");
         limelight.setPollRateHz(100);
-        limelight.pipelineSwitch(9); // for ball detection
+        limelight.pipelineSwitch(1); // for ball detection
         //limelight.start();
         waitForStart();
         limelight.start(); //uses lots of energy, can be put before start if there is delay but prob fine
@@ -37,9 +37,9 @@ public class SheaLLArtifactDistaneSensor extends LinearOpMode {
                 telemetry.addData("Calculated Distance:", result.getTx());
                 telemetry.addData("Target Y Offset:", result.getTy());
                 telemetry.addData("Target Area Offset:", result.getTa()); //%of field of view
-            }
-            else {
+            }else {
                 telemetry.addLine("No valid target detected.");
+
             }
             telemetry.update();
 
@@ -47,11 +47,26 @@ public class SheaLLArtifactDistaneSensor extends LinearOpMode {
             double limelightLensHeightInches = 20.0; // Height of Limelight lens
             double goalHeightInches = 60.0; // Height of the target
 
-            double angleToGoalDegrees = limelightMountAngleDegrees + result.getTy();
+ //           double angleToGoalDegrees = limelightMountAngleDegrees + result.getTy();
+            double angleToGoalDegrees = result.getTy();
             double angleToGoalRadians = Math.toRadians(angleToGoalDegrees);
-            double distanceFromLimelightToGoalInches = (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);
-
-            servo.setPower(3.0);
+//            double distanceFromLimelightToGoalInches = (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);
+            double distanceFromLimelightToGoalInches = (goalHeightInches) / Math.tan(angleToGoalRadians);
+            
+            if (result != null && result.isValid()) {
+                double tx = result.getTx();
+                if(tx > 20) { // tag is on the right
+                    servo.setPower(0.8);
+                    telemetry.addLine("moving right (positive power) ");
+                    sleep(0100);
+                } else if(tx < -20) { // tag is on the left
+                    servo.setPower(-0.8);
+                    telemetry.addLine("moving left (negative power) ");
+                    sleep(0100);
+                } else { // tag is within left and right bounds
+                    servo.setPower(0);
+                }
+            }
         }
     }
 }
