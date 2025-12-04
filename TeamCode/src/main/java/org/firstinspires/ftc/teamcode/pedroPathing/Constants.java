@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class Constants {
+    // TODO: Set the proper mass
     public static FollowerConstants followerConstants = new FollowerConstants()
             .mass(10.1); //should be right for robot
 
