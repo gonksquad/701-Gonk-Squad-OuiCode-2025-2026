@@ -15,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class Constants {
     // TODO: Set the proper mass
     public static FollowerConstants followerConstants = new FollowerConstants()
+            .forwardZeroPowerAcceleration(-53)
             .mass(10.1); //should be right for robot
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
@@ -22,6 +23,8 @@ public class Constants {
     // TODO: Set the proper directions and update motor names if needed
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)
+            .xVelocity(46.9)
+            .yVelocity(38.6)
             .leftFrontMotorName("fl")
             .rightFrontMotorName("fr")
             .leftRearMotorName("bl")
