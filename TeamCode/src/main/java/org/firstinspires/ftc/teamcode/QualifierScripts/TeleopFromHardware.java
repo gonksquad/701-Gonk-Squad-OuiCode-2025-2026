@@ -2,17 +2,19 @@ package org.firstinspires.ftc.teamcode.QualifierScripts;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Hardware;
 
-@Disabled
+@TeleOp(name="QualTele")
 public class TeleopFromHardware extends LinearOpMode {
-    Hardware hardware = new Hardware(hardwareMap);
 
     boolean prevLt = false;
 
     @Override
     public void runOpMode() throws InterruptedException {
+        Hardware hardware = new Hardware(hardwareMap);
+
         waitForStart();
         while (opModeIsActive()) {
             // toggle intake
@@ -28,7 +30,7 @@ public class TeleopFromHardware extends LinearOpMode {
             } else {
                 prevLt = false;
             }*/
-            if (gamepad2.a) {
+            /*if (gamepad2.a) {
                 hardware.sorter.setPosition(Math.abs(hardware.sorter.getPosition() - 1));
                 sleep(250);
             }
@@ -37,8 +39,8 @@ public class TeleopFromHardware extends LinearOpMode {
             //hardware.aimTurret("red"); // if we're on red side (ID 24)
             //if (gamepad2.y && !(gamepad2.x || gamepad2.b)) {
               //  hardware.stopLaunch();
-            //}
-            //hardware.doDrive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
+            //}*/
+            hardware.doDrive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
         }
     }
 }

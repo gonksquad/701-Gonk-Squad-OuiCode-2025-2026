@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class Hardware {
     // declare hardware
@@ -22,7 +23,11 @@ public class Hardware {
     int red, green, blue;
     float[] hsvValues = new float[3];
     boolean nextPos = true;
-
+    double[] outtakePos = {1, 0.6, 0.2}; // sorter servo positions for outtaking
+    double[] intakePos = {0, 0.4, 0.8}; // sorter servo positions for intaking
+    String[] sorterPos = {null, null, null}; // what is stored in each sorter slot
+    int currentPos;
+    ElapsedTime changePosTimer = new ElapsedTime();
 
     // initialize flags
     public boolean intaking = false;
@@ -33,21 +38,21 @@ public class Hardware {
     // assign hardware
     public Hardware(HardwareMap hardwareMap) {
         // e0 = expansion hub 0, c2 = control hub 2
-        frontLeft = hardwareMap.get(DcMotor.class, "fl"); // c0
-        frontRight = hardwareMap.get(DcMotor.class, "fr"); // e0
-        backLeft = hardwareMap.get(DcMotor.class, "bl"); // c1
-        backRight = hardwareMap.get(DcMotor.class, "br"); // e1
+        frontLeft = hardwareMap.get(DcMotor.class, "fl"); // c1
+        frontRight = hardwareMap.get(DcMotor.class, "fr"); // e1
+        backLeft = hardwareMap.get(DcMotor.class, "bl"); // c2
+        backRight = hardwareMap.get(DcMotor.class, "br"); // e2
 
-        launcherLeft = hardwareMap.get(DcMotor.class, "launcherL"); //
-        launcherRight = hardwareMap.get(DcMotor.class, "launcherR"); //c2
-        launcherTurn = hardwareMap.get(CRServo.class, "launcherT"); //c0
-        limelightTurn = hardwareMap.get(CRServo.class, "limelightT"); //c0
+        launcherLeft = hardwareMap.get(DcMotor.class, "launcherL"); //e0
+        launcherRight = hardwareMap.get(DcMotor.class, "launcherR"); //c0
+        launcherTurn = hardwareMap.get(CRServo.class, "launcherYaw"); //c1
+        limelightTurn = hardwareMap.get(CRServo.class, "limeservo"); //c0
 
         intake = hardwareMap.get(DcMotor.class, "intake"); // e2
 
-        sorter = hardwareMap.get(Servo.class, "sorter");
+        sorter = hardwareMap.get(Servo.class, "sorter"); //c2
 
-        outtakeTransfer = hardwareMap.get(Servo.class, "transfer");
+        outtakeTransfer = hardwareMap.get(Servo.class, "transfer"); // c5
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
@@ -65,6 +70,7 @@ public class Hardware {
             intaking = true;
         }
         if (intaking) {
+            detectFilled();
             // treat this as a loop
             // try to go to the artifact (maybe split int tryIntakePurple and tryIntakeGreen)
             // check if intaking was completed -> store color at position
@@ -85,7 +91,20 @@ public class Hardware {
             launcherLeft.setPower(1);
             launcherRight.setPower(1);
         }
+        for(int i=getCurrentPos(); i<sorterPos.length+getCurrentPos();i=(i+1)%3){ // for every sorter position starting at the current one
+            if(sorterPos[i] == "purple") { // if the position has a purple inside of it
+                sorter.setPosition(outtakePos[i]);
+                changePosTimer.reset();
+            }
+        }
         if (launchingPurple) {
+            if(changePosTimer.milliseconds()>=750 && sorterPos[getCurrentPos()] == "purple") {
+                outtakeTransfer.setPosition(1);
+                sorterPos[getCurrentPos()] = null;
+            }
+            if(changePosTimer.milliseconds()>= 1250){
+                outtakeTransfer.setPosition(0);
+            }
             // treat this as a loop
             /*
             Check for the following:
@@ -104,7 +123,21 @@ public class Hardware {
             launcherLeft.setPower(1);
             launcherRight.setPower(1);
         }
+        for(int i=getCurrentPos(); i<sorterPos.length+getCurrentPos();i=(i+1)%3){ // for every sorter position starting at the current one
+            if(sorterPos[i] == "green") { // if the position has a green inside of it
+                sorter.setPosition(outtakePos[i]);
+                changePosTimer.reset();
+            }
+        }
         if (launchingGreen) {
+
+            if(changePosTimer.milliseconds()>=750 && sorterPos[getCurrentPos()] == "green") {
+                outtakeTransfer.setPosition(1);
+                sorterPos[getCurrentPos()] = null;
+            }
+            if(changePosTimer .milliseconds()>= 1250){
+                outtakeTransfer.setPosition(0);
+            }
             // treat this as a loop
             /*
             Check for the following:
@@ -176,7 +209,26 @@ public class Hardware {
         backLeft.setPower(blPwr / denominator);
         backRight.setPower(brPwr / denominator);
     }
+    public int getCurrentPos() {
+        for (int i=0; i<sorterPos.length;i++) {
+            if(sorter.getPosition() == intakePos[i] || sorter.getPosition() == outtakePos[i]) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
+    public void moveToEmptyPos() {
+        currentPos = getCurrentPos();
+
+        if (sorterPos[currentPos] != null) {
+            for (int i=0; i<sorterPos.length; i++) {
+                if(sorterPos[i] == null) {
+                    sorter.setPosition(intakePos[i]);
+                }
+            }
+        }
+    }
     public void detectFilled() {
 
         red = colorSensor.red();
@@ -186,14 +238,18 @@ public class Hardware {
 
         boolean validColor = hsvValues[1] > 0.55; // make sure saturation is high so we don't detect gray or smth
         float hue = hsvValues[0];
-        if (hue > 220 && hue < 230 && validColor && nextPos) { // purple
+        if (hue > 220 && hue < 230 && validColor && nextPos && changePosTimer.milliseconds() > 500) { // purple
             nextPos = false;
-            // set current position to purple
-            // move to new empty position as long as not all three are filled
+            sorterPos[getCurrentPos()] = "purple"; // set current position to purple
+            moveToEmptyPos(); // move to new empty position as long as not all three are filled
+            changePosTimer.reset();
         } else if(hue > 155 && hue < 175 && validColor && nextPos) { // green
             nextPos = false;
-            // set current position to green
-            // move to new empty position as long as not all three are filled
+            sorterPos[getCurrentPos()] = "green"; // set current position to green
+            moveToEmptyPos(); // move to new empty position as long as not all three are filled
+            changePosTimer.reset();
+        } else {
+            nextPos = true;
         }
     }
 
