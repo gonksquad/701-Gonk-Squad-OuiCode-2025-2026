@@ -25,15 +25,22 @@ public class RRHardware extends Hardware {
         intake.setPower(1);
         sleep(1000);
         intake.setPower(0);
+//need to set servo position to intake at pos1intake, intake,
+//move to pos2intake, intake,
+// move to pos3intake, intake
 
     }
-    public void shoot() { //gpp, both because spike mark 1
-        
+    public void shootgpp() { //gpp start, both because spike mark 1
+//        1,2,3(outtake servo pos)
+        //black, grey, blue
+    }
+    public void shootpgp() { //gpp start, both because spike mark 1
+//        2,1,3(outtake servo pos)
+    }
+    public void shootppg() { //gpp start, both because spike mark 1
+//        2,3,1
     }
     public void liftArtifact() {
 
     }
-//    public void sorter?????() {
-//
-//    }
 }

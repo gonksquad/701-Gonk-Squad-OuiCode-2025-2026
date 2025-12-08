@@ -19,11 +19,15 @@ import java.util.List;
 
 @Autonomous
 public class backendAutoRed extends OpMode {
+    int id = -1;
+    String motif = "null";
     Hardware hardware = new Hardware(hardwareMap);
 
     public Hardware getHardware() {
         return hardware;
     }
+    
+    RRHardware rrHardware;
 
     private Limelight3A limelight;
     private Follower follower;
@@ -73,9 +77,6 @@ public class backendAutoRed extends OpMode {
     public void statePathUpdate() {
         switch(pathState) {
             case APRILTAGLOOKSIES:
-                int id = -1;
-                String motif = "null";
-
                 LLResult result = limelight.getLatestResult();
                 //BoundingBox();
                 if(result != null && result.isValid()) {
@@ -107,7 +108,18 @@ public class backendAutoRed extends OpMode {
                 break;
             case SHOOT:
                 if (!follower.isBusy()) {
-                    //hmm yes
+                    if(id == 21) {
+                        rrHardware.shootgpp();
+                    }
+                    if(id == 22) {
+                        rrHardware.shootpgp();
+                    }
+                    if(id == 23) {
+                        rrHardware.shootppg();
+                    }
+                    else {
+                        rrHardware.shootgpp();
+                    }
                 }
                 setPathState(pathState.STARTTODRIVE);
                 break;
@@ -126,7 +138,18 @@ public class backendAutoRed extends OpMode {
                 break;
             case SHOOT2:
                 if (!follower.isBusy()) {
-                    //hmm
+                    if(id == 21) {
+                        rrHardware.shootgpp();
+                    }
+                    if(id == 22) {
+                        rrHardware.shootpgp();
+                    }
+                    if(id == 23) {
+                        rrHardware.shootppg();
+                    }
+                    else {
+                        rrHardware.shootppg();
+                    }
                 }
                 setPathState(pathState.SHOOTFORWARD);
                 break;
