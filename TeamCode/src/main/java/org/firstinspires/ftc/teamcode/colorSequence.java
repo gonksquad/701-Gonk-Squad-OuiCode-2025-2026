@@ -17,38 +17,45 @@ public class colorSequence extends LinearOpMode{
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         waitForStart();
         limelight.start();
+        limelight.pipelineSwitch(1);
         while (opModeIsActive()) {
-            //telemetry.addLine("opModeIsActive started");
-            limelight.pipelineSwitch(1);
-            telemetry.update();
-
-            int id = -1;
             String motif = "null";
             LLResult result = limelight.getLatestResult();
-            //BoundingBox();
+            int id = 0;
             if(result != null && result.isValid()) {
                 List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
-                //findID();
+
                 for (LLResultTypes.FiducialResult fiducial : fiducials) {
                     id = fiducial.getFiducialId();
                 }
+//                switch(id) {
+//                    case 21:
+//                        motif = "gpp";
+//                        break;
+//                    case 22:
+//                        motif = "pgp";
+//                        break;
+//                    case 23:
+//                        motif = "ppg";
+//                        break;
+//                    default:
+//                        motif = "null";
+//                }
 
-                switch(id) {
-                    case 21:
-                        motif = "gpp";
-                        break;
-                    case 22:
-                        motif = "pgp";
-                        break;
-                    case 23:
-                        motif = "ppg";
-                        break;
-                    default:
-                        motif = "null";
+                if (id == 21){
+                    motif = "gpp";
+                } else if (id == 22){
+                    motif = "pgp";
+                } else if (id == 23){
+                    motif = "ppg";
                 }
 
                 telemetry.addData("tag found", id);
                 telemetry.addData("motif", motif);
+
+                telemetry.update();
+            } else {
+                telemetry.addLine("No apriltag found");
                 telemetry.update();
             }
         }
