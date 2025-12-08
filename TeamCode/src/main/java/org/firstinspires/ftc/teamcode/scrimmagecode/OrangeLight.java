@@ -46,19 +46,20 @@ public class OrangeLight extends LinearOpMode {
                 }
                 telemetry.addData("tag found", id);
                 telemetry.addData("motif", motif);
-
-                switch(id) {
-                    case 21:
-                        motif = "gpp";
-                        break;
-                    case 22:
-                        motif = "pgp";
-                        break;
-                    case 23:
-                        motif = "ppg";
-                        break;
-                    default:
-                        motif = "null";
+                if(motif == "null") {
+                    switch(id) {
+                        case 21:
+                            motif = "gpp";
+                            break;
+                        case 22:
+                            motif = "pgp";
+                            break;
+                        case 23:
+                            motif = "ppg";
+                            break;
+                        default:
+                            motif = "null";
+                }
                 }
                         telemetry.update();
             }

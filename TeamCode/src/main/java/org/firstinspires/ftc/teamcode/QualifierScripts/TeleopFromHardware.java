@@ -30,8 +30,8 @@ public class TeleopFromHardware extends LinearOpMode {
             } else {
                 prevLt = false;
             }*/
-            /*if (gamepad2.a) {
-                hardware.sorter.setPosition(Math.abs(hardware.sorter.getPosition() - 1));
+            if (gamepad2.a) {
+                hardware.outtakeTransfer.setPosition(Math.abs(hardware.outtakeTransfer.getPosition()-0.25)+0.6);
                 sleep(250);
             }
             //hardware.tryLaunchGreen(gamepad2.x);

@@ -52,7 +52,7 @@ public class Hardware {
 
         sorter = hardwareMap.get(Servo.class, "sorter"); //c2
 
-        outtakeTransfer = hardwareMap.get(Servo.class, "transfer"); // c5
+        outtakeTransfer = hardwareMap.get(Servo.class, "lift"); // c5
 
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
