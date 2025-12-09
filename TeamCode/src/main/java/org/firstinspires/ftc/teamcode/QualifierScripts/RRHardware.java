@@ -21,26 +21,68 @@ public class RRHardware extends Hardware {
             Thread.currentThread().interrupt();
         }
     }
-    public void intake() {
+    public void intake1() { //gpp order
+        sorter.setPosition(/*intake pos1*/);
         intake.setPower(1);
         sleep(1000);
         intake.setPower(0);
-//need to set servo position to intake at pos1intake, intake,
-//move to pos2intake, intake,
-// move to pos3intake, intake
-
+    }
+    public void intake2() { //gpp order
+        sorter.setPosition(/*intake pos2*/);
+        intake.setPower(1);
+        sleep(1000);
+        intake.setPower(0);
+    }
+    public void intake3() { //gpp order
+        sorter.setPosition(/*intake pos3*/);
+        intake.setPower(1);
+        sleep(1000);
+        intake.setPower(0);
     }
     public void shootgpp() { //gpp start, both because spike mark 1
+        sorter.setPosition(/* outtake pos1*/);
+        outtakeTransfer.setPosition(1);
+        sleep(500);
+        outtakeTransfer.setPosition(0);
+        sorter.setPosition(/* outtake pos2*/);
+        outtakeTransfer.setPosition(1);
+        sleep(500);
+        outtakeTransfer.setPosition(0);
+        sorter.setPosition(/* outtake pos3*/);
+        outtakeTransfer.setPosition(1);
+        sleep(500);
+        outtakeTransfer.setPosition(0);
 //        1,2,3(outtake servo pos)
         //black, grey, blue
     }
     public void shootpgp() { //gpp start, both because spike mark 1
+        sorter.setPosition(/* outtake pos2*/);
+        outtakeTransfer.setPosition(1);
+        sleep(500);
+        outtakeTransfer.setPosition(0);
+        sorter.setPosition(/* outtake pos1*/);
+        outtakeTransfer.setPosition(1);
+        sleep(500);
+        outtakeTransfer.setPosition(0);
+        sorter.setPosition(/* outtake pos3*/);
+        outtakeTransfer.setPosition(1);
+        sleep(500);
+        outtakeTransfer.setPosition(0);
 //        2,1,3(outtake servo pos)
     }
     public void shootppg() { //gpp start, both because spike mark 1
+        sorter.setPosition(/* outtake pos2*/);
+        outtakeTransfer.setPosition(1);
+        sleep(500);
+        outtakeTransfer.setPosition(0);
+        sorter.setPosition(/* outtake pos3*/);
+        outtakeTransfer.setPosition(1);
+        sleep(500);
+        outtakeTransfer.setPosition(0);
+        sorter.setPosition(/* outtake pos1*/);
+        outtakeTransfer.setPosition(1);
+        sleep(500);
+        outtakeTransfer.setPosition(0);
 //        2,3,1
-    }
-    public void liftArtifact() {
-
     }
 }

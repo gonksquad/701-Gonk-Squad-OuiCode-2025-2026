@@ -18,109 +18,122 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import java.util.List;
 
 @Autonomous
-public class backendAutoRed extends OpMode {
-    int id = -1;
-    String motif = "null";
+public class frontendAutoRed extends OpMode {
+    String motif = "null"; //will this still work here?
+    int id = 0; //same ?
     Hardware hardware = new Hardware(hardwareMap);
 
     public Hardware getHardware() {
         return hardware;
     }
-    
+
     RRHardware rrHardware;
 
     private Limelight3A limelight;
     private Follower follower;
-    private Timer pathTimer, actionTimer, opModeTimer;
+    private Timer pathTimer, opModeTimer;
     //private ElapsedTime runtime = new ElapsedTime();
 
     pathState pathState;
     public enum pathState {
         APRILTAGLOOKSIES,
+        MOVETOSHOOT,
         SHOOT,
         STARTTOBEFOREPICKUP,
-        PICKUP1,
-        PICKUP2,
-        PICKUP3,
+        S1PICKUP1,
+        S1PICKUP2,
+        S1PICKUP3,
         PICKUPTOSHOOT,
         SHOOT2,
-        SHOOTFORWARD
+        SHOOTMOVE
 
     }
-    float bounds_X = 4f;
-    String lastPos = "None";
+//    float bounds_X = 4f;
+//    String lastPos = "None";
 
-    private PathChain start_driveToFirstSpike, firstSpike_firstArtifactCollect, firstSpike_secondArtifactCollect,
-            firstSpike_thirdArtifactCollect, firstSpike_shoot, shoot_forward;
+    private PathChain start_driveToShoot, shoot_beforeThirdSpike, thirdSpike_firstArtifactCollect,
+            thirdSpike_secondArtifactCollect, thirdSpike_thirdArtifactCollect, thirdSpike_shoot, shoot_forward;
 
     //poses initialized
-    private final Pose startPose = new Pose(48, 9, Math.toRadians(180));
-    private final Pose forward = new Pose(48, 21, Math.toRadians(90));
-    private final Pose beforeFirstSpike = new Pose(44,36, Math.toRadians(180));
+    private final Pose startPose = new Pose(21, 123.3, Math.toRadians(324));
+    private final Pose shootpose = new Pose(59, 85, Math.toRadians(324));
+    private final Pose beforeThirdSpike = new Pose(44,84, Math.toRadians(180));
 
-    private final Pose firstSpike1 = new Pose(40.5,36, Math.toRadians(180)); //5.5 in artifact
-    private final Pose firstSpike2 = new Pose(35,36, Math.toRadians(180));
-    private final Pose firstSpike3 = new Pose(29.5,36, Math.toRadians(180));
+    private final Pose thirdSpike1 = new Pose(40.5,84, Math.toRadians(180)); //5.5 in. artifact
+    private final Pose thirdSpike2 = new Pose(35,84, Math.toRadians(180));
+    private final Pose thirdSpike3 = new Pose(29.5,84, Math.toRadians(180));
+    private final Pose forward = new Pose(44,80, Math.toRadians(180));
+
 
 
     //path initializing
     public void buildPaths() {
-        start_driveToFirstSpike = follower.pathBuilder()
-                .addPath(new BezierCurve(startPose, beforeFirstSpike))
-                .setLinearHeadingInterpolation(startPose.getHeading(), beforeFirstSpike.getHeading())
+        start_driveToShoot = follower.pathBuilder()
+                .addPath(new BezierCurve(startPose, shootpose))
+                .setLinearHeadingInterpolation(startPose.getHeading(), shootpose.getHeading())
                 .build();
-        firstSpike_firstArtifactCollect = follower.pathBuilder()
-                .addPath(new BezierLine(beforeFirstSpike, firstSpike1))
-                .setLinearHeadingInterpolation(beforeFirstSpike.getHeading(), firstSpike1.getHeading())
+        shoot_beforeThirdSpike = follower.pathBuilder()
+                .addPath(new BezierCurve(shootpose, beforeThirdSpike))
+                .setLinearHeadingInterpolation(shootpose.getHeading(), beforeThirdSpike.getHeading())
                 .build();
-        firstSpike_secondArtifactCollect = follower.pathBuilder()
-                .addPath(new BezierLine(firstSpike1, firstSpike2))
-                .setLinearHeadingInterpolation(firstSpike1.getHeading(), firstSpike2.getHeading())
+        thirdSpike_firstArtifactCollect = follower.pathBuilder()
+                .addPath(new BezierLine(beforeThirdSpike, thirdSpike1))
+                .setLinearHeadingInterpolation(beforeThirdSpike.getHeading(), thirdSpike1.getHeading())
                 .build();
-        firstSpike_thirdArtifactCollect = follower.pathBuilder()
-                .addPath(new BezierLine(firstSpike2, firstSpike3))
-                .setLinearHeadingInterpolation(firstSpike2.getHeading(), firstSpike3.getHeading())
+        thirdSpike_secondArtifactCollect = follower.pathBuilder()
+                .addPath(new BezierLine(thirdSpike1, thirdSpike2))
+                .setLinearHeadingInterpolation(thirdSpike1.getHeading(), thirdSpike2.getHeading())
                 .build();
-        firstSpike_shoot = follower.pathBuilder()
-                .addPath(new BezierCurve(firstSpike3, startPose))
-                .setLinearHeadingInterpolation(firstSpike3.getHeading(), startPose.getHeading()).setReversed() //hopefully backwards drive
+        thirdSpike_thirdArtifactCollect = follower.pathBuilder()
+                .addPath(new BezierLine(thirdSpike2, thirdSpike3))
+                .setLinearHeadingInterpolation(thirdSpike2.getHeading(), thirdSpike3.getHeading())
+                .build();
+        thirdSpike_shoot = follower.pathBuilder()
+                .addPath(new BezierCurve(thirdSpike3, shootpose))
+                .setLinearHeadingInterpolation(thirdSpike3.getHeading(), shootpose.getHeading()) //hopefully backwards drive
                 .build();
         shoot_forward = follower.pathBuilder()
-                .addPath(new BezierLine(startPose, forward))
-                .setLinearHeadingInterpolation(90, forward.getHeading())
+                .addPath(new BezierLine(shootpose, forward))
+                .setLinearHeadingInterpolation(shootpose.getHeading(), forward.getHeading())
                 .build();
     }
 
     public void statePathUpdate() {
         switch(pathState) {
+            case MOVETOSHOOT:
+                if (!follower.isBusy()) {
+                    follower.followPath(start_driveToShoot);
+                }
+                setPathState(pathState.APRILTAGLOOKSIES);
+                break;
             case APRILTAGLOOKSIES:
-                LLResult result = limelight.getLatestResult();
-                //BoundingBox();
-                if(result != null && result.isValid()) {
-                    String motif = "null";
-                    int id = 0;
-                    if (result != null && result.isValid()) {
-                        List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 5) {
+                    LLResult result = limelight.getLatestResult();
+                    //BoundingBox();
+                    if(result != null && result.isValid()) {
+                        if (result != null && result.isValid()) {
+                            List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
 
-                        for (LLResultTypes.FiducialResult fiducial : fiducials) {
-                            id = fiducial.getFiducialId();
+                            for (LLResultTypes.FiducialResult fiducial : fiducials) {
+                                id = fiducial.getFiducialId();
+                            }
+
+                            if (id == 21) {
+                                motif = "gpp";
+                            } else if (id == 22) {
+                                motif = "pgp";
+                            } else if (id == 23) {
+                                motif = "ppg";
+                            }
+
+                            telemetry.addData("tag found", id);
+                            telemetry.addData("motif", motif);
+
+                            telemetry.update();
+                        } else {
+                            telemetry.addLine("No apriltag found");
+                            telemetry.update();
                         }
-
-                        if (id == 21) {
-                            motif = "gpp";
-                        } else if (id == 22) {
-                            motif = "pgp";
-                        } else if (id == 23) {
-                            motif = "ppg";
-                        }
-
-                        telemetry.addData("tag found", id);
-                        telemetry.addData("motif", motif);
-
-                        telemetry.update();
-                    } else {
-                        telemetry.addLine("No apriltag found");
-                        telemetry.update();
                     }
                 }
                 setPathState(pathState.SHOOT); //reset timer and make new state
@@ -144,35 +157,34 @@ public class backendAutoRed extends OpMode {
                 break;
             case STARTTOBEFOREPICKUP:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 10) { //note: after shoot and change time to something for whole auto
-                    follower.followPath(start_driveToFirstSpike, true);
-                    //pathState = pathState.FIRSTSPIKEDRIVE;
+                    follower.followPath(shoot_beforeThirdSpike, true);
                 }
-                setPathState(pathState.PICKUP1);
+                setPathState(pathState.S1PICKUP1);
                 break;
-            case PICKUP1:
+            case S1PICKUP1:
                 if (!follower.isBusy()) {
                     rrHardware.intake1(); //make sure this doesn't stop other functions
-                    follower.followPath(firstSpike_firstArtifactCollect, true);
+                    follower.followPath(thirdSpike_firstArtifactCollect, true);
                 }
-                setPathState(pathState.PICKUP2);
+                setPathState(pathState.S1PICKUP2);
                 break;
-            case PICKUP2:
+            case S1PICKUP2:
                 if (!follower.isBusy()) {
                     rrHardware.intake2();
-                    follower.followPath(firstSpike_secondArtifactCollect, true);
+                    follower.followPath(thirdSpike_secondArtifactCollect, true);
                 }
-                setPathState(pathState.PICKUP3);
+                setPathState(pathState.S1PICKUP3);
                 break;
-            case PICKUP3:
+            case S1PICKUP3:
                 if (!follower.isBusy()) {
                     rrHardware.intake3();
-                    follower.followPath(firstSpike_thirdArtifactCollect, true);
+                    follower.followPath(thirdSpike_thirdArtifactCollect, true);
                 }
                 setPathState(pathState.PICKUPTOSHOOT);
                 break;
             case PICKUPTOSHOOT:
                 if (!follower.isBusy()) {
-                    follower.followPath(firstSpike_shoot, true);
+                    follower.followPath(thirdSpike_shoot, true);
                 }
                 setPathState(pathState.SHOOT2);
                 break;
@@ -191,10 +203,10 @@ public class backendAutoRed extends OpMode {
                         rrHardware.shootppg();
                     }
                 }
-                setPathState(pathState.SHOOTFORWARD);
+                setPathState(pathState.SHOOTMOVE);
                 break;
-            case SHOOTFORWARD:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 25) { //note: change time to something for whole auto
+            case SHOOTMOVE:
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 5) { //note: change time to something for whole auto
                     follower.followPath(shoot_forward, true);
                 }
                 break;
@@ -215,12 +227,12 @@ public class backendAutoRed extends OpMode {
 
         //turretAxon = hardwareMap.get(CRServo.class, "axon");
         limelight.setPollRateHz(90);
-        limelight.pipelineSwitch(1); // motif pipeline (ID=21,22,23)
+        limelight.pipelineSwitch(0); // motif pipeline (ID=21,22,23)
         //limelight.pipelineSwitch(1); // this is for left goal (ID=20)
 
         limelight.start();
 
-        pathState = pathState.APRILTAGLOOKSIES;
+        pathState = pathState.MOVETOSHOOT;
         pathTimer = new Timer();
         opModeTimer = new Timer();
         follower = Constants.createFollower(hardwareMap);
