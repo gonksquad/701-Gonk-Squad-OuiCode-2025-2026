@@ -9,7 +9,9 @@ import org.firstinspires.ftc.teamcode.Hardware;
 @TeleOp(name="QualTele")
 public class TeleopFromHardware extends LinearOpMode {
 
-    boolean prevLt = false;
+    boolean prevA = false;
+    boolean prevB = false;
+    int nextPos = 0;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -17,30 +19,37 @@ public class TeleopFromHardware extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
-            // toggle intake
-            /*if (gamepad2.left_trigger>0.05) {
-                if (!prevLt) {
-                    prevLt = true;
-                    if (hardware.intaking) {
-                        hardware.stopIntake();
-                    } else {
-                        hardware.tryIntake(true);
-                    }
+//            hardware.tryIntake(gamepad1.a);
+//            if (gamepad1.b && !gamepad1.a) {
+//                hardware.stopIntake();
+//            }
+//
+//            hardware.tryLaunchPurple(gamepad1.x);
+//            if (gamepad1.y && !gamepad1.x) {
+//                hardware.stopLaunch();
+//            }
+//            hardware.doDrive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
+            if (gamepad1.a) {
+                if (!prevA) {
+                    hardware.sorter.setPosition(hardware.intakePos[nextPos]);
+                    nextPos ++;
+                    if (nextPos >= 3) nextPos -= 3;
                 }
+                prevA = true;
             } else {
-                prevLt = false;
-            }*/
-            if (gamepad2.a) {
-                hardware.outtakeTransfer.setPosition(Math.abs(hardware.outtakeTransfer.getPosition()-0.25)+0.6);
-                sleep(250);
+                prevA = false;
             }
-            //hardware.tryLaunchGreen(gamepad2.x);
-            //hardware.tryLaunchPurple(gamepad2.b);
-            //hardware.aimTurret("red"); // if we're on red side (ID 24)
-            //if (gamepad2.y && !(gamepad2.x || gamepad2.b)) {
-              //  hardware.stopLaunch();
-            //}*/
-            hardware.doDrive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
+
+            if (gamepad1.b) {
+                if (!prevB) {
+                    hardware.sorter.setPosition(hardware.outtakePos[nextPos]);
+                    nextPos ++;
+                    if (nextPos >= 3) nextPos -= 3;
+                }
+                prevB = true;
+            } else {
+                prevB = false;
+            }
         }
     }
 }
