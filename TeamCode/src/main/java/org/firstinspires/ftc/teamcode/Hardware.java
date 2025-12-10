@@ -28,6 +28,7 @@ public class Hardware {
     // TODO: Set correct intake and outtake positions
     public final double[] outtakePos = {0.254, 0.423, 0.085}; // sorter servo positions for outtaking
     public final double[] intakePos = {0.0, 0.169, 0.338}; // sorter servo positions for intaking
+    public double sorterOffset = 0d;
     byte[] sorterPos = {0, 0, 0}; // what is stored in each sorter slot 0 = empty, 1 = purple, 2 = green
     int currentPos = 0; // intake is 0-2 outtake is 3-5
     ElapsedTime changePosTimer = new ElapsedTime();
@@ -80,7 +81,7 @@ public class Hardware {
             boolean sorterSuccess = false;
             for (int i = 0; i < 3; i++) {
                 if (sorterPos[i] == 0) {
-                    sorter.setPosition(intakePos[i]);
+                    sorter.setPosition((intakePos[i] + sorterOffset) % 1d);
                     currentPos = i;
                     sorterSuccess = true;
                     break;
@@ -113,7 +114,7 @@ public class Hardware {
             for (int i = getCurrentPos(); i < sorterPos.length + getCurrentPos(); i = (i + 1) % 3) { // for every sorter position starting at the current one
                 if (sorterPos[i] == 1) { // if the position has a purple inside of it
                     sorterSuccess = true;
-                    sorter.setPosition(outtakePos[i]);
+                    sorter.setPosition((outtakePos[i] + sorterOffset) % 1d);
                     currentPos = i + 3;
                     changePosTimer.reset();
                     break;
@@ -155,7 +156,7 @@ public class Hardware {
             for (int i = getCurrentPos(); i < sorterPos.length + getCurrentPos(); i = (i + 1) % 3) { // for every sorter position starting at the current one
                 if (sorterPos[i] == 2) { // if the position has a green inside of it
                     sorterSuccess = true;
-                    sorter.setPosition(outtakePos[i]);
+                    sorter.setPosition((outtakePos[i] + sorterOffset) % 1d);
                     changePosTimer.reset();
                     break;
                 }
