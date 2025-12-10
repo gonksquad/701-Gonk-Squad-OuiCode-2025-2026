@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.pedroPathing;
 
+import com.pedropathing.control.FilteredPIDFCoefficients;
+import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
@@ -17,16 +19,16 @@ public class Constants {
     public static FollowerConstants followerConstants = new FollowerConstants()
             .forwardZeroPowerAcceleration(-46)
             .lateralZeroPowerAcceleration(-59)
-            .mass(10.1) //should be right for robot
-            .useSecondaryTranslationalPIDF(true)
-            .useSecondaryHeadingPIDF(true)
-            .useSecondaryDrivePIDF(true);
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.9, 0, 0.01, 0))
+            .headingPIDFCoefficients(new PIDFCoefficients(1, 0, 0.01, 0))
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.1,0.0,0.01,0.6,0.0))
+            .mass(10.1); //should be right for robot
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
     // TODO: Set the proper directions and update motor names if needed
     public static MecanumConstants driveConstants = new MecanumConstants()
-            .maxPower(1)
+            .maxPower(.5)
             .xVelocity(64.29)
             .yVelocity(58.39)
             .leftFrontMotorName("fl")
