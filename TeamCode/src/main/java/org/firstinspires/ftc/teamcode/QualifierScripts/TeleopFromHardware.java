@@ -65,7 +65,7 @@ public class TeleopFromHardware extends LinearOpMode {
                 hardware.launcherRight.setVelocity(launchVelocity);
                 hardware.launcherLeft.setVelocity(launchVelocity);
 
-                if ()
+                //if ()
 
                 if (hardware.sorterOffset != prevOffset) { // don't set position if it is already set
                     prevOffset = hardware.sorterOffset;

@@ -43,7 +43,7 @@ public class blueGoalTargeting extends LinearOpMode{
                     while (result.getTx() >5){
                         servoPosition = servo.getPosition() + 0.01;
                         if (servoPosition < 0){
-                            servoPosition = 0.0
+                            servoPosition = 0.0;
                         }
                         servo.setPosition(servoPosition);
                         result = limelight.getLatestResult();

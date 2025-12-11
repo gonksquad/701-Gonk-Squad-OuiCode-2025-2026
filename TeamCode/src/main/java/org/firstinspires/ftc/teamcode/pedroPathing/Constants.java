@@ -21,7 +21,8 @@ public class Constants {
             .lateralZeroPowerAcceleration(-59)
             .translationalPIDFCoefficients(new PIDFCoefficients(0.9, 0, 0.01, 0))
             .headingPIDFCoefficients(new PIDFCoefficients(1, 0, 0.01, 0))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.1,0.0,0.01,0.6,0.0))
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.025,0.0,0.0001,0.6,0.01))
+            .centripetalScaling(0.005)
             .mass(10.1); //should be right for robot
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);

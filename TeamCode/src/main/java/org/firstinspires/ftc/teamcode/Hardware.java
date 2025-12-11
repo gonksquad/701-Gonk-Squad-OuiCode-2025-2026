@@ -47,7 +47,7 @@ public class Hardware {
         backLeft = hardwareMap.get(DcMotor.class, "bl"); // c2
         backRight = hardwareMap.get(DcMotor.class, "br"); // e2
 
-<<<<<<< HEAD
+//<<<<<<< HEAD
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -55,10 +55,10 @@ public class Hardware {
 
         launcherLeft = hardwareMap.get(DcMotor.class, "launcherL"); //e0
         launcherRight = hardwareMap.get(DcMotor.class, "launcherR"); //c0
-=======
+//
         launcherLeft = hardwareMap.get(DcMotorEx.class, "launcherL"); //e0
         launcherRight = hardwareMap.get(DcMotorEx.class, "launcherR"); //c0
->>>>>>> origin/master
+//>>>>>>>
         launcherTurn = hardwareMap.get(CRServo.class, "launcherYaw"); //c1
         limelightTurn = hardwareMap.get(CRServo.class, "limeservo"); //c0
 
