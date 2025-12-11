@@ -65,7 +65,7 @@ public class TeleopFromHardware extends LinearOpMode {
                 hardware.launcherRight.setVelocity(launchVelocity);
                 hardware.launcherLeft.setVelocity(launchVelocity);
 
-                //if ()
+               // if ()
 
                 if (hardware.sorterOffset != prevOffset) { // don't set position if it is already set
                     prevOffset = hardware.sorterOffset;
@@ -83,7 +83,7 @@ public class TeleopFromHardware extends LinearOpMode {
                     hardware.stopLaunch();
                 }
 
-                hardware.doDrive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, 1d, 1d, 0.5);
+                hardware.doDrive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, .75d, .75d, 0.5);
             }
         }
     }
