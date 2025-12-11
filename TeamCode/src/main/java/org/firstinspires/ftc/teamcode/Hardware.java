@@ -26,8 +26,8 @@ public class Hardware {
     float[] hsvValues = new float[3];
     boolean nextPos = true;
     // TODO: Set correct intake and outtake positions
-    public final double[] outtakePos = {0.254, 0.423, 0.085}; // sorter servo positions for outtaking
-    public final double[] intakePos = {0.0, 0.169, 0.338}; // sorter servo positions for intaking
+    public final double[] intakePos = {0.2, 0.6, 1.0}; // sorter servo positions for outtaking
+    public final double[] outtakePos = {0.8, 0.0, 0.4}; // sorter servo positions for intaking
     public double sorterOffset = 0d;
     byte[] sorterPos = {0, 0, 0}; // what is stored in each sorter slot 0 = empty, 1 = purple, 2 = green
     int currentPos = 0; // intake is 0-2 outtake is 3-5
@@ -81,6 +81,8 @@ public class Hardware {
 
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void tryIntake(boolean button) {
