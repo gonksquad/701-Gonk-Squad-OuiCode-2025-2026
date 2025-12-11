@@ -24,11 +24,12 @@ public class blueGoalTargeting extends LinearOpMode{
         waitForStart();
         limelight.start();
         servo.setPosition(0.5);
-        servo.setPosition(0.0);
+        fakeTurret.setPosition(0.5);
 
         while (opModeIsActive()){
             LLResult result = limelight.getLatestResult();
             double id = -1;
+
 
             if (result != null && result.isValid()){
                 List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
@@ -64,6 +65,10 @@ public class blueGoalTargeting extends LinearOpMode{
                         sleep(100);
                     }
                 }
+                telemetry.update();
+            }
+            else{
+                telemetry.addLine("No apriltag found");
                 telemetry.update();
             }
         }
