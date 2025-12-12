@@ -109,7 +109,7 @@ public class frontendAutoRed extends OpMode {
             case APRILTAGLOOKSIES:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 5) {
                     hardware.limelightTurn.setPosition(.5);
-                    LLResult result = limelight.getLatestResult();
+                    LLResult result = hardware.limelight.getLatestResult();
                     //BoundingBox();
                     if(result != null && result.isValid()) {
                         if (result != null && result.isValid()) {
