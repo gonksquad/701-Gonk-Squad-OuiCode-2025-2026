@@ -5,6 +5,7 @@ import android.graphics.Color;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -46,7 +47,6 @@ public class Hardware {
         backLeft = hardwareMap.get(DcMotor.class, "bl"); // c2
         backRight = hardwareMap.get(DcMotor.class, "br"); // e2
 
-
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -72,11 +72,6 @@ public class Hardware {
         launcherLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         launcherLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         launcherLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -155,6 +150,47 @@ public class Hardware {
         if (outtakeTransfer.getPosition() == 0d && changePosTimer.milliseconds() > 1000) {
             stopLaunch();
         }
+    }
+
+    public void tryLaunchGreen(boolean button) {
+        if (button && !launchingGreen) { // on first button press
+
+            // check if sorter has green
+            boolean sorterSuccess = false;
+            for (int i = getCurrentPos(); i < sorterPos.length + getCurrentPos(); i = (i + 1) % 3) { // for every sorter position starting at the current one
+                if (sorterPos[i] == 2) { // if the position has a green inside of it
+                    sorterSuccess = true;
+                    sorter.setPosition((outtakePos[i] + sorterOffset) % 1d);
+                    changePosTimer.reset();
+                    break;
+                }
+            }
+
+            if (sorterSuccess) {
+                launchingPurple = false;
+                launchingGreen = true;
+                // TODO: set velocity based on apriltag distance
+                launcherLeft.setVelocity(6000);
+                launcherRight.setVelocity(6000);
+            }
+        }
+//        if (launchingGreen) {
+////            if(changePosTimer.milliseconds() >= 750 && sorterPos[getCurrentPos()] == 1) {
+////                outtakeTransfer.setPosition(1);
+////                sorterPos[getCurrentPos()] = 0;
+////            }
+////            if(changePosTimer.milliseconds() >= 1250){
+////                outtakeTransfer.setPosition(0);
+////            }
+//            // treat this as a loop
+//            /*
+//            Check for the following:
+//              - sorter position
+//              - robot position
+//              - launcher speed?
+//            if all are correct, push artifact into launcher
+//            */
+//        }
     }
 
     public void stopLaunch() {
@@ -264,17 +300,20 @@ public class Hardware {
         LLResult result = limelight.getLatestResult();
 
 //        if (result != null && result.isValid()) {
-//            double tx = result.getTx();
-//            double ratio = 90d/270d; // approximate teeth of servo to teeth of launcher
-//            if(tx > 4f) { // tag is on the right
-//                launcherTurn.setPower(0.8 * ratio);
-//                limelightTurn.setPower(0.8);
-//            } else if(tx < -4) { // tag is on the left
-//                launcherTurn.setPower(-0.8 * ratio);
-//                limelightTurn.setPower(-0.8);
-//            } else { // tag is within left and right bounds
-//                launcherTurn.setPower(0);
-//            }
-//        }
+
+        if (result != null && result.isValid()) {
+            double tx = result.getTx();
+            double ratio = 90d/270d; // approximate teeth of servo to teeth of launcher
+            if(tx > 4f) { // tag is on the right
+                launcherTurn.setPower(0.8 * ratio);
+               limelightTurn.setPosition(0.8);
+            } else if(tx < -4) { // tag is on the left
+                launcherTurn.setPower(-0.8 * ratio);
+               limelightTurn.setPosition(0.8);
+            } else { // tag is within left and right bounds
+                launcherTurn.setPower(0);
+            }
+        }
+
     }
 }
