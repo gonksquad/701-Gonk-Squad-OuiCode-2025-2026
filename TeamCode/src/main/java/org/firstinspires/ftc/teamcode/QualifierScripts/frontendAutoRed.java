@@ -108,6 +108,7 @@ public class frontendAutoRed extends OpMode {
                 break;
             case APRILTAGLOOKSIES:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 5) {
+                    hardware.limelightTurn.setPosition(.5);
                     LLResult result = limelight.getLatestResult();
                     //BoundingBox();
                     if(result != null && result.isValid()) {
@@ -151,15 +152,18 @@ public class frontendAutoRed extends OpMode {
                     }
                     else {
                         rrHardware.shootgpp();
+                        telemetry.addLine("no apriltag found :(");
                     }
                 }
                 setPathState(pathState.STARTTOBEFOREPICKUP);
+                telemetry.addLine("apriltag section done");
                 break;
             case STARTTOBEFOREPICKUP:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 10) { //note: after shoot and change time to something for whole auto
                     follower.followPath(shoot_beforeThirdSpike, true);
                 }
                 setPathState(pathState.S1PICKUP1);
+                telemetry.addLine("before pickup");
                 break;
             case S1PICKUP1:
                 if (!follower.isBusy()) {
@@ -167,6 +171,7 @@ public class frontendAutoRed extends OpMode {
                     follower.followPath(thirdSpike_firstArtifactCollect, true);
                 }
                 setPathState(pathState.S1PICKUP2);
+                telemetry.addLine(" done pickup 1");
                 break;
             case S1PICKUP2:
                 if (!follower.isBusy()) {
@@ -174,6 +179,7 @@ public class frontendAutoRed extends OpMode {
                     follower.followPath(thirdSpike_secondArtifactCollect, true);
                 }
                 setPathState(pathState.S1PICKUP3);
+                telemetry.addLine(" done pickup 2");
                 break;
             case S1PICKUP3:
                 if (!follower.isBusy()) {
@@ -181,12 +187,14 @@ public class frontendAutoRed extends OpMode {
                     follower.followPath(thirdSpike_thirdArtifactCollect, true);
                 }
                 setPathState(pathState.PICKUPTOSHOOT);
+                telemetry.addLine(" done pickup 3");
                 break;
             case PICKUPTOSHOOT:
                 if (!follower.isBusy()) {
                     follower.followPath(thirdSpike_shoot, true);
                 }
                 setPathState(pathState.SHOOT2);
+                telemetry.addLine("moved to shoot");
                 break;
             case SHOOT2:
                 if (!follower.isBusy()) {
@@ -204,14 +212,16 @@ public class frontendAutoRed extends OpMode {
                     }
                 }
                 setPathState(pathState.SHOOTMOVE);
+                telemetry.addLine("done shooting");
                 break;
             case SHOOTMOVE:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 5) { //note: change time to something for whole auto
                     follower.followPath(shoot_forward, true);
                 }
+                telemetry.addLine(" done! :)");
                 break;
             default:
-                telemetry.addLine("Nothing runnnning");
+                telemetry.addLine("Nothing running :(");
                 break;
         }
     }

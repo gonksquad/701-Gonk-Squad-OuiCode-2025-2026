@@ -47,8 +47,8 @@ public class backendAutoRed extends OpMode {
         SHOOTFORWARD
 
     }
-    float bounds_X = 4f;
-    String lastPos = "None";
+//    float bounds_X = 4f;
+//    String lastPos = "None";
 
     private PathChain start_driveToFirstSpike, firstSpike_firstArtifactCollect, firstSpike_secondArtifactCollect,
             firstSpike_thirdArtifactCollect, firstSpike_shoot, shoot_forward;
@@ -94,6 +94,7 @@ public class backendAutoRed extends OpMode {
     public void statePathUpdate() {
         switch(pathState) {
             case APRILTAGLOOKSIES:
+                hardware.limelightTurn.setPosition(.5);
                 LLResult result = limelight.getLatestResult();
                 //BoundingBox();
                 if(result != null && result.isValid()) {

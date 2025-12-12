@@ -144,6 +144,7 @@ public class testPathingBACKAUTORED extends OpMode {
                     //pathState = pathState.FIRSTSPIKEDRIVE;
                 }
                 setPathState(pathState.PICKUP1);
+                telemetry.addLine(" done to pickup");
                 break;
             case PICKUP1:
                 if (!follower.isBusy()) {
@@ -151,6 +152,7 @@ public class testPathingBACKAUTORED extends OpMode {
                     follower.followPath(firstSpike_firstArtifactCollect, true);
                 }
                 setPathState(pathState.PICKUP2);
+                telemetry.addLine(" done pickup 1");
                 break;
             case PICKUP2:
                 if (!follower.isBusy()) {
@@ -158,6 +160,7 @@ public class testPathingBACKAUTORED extends OpMode {
                     follower.followPath(firstSpike_secondArtifactCollect, true);
                 }
                 setPathState(pathState.PICKUP3);
+                telemetry.addLine(" done pickup 2");
                 break;
             case PICKUP3:
                 if (!follower.isBusy()) {
@@ -165,12 +168,15 @@ public class testPathingBACKAUTORED extends OpMode {
                     follower.followPath(firstSpike_thirdArtifactCollect, true);
                 }
                 setPathState(pathState.PICKUPTOSHOOT);
+                telemetry.addLine(" done pickup 3");
                 break;
             case PICKUPTOSHOOT:
                 if (!follower.isBusy()) {
                     follower.followPath(firstSpike_shoot, true);
+                    rrHardware.shootpgp();
                 }
                 setPathState(pathState.SHOOTFORWARD);
+                telemetry.addLine(" done shooting");
                 break;
 //            case SHOOT2:
 //                if (!follower.isBusy()) {
@@ -193,6 +199,7 @@ public class testPathingBACKAUTORED extends OpMode {
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 25) { //note: change time to something for whole auto
                     follower.followPath(shoot_forward, true);
                 }
+                telemetry.addLine(" done! :)");
                 break;
             default:
                 telemetry.addLine("Nothing runnnning");
