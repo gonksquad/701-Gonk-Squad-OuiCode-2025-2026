@@ -86,10 +86,12 @@ public class Hardware {
     }
 
     public void tryIntake(boolean button) {
+        // check if intake button is being pressed and not currently intaking
         if (button && !intaking) {
             // set sorter position
             boolean sorterSuccess = false;
             for (int i = 0; i < 3; i++) {
+                //if spot is empty, set to that pos
                 if (sorterPos[i] == 0) {
                     sorter.setPosition(intakePos[i]);
                     currentPos = i;
@@ -98,6 +100,7 @@ public class Hardware {
                     break;
                 }
             }
+            // start intaking if open spot was found
             if (sorterSuccess) {
                 intaking = true;
                 intake.setPower(1);
@@ -106,8 +109,10 @@ public class Hardware {
         if (intaking && changePosTimer.milliseconds() > 1000) {
             byte guess = detectFilled();
             if (guess == 0) return;
+            //set current sorter pos to color-sensor-detected color
             sorterPos[currentPos] = guess;
             currentPos = (currentPos + 2) % 3;
+            //change to outtake
             sorter.setPosition(outtakePos[currentPos]);
             stopIntake();
             // treat this as a loop
@@ -127,8 +132,10 @@ public class Hardware {
 
             // check if sorter has purple
             boolean sorterSuccess = false;
+            
             for (int i = getCurrentPos(); i < sorterPos.length + getCurrentPos(); i = (i + 1) % 3) { // for every sorter position starting at the current one
-                if (sorterPos[i] == 1) { // if the position has a purple inside of it
+                //if position has purple
+                if (sorterPos[i] == 1) {
                     sorterSuccess = true;
                     sorter.setPosition((outtakePos[i] + sorterOffset) % 1d);
                     currentPos = i + 3;
@@ -289,8 +296,10 @@ public class Hardware {
 
         byte guess = 0;
         if (blue > 200 && blue > green) {
+            //likely purple artifact
             guess = 1;
         } else if (green > 200 && green > blue) {
+            //likely green artifact
             guess = 2;
         }
 
