@@ -25,12 +25,11 @@ public class Hardware {
     int red, green, blue;
     float[] hsvValues = new float[3];
     boolean nextPos = true;
-    // TODO: Set correct intake and outtake positions
     public final double[] intakePos = {1.0, 0.6, 0.2}; // sorter servo positions for outtaking
     public final double[] outtakePos = {0.4, 0.0, 0.8}; // sorter servo positions for intaking
     public double sorterOffset = 0d;
     public byte[] sorterPos = {0, 0, 0}; // what is stored in each sorter slot 0 = empty, 1 = purple, 2 = green
-    public int currentPos = 0; // intake is 0-2 outtake is 3-5
+    public int currentPos = 0; // 0-2
     ElapsedTime changePosTimer = new ElapsedTime();
 
     // initialize flags
@@ -89,21 +88,20 @@ public class Hardware {
         // check if intake button is being pressed and not currently intaking
         if (button && !intaking) {
             // set sorter position
-            boolean sorterSuccess = false;
             for (int i = 0; i < 3; i++) {
                 //if spot is empty, set to that pos
                 if (sorterPos[i] == 0) {
+                    stopLaunch();
+
+                    intaking = true;
+                    intake.setPower(1);
+
                     sorter.setPosition(intakePos[i]);
                     currentPos = i;
-                    sorterSuccess = true;
                     changePosTimer.reset();
+
                     break;
                 }
-            }
-            // start intaking if open spot was found
-            if (sorterSuccess) {
-                intaking = true;
-                intake.setPower(1);
             }
         }
         if (intaking && changePosTimer.milliseconds() > 1000) {
@@ -127,92 +125,40 @@ public class Hardware {
     }
 
     // NOTE: if the color is not in the
-    public void tryLaunchPurple(boolean button) {
-        if (button && !launchingPurple) { // on first button press
-
+    public void tryLaunch(boolean button, boolean isGreen) {
+        if (button && !(launchingPurple || launchingGreen)) { // on first button press
             // check if sorter has purple
-            boolean sorterSuccess = false;
-            
-            for (int i = getCurrentPos(); i < sorterPos.length + getCurrentPos(); i = (i + 1) % 3) { // for every sorter position starting at the current one
+            for (int i = currentPos; i < currentPos + 3; i++) { // for every sorter position starting at the current one
                 //if position has purple
-                if (sorterPos[i] == 1) {
-                    sorterSuccess = true;
-                    sorter.setPosition((outtakePos[i] + sorterOffset) % 1d);
-                    currentPos = i + 3;
-                    changePosTimer.reset();
+                if (sorterPos[i % 3] == (isGreen? 2 : 1)) {
+                    stopIntake();
+
+                    launchingGreen = isGreen;
+                    launchingPurple = !isGreen;
+
+                    // TODO: set velocity based on apriltag distance
+                    launcherLeft.setVelocity(2800);
+                    launcherRight.setVelocity(2800);
+
+                    currentPos = i % 3;
+                    sorter.setPosition(outtakePos[currentPos]);
+
                     break;
                 }
             }
-
-            if (sorterSuccess) {
-                launchingGreen = false;
-                launchingPurple = true;
-                // TODO: set velocity based on apriltag distance
-                launcherLeft.setVelocity(6000);
-                launcherRight.setVelocity(6000);
-            }
         }
-        if (launchingPurple) {
-//            if(changePosTimer.milliseconds() >= 750 && sorterPos[getCurrentPos()] == 1) {
-//                outtakeTransfer.setPosition(1);
-//                sorterPos[getCurrentPos()] = 0;
-//            }
-//            if(changePosTimer.milliseconds() >= 1250){
-//                outtakeTransfer.setPosition(0);
-//            }
-            // treat this as a loop
-            /*
-            Check for the following:
-              - sorter position
-              - robot position
-              - launcher speed?
-            if all are correct, push artifact into launcher
-            */
+        if ((launchingPurple || launchingGreen) && launcherLeft.getVelocity() > 1700 && outtakeTransfer.getPosition() != 0d) {
+            outtakeTransfer.setPosition(0d);
+            sorterPos[currentPos] = 0;
+            changePosTimer.reset();
         }
-    }
-
-    public void tryLaunchGreen(boolean button) {
-        if (button && !launchingGreen) { // on first button press
-
-            // check if sorter has green
-            boolean sorterSuccess = false;
-            for (int i = getCurrentPos(); i < sorterPos.length + getCurrentPos(); i = (i + 1) % 3) { // for every sorter position starting at the current one
-                if (sorterPos[i] == 2) { // if the position has a green inside of it
-                    sorterSuccess = true;
-                    sorter.setPosition((outtakePos[i] + sorterOffset) % 1d);
-                    changePosTimer.reset();
-                    break;
-                }
-            }
-
-            if (sorterSuccess) {
-                launchingPurple = false;
-                launchingGreen = true;
-                // TODO: set velocity based on apriltag distance
-                launcherLeft.setVelocity(6000);
-                launcherRight.setVelocity(6000);
-            }
-        }
-        if (launchingGreen) {
-//            if(changePosTimer.milliseconds() >= 750 && sorterPos[getCurrentPos()] == 1) {
-//                outtakeTransfer.setPosition(1);
-//                sorterPos[getCurrentPos()] = 0;
-//            }
-//            if(changePosTimer.milliseconds() >= 1250){
-//                outtakeTransfer.setPosition(0);
-//            }
-            // treat this as a loop
-            /*
-            Check for the following:
-              - sorter position
-              - robot position
-              - launcher speed?
-            if all are correct, push artifact into launcher
-            */
+        if (outtakeTransfer.getPosition() == 0d && changePosTimer.milliseconds() > 1000) {
+            stopLaunch();
         }
     }
 
     public void stopLaunch() {
+        outtakeTransfer.setPosition(0.9);
         launcherLeft.setVelocity(0);
         launcherRight.setVelocity(0);
         launchingPurple = false;
@@ -290,7 +236,6 @@ public class Hardware {
         float blue = colorSensor.blue();
 
         float multiplier = 255f / Math.max(Math.max(red, green), Math.max(blue, 255f));
-        red *= multiplier;
         green *= multiplier;
         blue *= multiplier;
 

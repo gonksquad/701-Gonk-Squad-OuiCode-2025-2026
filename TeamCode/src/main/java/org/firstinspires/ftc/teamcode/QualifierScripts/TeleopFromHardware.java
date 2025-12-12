@@ -97,11 +97,14 @@ public class TeleopFromHardware extends LinearOpMode {
                 }
             } else {
                 hardware.tryIntake(gamepad2.a);
-                if (gamepad2.b && !gamepad2.a) {
+                if (gamepad2.b && !gamepad2.a && !gamepad2.right_bumper) {
                     hardware.stopIntake();
+                    hardware.stopLaunch();
                 }
 
-//                hardware.tryLaunchPurple(gamepad2.dpad_up);
+                hardware.tryLaunch(gamepad2.right_bumper, false);
+                hardware.tryLaunch(gamepad2.left_bumper, true);
+
 //                hardware.tryLaunchGreen(gamepad2.dpad_down);
 //                if (gamepad2.dpad_right && !(gamepad2.dpad_up || gamepad2.dpad_down)) {
 //                    hardware.stopLaunch();
@@ -111,6 +114,7 @@ public class TeleopFromHardware extends LinearOpMode {
 
                 telemetry.addData("Position Value: ", hardware.sorter.getPosition());
                 telemetry.addData("Sorter Contents: ", "%d, %d, %d", hardware.sorterPos[0], hardware.sorterPos[1], hardware.sorterPos[2]);
+                telemetry.addData("Launch Speed: ", hardware.launcherLeft.getVelocity());
                 telemetry.update();
             }
         }
