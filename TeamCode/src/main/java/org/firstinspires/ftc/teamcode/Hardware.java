@@ -26,10 +26,10 @@ public class Hardware {
     float[] hsvValues = new float[3];
     boolean nextPos = true;
     // TODO: Set correct intake and outtake positions
-    public final double[] outtakePos = {0.254, 0.423, 0.085}; // sorter servo positions for outtaking
-    public final double[] intakePos = {0.0, 0.169, 0.338}; // sorter servo positions for intaking
+    public final double[] intakePos = {1.0, 0.2, 0.6}; // sorter servo positions for outtaking
+    public final double[] outtakePos = {0.8, 0.4, 0.0}; // sorter servo positions for intaking
     public double sorterOffset = 0d;
-    byte[] sorterPos = {0, 0, 0}; // what is stored in each sorter slot 0 = empty, 1 = purple, 2 = green
+    public byte[] sorterPos = {0, 0, 0}; // what is stored in each sorter slot 0 = empty, 1 = purple, 2 = green
     int currentPos = 0; // intake is 0-2 outtake is 3-5
     ElapsedTime changePosTimer = new ElapsedTime();
 
@@ -81,6 +81,8 @@ public class Hardware {
 
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void tryIntake(boolean button) {
@@ -89,7 +91,7 @@ public class Hardware {
             boolean sorterSuccess = false;
             for (int i = 0; i < 3; i++) {
                 if (sorterPos[i] == 0) {
-                    sorter.setPosition((intakePos[i] + sorterOffset) % 1d);
+                    sorter.setPosition(intakePos[i]);
                     currentPos = i;
                     sorterSuccess = true;
                     break;
@@ -101,7 +103,11 @@ public class Hardware {
             }
         }
         if (intaking) {
-            //detectFilled();
+            byte guess = detectFilled();
+            if (guess == 0) return;
+            sorterPos[currentPos] = guess;
+            sorter.setPosition(outtakePos[currentPos]);
+            stopIntake();
             // treat this as a loop
             // try to go to the artifact (maybe split int tryIntakePurple and tryIntakeGreen)
             // check if intaking was completed -> store color at position
@@ -269,26 +275,24 @@ public class Hardware {
         return -1;
     }
 
-    public void detectFilled() {
+    public byte detectFilled() {
+        float red = colorSensor.red();
+        float green = colorSensor.green();
+        float blue = colorSensor.blue();
 
-        red = colorSensor.red();
-        green = colorSensor.green();
-        blue = colorSensor.blue();
-        Color.RGBToHSV(red, green, blue, hsvValues);
+        float multiplier = 255f / Math.max(Math.max(red, green), Math.max(blue, 255f));
+        red *= multiplier;
+        green *= multiplier;
+        blue *= multiplier;
 
-        boolean validColor = hsvValues[1] > 0.5; // make sure saturation is high so we don't detect gray or smth
-        float hue = hsvValues[0];
-        if (hue > 260 && hue < 300 && validColor && nextPos && changePosTimer.milliseconds() > 500) { // purple
-            nextPos = false;
-            sorterPos[getCurrentPos()] = 1; // set current position to purple
-            changePosTimer.reset();
-        } else if(hue > 80 && hue < 160 && validColor && nextPos) { // green
-            nextPos = false;
-            sorterPos[getCurrentPos()] = 2; // set current position to green
-            changePosTimer.reset();
-        } else {
-            nextPos = true;
+        byte guess = 0;
+        if (blue > 200 && blue > green) {
+            guess = 1;
+        } else if (green > 200 && green > blue) {
+            guess = 2;
         }
+
+        return guess;
     }
 
     public void aimTurret(String side) {
