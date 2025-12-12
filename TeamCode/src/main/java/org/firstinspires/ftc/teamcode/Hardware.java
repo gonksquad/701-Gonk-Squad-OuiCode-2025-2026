@@ -26,11 +26,11 @@ public class Hardware {
     float[] hsvValues = new float[3];
     boolean nextPos = true;
     // TODO: Set correct intake and outtake positions
-    public final double[] intakePos = {1.0, 0.2, 0.6}; // sorter servo positions for outtaking
-    public final double[] outtakePos = {0.8, 0.4, 0.0}; // sorter servo positions for intaking
+    public final double[] intakePos = {1.0, 0.6, 0.2}; // sorter servo positions for outtaking
+    public final double[] outtakePos = {0.4, 0.0, 0.8}; // sorter servo positions for intaking
     public double sorterOffset = 0d;
     public byte[] sorterPos = {0, 0, 0}; // what is stored in each sorter slot 0 = empty, 1 = purple, 2 = green
-    int currentPos = 0; // intake is 0-2 outtake is 3-5
+    public int currentPos = 0; // intake is 0-2 outtake is 3-5
     ElapsedTime changePosTimer = new ElapsedTime();
 
     // initialize flags
@@ -94,6 +94,7 @@ public class Hardware {
                     sorter.setPosition(intakePos[i]);
                     currentPos = i;
                     sorterSuccess = true;
+                    changePosTimer.reset();
                     break;
                 }
             }
@@ -102,10 +103,11 @@ public class Hardware {
                 intake.setPower(1);
             }
         }
-        if (intaking) {
+        if (intaking && changePosTimer.milliseconds() > 1000) {
             byte guess = detectFilled();
             if (guess == 0) return;
             sorterPos[currentPos] = guess;
+            currentPos = (currentPos + 2) % 3;
             sorter.setPosition(outtakePos[currentPos]);
             stopIntake();
             // treat this as a loop
@@ -307,18 +309,18 @@ public class Hardware {
 
         LLResult result = limelight.getLatestResult();
 
-        if (result != null && result.isValid()) {
-            double tx = result.getTx();
-            double ratio = 90d/270d; // approximate teeth of servo to teeth of launcher
-            if(tx > 4f) { // tag is on the right
-                launcherTurn.setPower(0.8 * ratio);
-                limelightTurn.setPower(0.8);
-            } else if(tx < -4) { // tag is on the left
-                launcherTurn.setPower(-0.8 * ratio);
-                limelightTurn.setPower(-0.8);
-            } else { // tag is within left and right bounds
-                launcherTurn.setPower(0);
-            }
-        }
+//        if (result != null && result.isValid()) {
+//            double tx = result.getTx();
+//            double ratio = 90d/270d; // approximate teeth of servo to teeth of launcher
+//            if(tx > 4f) { // tag is on the right
+//                launcherTurn.setPower(0.8 * ratio);
+//                limelightTurn.setPower(0.8);
+//            } else if(tx < -4) { // tag is on the left
+//                launcherTurn.setPower(-0.8 * ratio);
+//                limelightTurn.setPower(-0.8);
+//            } else { // tag is within left and right bounds
+//                launcherTurn.setPower(0);
+//            }
+//        }
     }
 }
