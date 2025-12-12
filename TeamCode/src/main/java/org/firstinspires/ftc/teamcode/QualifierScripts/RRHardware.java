@@ -52,46 +52,46 @@ public class RRHardware extends Hardware {
         sorter.setPosition(.4);
         outtakeTransfer.setPosition(0);
         sleep(500);
-        outtakeTransfer.setPosition(.8);
+        outtakeTransfer.setPosition(.9);
         sorter.setPosition(.8);
         outtakeTransfer.setPosition(0);
         sleep(500);
-        outtakeTransfer.setPosition(.8);
+        outtakeTransfer.setPosition(.9);
         sorter.setPosition(0);
         outtakeTransfer.setPosition(0);
         sleep(500);
-        outtakeTransfer.setPosition(.8);
+        outtakeTransfer.setPosition(.9);
 //        1,2,3(outtake servo pos)
         //black, grey, blue
     }
     public void shootpgp() { //gpp start, both because spike mark 1
         sorter.setPosition(0);
-        outtakeTransfer.setPosition(1);
-        sleep(500);
         outtakeTransfer.setPosition(0);
+        sleep(500);
+        outtakeTransfer.setPosition(.9);
         sorter.setPosition(.4);
-        outtakeTransfer.setPosition(1);
-        sleep(500);
         outtakeTransfer.setPosition(0);
+        sleep(500);
+        outtakeTransfer.setPosition(.9);
         sorter.setPosition(.8);
-        outtakeTransfer.setPosition(1);
-        sleep(500);
         outtakeTransfer.setPosition(0);
+        sleep(500);
+        outtakeTransfer.setPosition(.9);
 //        2,1,3(outtake servo pos)
     }
     public void shootppg() { //gpp start, both because spike mark 1
         sorter.setPosition(0);
-        outtakeTransfer.setPosition(1);
-        sleep(500);
         outtakeTransfer.setPosition(0);
+        sleep(500);
+        outtakeTransfer.setPosition(.9);
         sorter.setPosition(.8);
-        outtakeTransfer.setPosition(1);
-        sleep(500);
         outtakeTransfer.setPosition(0);
+        sleep(500);
+        outtakeTransfer.setPosition(.9);
         sorter.setPosition(.4);
-        outtakeTransfer.setPosition(1);
-        sleep(500);
         outtakeTransfer.setPosition(0);
+        sleep(500);
+        outtakeTransfer.setPosition(.9);
 //        2,3,1
     }
 }
