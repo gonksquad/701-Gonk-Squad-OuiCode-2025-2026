@@ -29,10 +29,10 @@ public class TeleopFromHardware extends LinearOpMode {
                 if (!prevManual) {
                     manual = !manual;
                     if (manual) {
-                        gamepad2.rumble(10);
+                        gamepad2.rumble(200);
                     } else {
-                        gamepad2.rumble(10);
-                        gamepad2.rumble(10);
+                        gamepad2.rumble(200);
+                        gamepad2.rumble(200);
                     }
                 }
                 prevManual = true;
@@ -44,24 +44,11 @@ public class TeleopFromHardware extends LinearOpMode {
                 hardware.outtakeTransfer.setPosition(0);
             }
 
-            if (gamepad2.left_bumper) {
-                if (!prevSorterL) {
-                    hardware.sorterOffset += offsetAmount;
-                    if (hardware.sorterOffset > 1d) hardware.sorterOffset -= 1d;
-                }
-                prevSorterL = true;
+            double launchTurnPower = gamepad2.right_trigger - gamepad2.left_trigger;
+            if (Math.abs(launchTurnPower) > 0.125) {
+                hardware.launcherTurn.setPower(launchTurnPower * 0.5);
             } else {
-                prevSorterL = false;
-            }
-
-            if (gamepad2.right_bumper) {
-                if (!prevSorterR) {
-                    hardware.sorterOffset -= offsetAmount;
-                    if (hardware.sorterOffset > 1d) hardware.sorterOffset -= 1d;
-                }
-                prevSorterR = true;
-            } else {
-                prevSorterR = false;
+                hardware.launcherTurn.setPower(0d);
             }
 
             if (manual) {
@@ -70,8 +57,8 @@ public class TeleopFromHardware extends LinearOpMode {
                 } else if (gamepad2.b) {
                     hardware.intake.setPower(0d);
                 }
-                double  launchVelocity = gamepad2.left_trigger * 1400 + 1400;
-                if (launchVelocity < 2000) launchVelocity = 0;
+                double  launchVelocity = gamepad2.left_trigger * 700 + 1000;
+                if (launchVelocity < 1100) launchVelocity = 0;
                 hardware.launcherRight.setVelocity(launchVelocity);
                 hardware.launcherLeft.setVelocity(launchVelocity);
 
