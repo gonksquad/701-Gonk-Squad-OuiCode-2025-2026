@@ -318,6 +318,7 @@ public class Hardware {
 
         LLResult result = limelight.getLatestResult();
 
+<<<<<<< Updated upstream
 //        if (result != null && result.isValid()) {
 //            double tx = result.getTx();
 //            double ratio = 90d/270d; // approximate teeth of servo to teeth of launcher
@@ -331,5 +332,20 @@ public class Hardware {
 //                launcherTurn.setPower(0);
 //            }
 //        }
+=======
+        if (result != null && result.isValid()) {
+            double tx = result.getTx();
+            double ratio = 90d/270d; // approximate teeth of servo to teeth of launcher
+            if(tx > 4f) { // tag is on the right
+                launcherTurn.setPower(0.8 * ratio);
+               // limelightTurn.setPower(0.8);
+            } else if(tx < -4) { // tag is on the left
+                launcherTurn.setPower(-0.8 * ratio);
+               // limelightTurn.setPower(-0.8);
+            } else { // tag is within left and right bounds
+                launcherTurn.setPower(0);
+            }
+        }
+>>>>>>> Stashed changes
     }
 }

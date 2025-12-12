@@ -22,70 +22,73 @@ public class RRHardware extends Hardware {
         }
     }
     public void intake1() { //g
-        sorter.setPosition(.05); //blue
+        sorter.setPosition(.2); //blue
         intake.setPower(1);
         sleep(1000);
         intake.setPower(0);
     }
     public void intake2() { //p
-        sorter.setPosition(.45); //black
+        sorter.setPosition(.6); //black
         intake.setPower(1);
         sleep(1000);
         intake.setPower(0);
     }
     public void intake3() { //p
-        sorter.setPosition(.85); //grey
+        sorter.setPosition(1); //grey
         intake.setPower(1);
         sleep(1000);
         intake.setPower(0);
     }
 
     /*
+
+    intake pos: .2, .6, 1.0
+    outtake pos: 0, .4, .8
     between blue/black: .25 (p)
     between black/grey: .65 (g)
     between grey/blue: 1.05 (p)
      */
     public void shootgpp() { //gpp start, both because spike mark 1
-        sorter.setPosition(.65);
-        outtakeTransfer.setPosition(1);
-        sleep(500);
+        sorter.setPosition(.4);
         outtakeTransfer.setPosition(0);
-        sorter.setPosition(1.05);
-        outtakeTransfer.setPosition(1);
         sleep(500);
+        outtakeTransfer.setPosition(.8);
+        sorter.setPosition(.8);
         outtakeTransfer.setPosition(0);
-        sorter.setPosition(.25);
-        outtakeTransfer.setPosition(1);
         sleep(500);
+        outtakeTransfer.setPosition(.8);
+        sorter.setPosition(0);
         outtakeTransfer.setPosition(0);
+        sleep(500);
+        outtakeTransfer.setPosition(.8);
 //        1,2,3(outtake servo pos)
         //black, grey, blue
     }
     public void shootpgp() { //gpp start, both because spike mark 1
-        sorter.setPosition(.25);
+        sorter.setPosition(0);
         outtakeTransfer.setPosition(1);
         sleep(500);
         outtakeTransfer.setPosition(0);
-        sorter.setPosition(.65);
+        sorter.setPosition(.4);
         outtakeTransfer.setPosition(1);
         sleep(500);
         outtakeTransfer.setPosition(0);
-        sorter.setPosition(1.05);
+        sorter.setPosition(.8);
         outtakeTransfer.setPosition(1);
         sleep(500);
         outtakeTransfer.setPosition(0);
 //        2,1,3(outtake servo pos)
     }
     public void shootppg() { //gpp start, both because spike mark 1
-        sorter.setPosition(.25);
+        sorter.setPosition(0);
         outtakeTransfer.setPosition(1);
         sleep(500);
         outtakeTransfer.setPosition(0);
-        sorter.setPosition(1.05);
+        sorter.setPosition(.8);
         outtakeTransfer.setPosition(1);
         sleep(500);
         outtakeTransfer.setPosition(0);
-        sorter.setPosition(.65);
+        sorter.setPosition(.4);
         outtakeTransfer.setPosition(1);
         sleep(500);
         outtakeTransfer.setPosition(0);

@@ -40,13 +40,13 @@ public class PomeloLight extends LinearOpMode {
             double ratio = 90d/274d; // approximate teeth of servo to teeth of launcher
             if(tx > 4f) { // tag is on the right
                 //hardware.launcherTurn.setPower(0.8 * ratio);
-                hardware.limelightTurn.setPower(0.8);
+              //  hardware.limelightTurn.setPower(0.8);
             } else if(tx < -4) { // tag is on the left
                 //hardware.launcherTurn.setPower(-0.8 * ratio);
-                hardware.limelightTurn.setPower(-0.8);
+               // hardware.limelightTurn.setPower(-0.8);
             } else { // tag is within left and right bounds
                 //hardware.launcherTurn.setPower(0);
-                hardware.limelightTurn.setPower(0);
+               // hardware.limelightTurn.setPower(0);
 
             }
 
