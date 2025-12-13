@@ -4,69 +4,62 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
 
 import java.util.List;
 
-@TeleOp
+@TeleOp(name="a")
+
 public class NewestATDistance extends LinearOpMode{
     Limelight3A limelight;
-    Servo servo;
-    double servoPosition;
+    CRServo servo, llServo;
+    float lastSpeed = 0;
+    boolean tracking = false;
     public void runOpMode(){
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
-        servo = hardwareMap.get(Servo.class, "servo");
+        llServo = hardwareMap.get(CRServo.class, "servo");
+        servo = hardwareMap.get(CRServo.class, "fakeTurret");
         waitForStart();
         limelight.start();
         limelight.pipelineSwitch(1);
-        servo.setPosition(0.5);
-
+        float speed = 1;
         while (opModeIsActive()) {
+            if(gamepad2.a) {
+                speed++;
+                telemetry.addData("spd", speed);
+                sleep(500);
+            } else if(gamepad2.b) {
+                speed--;
+                telemetry.addData("spd", speed);
+                sleep(500);
+            }
             LLResult result = limelight.getLatestResult();
             double id = -1;
-            if(result != null && result.isValid()) {
+            //doesn't work for detecting if its true and it doesnt cause
+            //errors not having it so if it aint broke
+            //if(true){//result != null && result.isValid()) {
                 List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
 
                 for (LLResultTypes.FiducialResult fiducial : fiducials) {
                     id = fiducial.getTargetXDegrees();
                 }
+                    telemetry.addData("Tag Found, X Degrees:", result.getTx());
+                    setPos(0.03 * result.getTx());
+                    result = limelight.getLatestResult();
+                    telemetry.addData("Should be tracking... Servo Position:", llServo.getPower());
+                    telemetry.update();
 
-                telemetry.addData("Tag Found, X Degrees:", id);
-                telemetry.update();
 
-                if (result.getTx() >5){
-                    while (result.getTx() >5){
-                        servoPosition = servo.getPosition() + 0.02;
-                        if (servoPosition < 0){
-                            servoPosition = 0.0;
-                        }
-                        servo.setPosition(servoPosition);
-                        result = limelight.getLatestResult();
-                        telemetry.addData("Should be moving left... Servo Position:", servo.getPosition());
-                        telemetry.update();
-                        sleep(100);
-                    }
-                } else if (result.getTx() < -5){
-                    while (result.getTx() <-5){
-                        servoPosition = servo.getPosition() - 0.02;
-                        if (servoPosition > 1){
-                            servoPosition = 1.0;
-                        }
-                        servo.setPosition(servoPosition);
-                        result = limelight.getLatestResult();
-                        telemetry.addData("Should be moving right... Servo Position:", servo.getPosition());
-                        telemetry.update();
-                        sleep(100);
-                    }
-                }
-                telemetry.update();
-
-            } else {
-                telemetry.addLine("No apriltag found");
-                telemetry.update();
+            //} else {
+                //telemetry.addLine("No apriltag found");
                 //servo.setPosition(0.5);
-            }
+            //}
         }
+    }
+
+    void setPos(double posChange) {
+        servo.setPower(3*posChange);
+        llServo.setPower(posChange);
     }
 }
 
