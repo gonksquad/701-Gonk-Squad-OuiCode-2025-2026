@@ -18,9 +18,9 @@ public class RRHardware{
     private HardwareMap hwMap; // Store hardware map
 
     public DcMotor frontLeft, frontRight, backLeft, backRight, intake;
-    public DcMotorEx launcherLeft, launcherRight;
+    public DcMotorEx launcherLeft, launcherRight; //limelightturn
     public CRServo launcherTurn;
-    public Servo sorter, outtakeTransfer, limelightTurn;
+    public Servo sorter, outtakeTransfer;
     public Limelight3A limelight;
     public ColorSensor colorSensor;
     int red, green, blue;
@@ -57,7 +57,7 @@ public class RRHardware{
         launcherRight = hwMap.get(DcMotorEx.class, "launcherR");
 
         launcherTurn = hwMap.get(CRServo.class, "launcherYaw");
-        limelightTurn = hwMap. get(Servo.class, "limeservo");
+        //limelightTurn = hwMap. get(Servo.class, "limeservo");
 
         intake = hwMap.get(DcMotor.class, "intake");
         sorter = hwMap.get(Servo.class, "sorter");

@@ -16,7 +16,7 @@ import org.firstinspires.ftc.teamcode. pedroPathing.Constants;
 
 import java.util.List;
 
-@Autonomous
+@Di
 public class frontendAutoRed extends OpMode {
 
     String motif = "null";

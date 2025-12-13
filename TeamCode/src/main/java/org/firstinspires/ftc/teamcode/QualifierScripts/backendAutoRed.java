@@ -94,7 +94,7 @@ public class backendAutoRed extends OpMode {
     public void statePathUpdate() {
         switch(pathState) {
             case APRILTAGLOOKSIES:
-                hardware.limelightTurn.setPosition(.5);
+               // hardware.limelightTurn.setPosition(.5);
                 LLResult result = limelight.getLatestResult();
                 //BoundingBox();
                 if(result != null && result.isValid()) {
