@@ -135,8 +135,8 @@ public class Hardware {
                     launchingPurple = !isGreen;
 
                     // TODO: set velocity based on apriltag distance
-                    launcherLeft.setVelocity(tps + 200);
-                    launcherRight.setVelocity(tps + 200);
+                    launcherLeft.setVelocity(tps + 20);
+                    launcherRight.setVelocity(tps + 20);
 
                     targetTps = tps;
 

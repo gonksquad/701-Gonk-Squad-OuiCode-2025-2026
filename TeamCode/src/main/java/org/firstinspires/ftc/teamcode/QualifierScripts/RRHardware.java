@@ -139,13 +139,13 @@ public class RRHardware{
     }
 
     public void launchOnFar() {
-        launcherLeft.setVelocity(1250);
-        launcherRight.setVelocity(1250);
+        launcherLeft.setVelocity(2600);
+        launcherRight.setVelocity(2600);
     }
 
     public void launchOnClose() {
-        launcherLeft.setVelocity(1000);
-        launcherRight.setVelocity(1000);
+        launcherLeft.setVelocity(1250);
+        launcherRight.setVelocity(1250);
     }
 
     public void launchOff() {
@@ -242,6 +242,7 @@ public class RRHardware{
 
     public void shootpgpclose() {
         launchOnClose();
+        sleep(3000);
         sorter.setPosition(0);
         sleep(1000);
         outtakeTransfer.setPosition(0);
@@ -249,13 +250,13 @@ public class RRHardware{
         outtakeTransfer.setPosition(.9);
         sleep(1000);
         sorter.setPosition(.4);
-        sleep(1000);
+        sleep(5000);
         outtakeTransfer.setPosition(0);
         sleep(1000);
         outtakeTransfer.setPosition(.9);
         sleep(1000);
         sorter.setPosition(.8);
-        sleep(1000);
+        sleep(3500);
         outtakeTransfer.setPosition(0);
         sleep(1000);
         outtakeTransfer.setPosition(.9);

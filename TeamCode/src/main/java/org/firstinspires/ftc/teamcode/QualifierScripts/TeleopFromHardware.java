@@ -52,6 +52,11 @@ public class TeleopFromHardware extends LinearOpMode {
 //                hardware.launcherTurn.setPower(0d);
 //            }
 
+            if (gamepad2.y && !gamepad2.a) {
+                hardware.intaking = false;
+                hardware.intake.setPower(-1);
+            }
+
             if (manual) {
                 if (gamepad2.a) {
                     hardware.intake.setPower(1d);
@@ -94,10 +99,10 @@ public class TeleopFromHardware extends LinearOpMode {
                     hardware.stopLaunch();
                 }
 
-                hardware.tryLaunch(gamepad2.right_bumper, false, 1000);
-                hardware.tryLaunch(gamepad2.right_trigger > 0.125, false, 1250);
-                hardware.tryLaunch(gamepad2.left_bumper, true, 1000);
-                hardware.tryLaunch(gamepad2.left_trigger > 0.125, true, 1250);
+                hardware.tryLaunch(gamepad2.right_bumper, false, 1150);
+                hardware.tryLaunch(gamepad2.right_trigger > 0.125, false, 1350);
+                hardware.tryLaunch(gamepad2.left_bumper, true, 1150);
+                hardware.tryLaunch(gamepad2.left_trigger > 0.125, true, 1350);
 
 //                hardware.tryLaunchGreen(gamepad2.dpad_down);
 //                if (gamepad2.dpad_right && !(gamepad2.dpad_up || gamepad2.dpad_down)) {

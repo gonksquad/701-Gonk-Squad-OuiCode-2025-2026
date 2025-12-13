@@ -47,7 +47,7 @@ public class notimeBACKred extends LinearOpMode {
 
 //        sleep(5000);
 
-        rrHardware.doDrive(0,-.5,.1);
+        rrHardware.doDrive(0,-.5,.05);
         sleep(170);
         rrHardware.doDrive(0,0,0);
 
