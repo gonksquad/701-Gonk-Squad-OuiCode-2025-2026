@@ -23,6 +23,7 @@ public class TeleopFromHardware extends LinearOpMode {
 
         waitForStart();
         hardware.sorter.setPosition(0.8);
+        hardware.setSide("blue");
 
         while (opModeIsActive()) {
             if (gamepad2.guide) { // toggle manual override
@@ -44,13 +45,15 @@ public class TeleopFromHardware extends LinearOpMode {
                 hardware.outtakeTransfer.setPosition(0);
             }
 
+            //hardware.autoAimTurret();
+            /*
             double launchTurnPower = gamepad2.right_trigger - gamepad2.left_trigger;
             if (Math.abs(launchTurnPower) > 0.125) {
                 hardware.launcherTurn.setPower(launchTurnPower * 0.5);
             } else {
                 hardware.launcherTurn.setPower(0d);
             }
-
+            */
             if (manual) {
                 if (gamepad2.a) {
                     hardware.intake.setPower(1d);

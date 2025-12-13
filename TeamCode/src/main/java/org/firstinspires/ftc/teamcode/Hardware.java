@@ -15,12 +15,14 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.List;
+
 public class Hardware {
     // declare hardware
     public DcMotor frontLeft, frontRight, backLeft, backRight, intake;
     public DcMotorEx launcherLeft, launcherRight;
-    public CRServo launcherTurn;
-    public Servo sorter, outtakeTransfer, limelightTurn;
+    public CRServo launcherTurn, limelightTurn;
+    public Servo sorter, outtakeTransfer;
     public Limelight3A limelight;
     public ColorSensor colorSensor;
     int red, green, blue;
@@ -57,7 +59,7 @@ public class Hardware {
         launcherRight = hardwareMap.get(DcMotorEx.class, "launcherR"); //c0
 
         launcherTurn = hardwareMap.get(CRServo.class, "launcherYaw"); //c1
-        limelightTurn = hardwareMap.get(Servo.class, "limeservo"); //c0
+        limelightTurn = hardwareMap.get(CRServo.class, "limeservo"); //c0
 
         intake = hardwareMap.get(DcMotor.class, "intake"); // e2
         sorter = hardwareMap.get(Servo.class, "sorter"); //c2
@@ -287,33 +289,28 @@ public class Hardware {
         return guess;
     }
 
-    public void aimTurret(String side) {
+    public void setSide(String side) {
         switch (side) {
             case "blue":
-                limelight.pipelineSwitch(0); // pretend this detects april tag id 20
+                limelight.pipelineSwitch(6); // pretend this detects april tag id 20
                 break;
             case "red":
-                limelight.pipelineSwitch(4); // pretend this detects april tag id 24
+                limelight.pipelineSwitch(5); // pretend this detects april tag id 24
                 break;
         }
-
+    }
+    public void autoAimTurret() {
         LLResult result = limelight.getLatestResult();
+        double id = -1;
+        //doesn't work for detecting if its true and it doesnt cause
+        //errors not having it so if it aint broke
+        //if(true){//result != null && result.isValid()) {
+        List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
 
-//        if (result != null && result.isValid()) {
-
-        if (result != null && result.isValid()) {
-            double tx = result.getTx();
-            double ratio = 90d/270d; // approximate teeth of servo to teeth of launcher
-            if(tx > 4f) { // tag is on the right
-                launcherTurn.setPower(0.8 * ratio);
-               limelightTurn.setPosition(0.8);
-            } else if(tx < -4) { // tag is on the left
-                launcherTurn.setPower(-0.8 * ratio);
-               limelightTurn.setPosition(0.8);
-            } else { // tag is within left and right bounds
-                launcherTurn.setPower(0);
-            }
+        for (LLResultTypes.FiducialResult fiducial : fiducials) {
+            id = fiducial.getTargetXDegrees();
         }
-
+        launcherTurn.setPower(3*0.03*result.getTx());
+        limelightTurn.setPower(0.03*result.getTx());
     }
 }
