@@ -129,16 +129,16 @@ public class backendAutoRed extends OpMode {
             case SHOOT:
                 if (!follower.isBusy()) {
                     if(id == 21) {
-                        rrHardware.shootgpp();
+                        rrHardware.shootgppfar();
                     }
                     if(id == 22) {
-                        rrHardware.shootpgp();
+                        rrHardware.shootpgpfar();
                     }
                     if(id == 23) {
-                        rrHardware.shootppg();
+                        rrHardware.shootppgfar();
                     }
                     else {
-                        rrHardware.shootgpp();
+                        rrHardware.shootgppfar();
                     }
                 }
                 setPathState(pathState.STARTTOBEFOREPICKUP);
@@ -180,16 +180,16 @@ public class backendAutoRed extends OpMode {
             case SHOOT2:
                 if (!follower.isBusy()) {
                     if(id == 21) {
-                        rrHardware.shootgpp();
+                        rrHardware.shootgppfar();
                     }
                     if(id == 22) {
-                        rrHardware.shootpgp();
+                        rrHardware.shootpgpfar();
                     }
                     if(id == 23) {
-                        rrHardware.shootppg();
+                        rrHardware.shootppgfar();
                     }
                     else {
-                        rrHardware.shootppg();
+                        rrHardware.shootppgfar();
                     }
                 }
                 setPathState(pathState.SHOOTFORWARD);

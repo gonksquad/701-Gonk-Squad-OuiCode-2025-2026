@@ -173,7 +173,7 @@ public class testPathingBACKAUTORED extends OpMode {
             case PICKUPTOSHOOT:
                 if (!follower.isBusy()) {
                     follower.followPath(firstSpike_shoot, true);
-                    rrHardware.shootpgp();
+                    rrHardware.shootpgpfar();
                 }
                 setPathState(pathState.SHOOTFORWARD);
                 telemetry.addLine(" done shooting");

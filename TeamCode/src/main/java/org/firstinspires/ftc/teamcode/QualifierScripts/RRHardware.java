@@ -76,6 +76,8 @@ public class RRHardware{
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        double x = 0.75;
     }
 
     public final void sleep(long milliseconds) {
@@ -84,6 +86,35 @@ public class RRHardware{
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+    public void doDrive(double speedX, double speedY, double speedYaw) {
+        double pwrY = speedY;
+        double pwrX = speedX;
+        double pwrYaw = speedYaw;
+
+        if (Math.abs(pwrY) < 0.1) {
+            pwrY = 0;
+        }
+        if (Math.abs(pwrX) < 0.1) {
+            pwrX = 0;
+        }
+        if (Math.abs(pwrYaw) < 0.1) {
+            pwrYaw = 0;
+        } else if (Math.abs(pwrYaw) < 0.5) {
+            pwrYaw = Math.signum(pwrYaw) * 0.5;
+        }
+
+        double flPwr = pwrY - pwrYaw - pwrX;
+        double frPwr = pwrY + pwrYaw + pwrX;
+        double blPwr = pwrY - pwrYaw + pwrX;
+        double brPwr = pwrY + pwrYaw - pwrX;
+
+        double denominator = Math.max(Math.max(Math.max(flPwr, frPwr), Math.max(blPwr, brPwr)), 1);
+
+        frontLeft.setPower(flPwr / denominator);
+        frontRight.setPower(frPwr / denominator);
+        backLeft.setPower(blPwr / denominator);
+        backRight.setPower(brPwr / denominator);
     }
 
     public void intake1() {
@@ -107,48 +138,149 @@ public class RRHardware{
         intake.setPower(0);
     }
 
-    public void shootgpp() {
+    public void launchOnFar() {
+        launcherLeft.setVelocity(1250);
+        launcherRight.setVelocity(1250);
+    }
+
+    public void launchOnClose() {
+        launcherLeft.setVelocity(1000);
+        launcherRight.setVelocity(1000);
+    }
+
+    public void launchOff() {
+        launcherLeft.setVelocity(0);
+        launcherRight.setVelocity(0);
+    }
+
+    public void shootgppfar() {
+        launchOnFar();
         sorter.setPosition(.4);
+        sleep(1000);
         outtakeTransfer.setPosition(0);
-        sleep(500);
+        sleep(1000);
         outtakeTransfer.setPosition(.9);
+        sleep(1000);
         sorter.setPosition(.8);
+        sleep(1000);
         outtakeTransfer.setPosition(0);
-        sleep(500);
+        sleep(1000);
         outtakeTransfer. setPosition(.9);
+        sleep(1000);
         sorter.setPosition(0);
+        sleep(1000);
         outtakeTransfer.setPosition(0);
-        sleep(500);
+        sleep(1000);
         outtakeTransfer.setPosition(.9);
+        launchOff();
     }
 
-    public void shootpgp() {
+    public void shootpgpfar() {
+        launchOnFar();
         sorter.setPosition(0);
+        sleep(1000);
         outtakeTransfer.setPosition(0);
-        sleep(500);
+        sleep(1000);
         outtakeTransfer.setPosition(.9);
+        sleep(1000);
         sorter.setPosition(.4);
+        sleep(1000);
         outtakeTransfer.setPosition(0);
-        sleep(500);
+        sleep(1000);
         outtakeTransfer.setPosition(.9);
+        sleep(1000);
         sorter.setPosition(.8);
+        sleep(1000);
         outtakeTransfer.setPosition(0);
-        sleep(500);
+        sleep(1000);
         outtakeTransfer.setPosition(.9);
+        launchOff();
     }
 
-    public void shootppg() {
+    public void shootppgfar() {
+        launchOnFar();
         sorter.setPosition(0);
+        sleep(1000);
         outtakeTransfer.setPosition(0);
-        sleep(500);
+        sleep(1000);
         outtakeTransfer.setPosition(.9);
+        sleep(1000);
         sorter.setPosition(.8);
+        sleep(1000);
         outtakeTransfer.setPosition(0);
-        sleep(500);
+        sleep(1000);
         outtakeTransfer.setPosition(.9);
+        sleep(1000);
         sorter.setPosition(.4);
+        sleep(1000);
         outtakeTransfer.setPosition(0);
-        sleep(500);
+        sleep(1000);
         outtakeTransfer.setPosition(.9);
+        launchOff();
+    }
+    public void shootgppclose() {
+        launchOnClose();
+        sorter.setPosition(.4);
+        sleep(1000);
+        outtakeTransfer.setPosition(0);
+        sleep(1000);
+        outtakeTransfer.setPosition(.9);
+        sleep(1000);
+        sorter.setPosition(.8);
+        sleep(1000);
+        outtakeTransfer.setPosition(0);
+        sleep(1000);
+        outtakeTransfer. setPosition(.9);
+        sleep(1000);
+        sorter.setPosition(0);
+        sleep(1000);
+        outtakeTransfer.setPosition(0);
+        sleep(1000);
+        outtakeTransfer.setPosition(.9);
+        launchOff();
+    }
+
+    public void shootpgpclose() {
+        launchOnClose();
+        sorter.setPosition(0);
+        sleep(1000);
+        outtakeTransfer.setPosition(0);
+        sleep(1000);
+        outtakeTransfer.setPosition(.9);
+        sleep(1000);
+        sorter.setPosition(.4);
+        sleep(1000);
+        outtakeTransfer.setPosition(0);
+        sleep(1000);
+        outtakeTransfer.setPosition(.9);
+        sleep(1000);
+        sorter.setPosition(.8);
+        sleep(1000);
+        outtakeTransfer.setPosition(0);
+        sleep(1000);
+        outtakeTransfer.setPosition(.9);
+        launchOff();
+    }
+
+    public void shootppgclose() {
+        launchOnClose();
+        sorter.setPosition(0);
+        sleep(1000);
+        outtakeTransfer.setPosition(0);
+        sleep(1000);
+        outtakeTransfer.setPosition(.9);
+        sleep(1000);
+        sorter.setPosition(.8);
+        sleep(1000);
+        outtakeTransfer.setPosition(0);
+        sleep(1000);
+        outtakeTransfer.setPosition(.9);
+        sleep(1000);
+        sorter.setPosition(.4);
+        sleep(1000);
+        outtakeTransfer.setPosition(0);
+        sleep(1000);
+        outtakeTransfer.setPosition(.9);
+        launchOff();
     }
 }
