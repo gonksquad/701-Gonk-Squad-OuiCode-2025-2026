@@ -31,6 +31,7 @@ public class Hardware {
     public double sorterOffset = 0d;
     public byte[] sorterPos = {0, 0, 0}; // what is stored in each sorter slot 0 = empty, 1 = purple, 2 = green
     public int currentPos = 0; // 0-2
+    int targetTps = 0; // protect launcher tps from override
     ElapsedTime changePosTimer = new ElapsedTime();
 
     // initialize flags
@@ -120,7 +121,7 @@ public class Hardware {
     }
 
     // NOTE: if the color is not in the
-    public void tryLaunch(boolean button, boolean isGreen) {
+    public void tryLaunch(boolean button, boolean isGreen, int tps) {
         if (button && !(launchingPurple || launchingGreen)) { // on first button press
             // check if sorter has purple
             for (int i = currentPos; i < currentPos + 3; i++) { // for every sorter position starting at the current one
@@ -132,8 +133,10 @@ public class Hardware {
                     launchingPurple = !isGreen;
 
                     // TODO: set velocity based on apriltag distance
-                    launcherLeft.setVelocity(2800);
-                    launcherRight.setVelocity(2800);
+                    launcherLeft.setVelocity(tps + 200);
+                    launcherRight.setVelocity(tps + 200);
+
+                    targetTps = tps;
 
                     currentPos = i % 3;
                     sorter.setPosition(outtakePos[currentPos]);
@@ -142,46 +145,46 @@ public class Hardware {
                 }
             }
         }
-        if ((launchingPurple || launchingGreen) && launcherLeft.getVelocity() > 1700 && outtakeTransfer.getPosition() != 0d) {
-            outtakeTransfer.setPosition(0d);
+        if ((launchingPurple || launchingGreen) && launcherLeft.getVelocity() > targetTps && outtakeTransfer.getPosition() != 0.2) {
+            outtakeTransfer.setPosition(0.2);
             sorterPos[currentPos] = 0;
             changePosTimer.reset();
         }
-        if (outtakeTransfer.getPosition() == 0d && changePosTimer.milliseconds() > 1000) {
+        if (outtakeTransfer.getPosition() == 0.2 && changePosTimer.milliseconds() > 1000) {
             stopLaunch();
         }
     }
 
-    public void tryLaunchGreen(boolean button) {
-        if (button && !launchingGreen) { // on first button press
-
-            // check if sorter has green
-            boolean sorterSuccess = false;
-            for (int i = getCurrentPos(); i < sorterPos.length + getCurrentPos(); i = (i + 1) % 3) { // for every sorter position starting at the current one
-                if (sorterPos[i] == 2) { // if the position has a green inside of it
-                    sorterSuccess = true;
-                    sorter.setPosition((outtakePos[i] + sorterOffset) % 1d);
-                    changePosTimer.reset();
-                    break;
-                }
-            }
-
-            if (sorterSuccess) {
-                launchingPurple = false;
-                launchingGreen = true;
-                // TODO: set velocity based on apriltag distance
-                launcherLeft.setVelocity(6000);
-                launcherRight.setVelocity(6000);
-            }
-        }
+//    public void tryLaunchGreen(boolean button) {
+//        if (button && !launchingGreen) { // on first button press
+//
+//            // check if sorter has green
+//            boolean sorterSuccess = false;
+//            for (int i = getCurrentPos(); i < sorterPos.length + getCurrentPos(); i = (i + 1) % 3) { // for every sorter position starting at the current one
+//                if (sorterPos[i] == 2) { // if the position has a green inside of it
+//                    sorterSuccess = true;
+//                    sorter.setPosition((outtakePos[i] + sorterOffset) % 1d);
+//                    changePosTimer.reset();
+//                    break;
+//                }
+//            }
+//
+//            if (sorterSuccess) {
+//                launchingPurple = false;
+//                launchingGreen = true;
+//                // TODO: set velocity based on apriltag distance
+//                launcherLeft.setVelocity(6000);
+//                launcherRight.setVelocity(6000);
+//            }
+//        }
 //        if (launchingGreen) {
-////            if(changePosTimer.milliseconds() >= 750 && sorterPos[getCurrentPos()] == 1) {
-////                outtakeTransfer.setPosition(1);
-////                sorterPos[getCurrentPos()] = 0;
-////            }
-////            if(changePosTimer.milliseconds() >= 1250){
-////                outtakeTransfer.setPosition(0);
-////            }
+//            if(changePosTimer.milliseconds() >= 750 && sorterPos[getCurrentPos()] == 1) {
+//                outtakeTransfer.setPosition(1);
+//                sorterPos[getCurrentPos()] = 0;
+//            }
+//            if(changePosTimer.milliseconds() >= 1250){
+//                outtakeTransfer.setPosition(0);
+//            }
 //            // treat this as a loop
 //            /*
 //            Check for the following:
@@ -191,7 +194,7 @@ public class Hardware {
 //            if all are correct, push artifact into launcher
 //            */
 //        }
-    }
+//    }
 
     public void stopLaunch() {
         outtakeTransfer.setPosition(0.9);

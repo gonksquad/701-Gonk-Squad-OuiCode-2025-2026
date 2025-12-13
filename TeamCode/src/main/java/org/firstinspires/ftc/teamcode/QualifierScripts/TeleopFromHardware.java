@@ -23,6 +23,7 @@ public class TeleopFromHardware extends LinearOpMode {
 
         waitForStart();
         hardware.sorter.setPosition(0.8);
+        hardware.launcherTurn.setPower(0d);
 
         while (opModeIsActive()) {
             if (gamepad2.guide) { // toggle manual override
@@ -41,15 +42,15 @@ public class TeleopFromHardware extends LinearOpMode {
             }
 
             if(gamepad1.xWasPressed()) {
-                hardware.outtakeTransfer.setPosition(0);
+                hardware.outtakeTransfer.setPosition(0.2);
             }
 
-            double launchTurnPower = gamepad2.right_trigger - gamepad2.left_trigger;
-            if (Math.abs(launchTurnPower) > 0.125) {
-                hardware.launcherTurn.setPower(launchTurnPower * 0.5);
-            } else {
-                hardware.launcherTurn.setPower(0d);
-            }
+//            double launchTurnPower = gamepad2.right_trigger - gamepad2.left_trigger;
+//            if (Math.abs(launchTurnPower) > 0.125) {
+//                hardware.launcherTurn.setPower(launchTurnPower * 0.5);
+//            } else {
+//                hardware.launcherTurn.setPower(0d);
+//            }
 
             if (manual) {
                 if (gamepad2.a) {
@@ -93,8 +94,10 @@ public class TeleopFromHardware extends LinearOpMode {
                     hardware.stopLaunch();
                 }
 
-                hardware.tryLaunch(gamepad2.right_bumper, false);
-                hardware.tryLaunch(gamepad2.left_bumper, true);
+                hardware.tryLaunch(gamepad2.right_bumper, false, 1000);
+                hardware.tryLaunch(gamepad2.right_trigger > 0.125, false, 1250);
+                hardware.tryLaunch(gamepad2.left_bumper, true, 1000);
+                hardware.tryLaunch(gamepad2.left_trigger > 0.125, true, 1250);
 
 //                hardware.tryLaunchGreen(gamepad2.dpad_down);
 //                if (gamepad2.dpad_right && !(gamepad2.dpad_up || gamepad2.dpad_down)) {
