@@ -41,9 +41,9 @@ public class TeleopFromHardware extends LinearOpMode {
                 prevManual = false;
             }
 
-            if(gamepad1.xWasPressed()) {
-                hardware.outtakeTransfer.setPosition(0.2);
-            }
+//            if(gamepad1.xWasPressed()) {
+//                hardware.outtakeTransfer.setPosition(0.2);
+//            }
 
 //            double launchTurnPower = gamepad2.right_trigger - gamepad2.left_trigger;
 //            if (Math.abs(launchTurnPower) > 0.125) {
