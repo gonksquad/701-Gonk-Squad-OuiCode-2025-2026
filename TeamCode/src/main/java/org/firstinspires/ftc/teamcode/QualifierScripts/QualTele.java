@@ -1,3 +1,4 @@
+// used to be TeleopFromHardware
 package org.firstinspires.ftc.teamcode.QualifierScripts;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -5,8 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Hardware;
 
-@TeleOp(name="QualTele")
-public class TeleopFromHardware extends LinearOpMode {
+@TeleOp //(name="QualTele")
+public class QualTele extends LinearOpMode {
 
     boolean manual = false;
     boolean prevManual = false;
