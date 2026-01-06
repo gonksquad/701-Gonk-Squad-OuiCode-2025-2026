@@ -22,7 +22,7 @@ public class Constants {
             .translationalPIDFCoefficients(new PIDFCoefficients(0.9, 0, 0.01, 0))
             .headingPIDFCoefficients(new PIDFCoefficients(1, 0, 0.01, 0))
             .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.025,0.0,0.001,0.6,0.0))
-            .mass(10.1); //should be right for robot
+            .mass(10.61); //should be right for states robot
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
@@ -49,8 +49,8 @@ public class Constants {
     }
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(149)
-            .strafePodX(-57)
+            .forwardPodY(-5.125)
+            .strafePodX(6.4375)
             .distanceUnit(DistanceUnit.MM)
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
