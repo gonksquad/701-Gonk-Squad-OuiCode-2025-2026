@@ -123,16 +123,16 @@ public class Hardware {
     }
 
     // NOTE: if the color is not in the
-    public void tryLaunch(boolean button, boolean isGreen, int tps) {
+    public void tryLaunch(boolean button, int color, int tps) { // 1=purple, 2=green, other=any color
         if (button && !(launchingPurple || launchingGreen)) { // on first button press
             // check if sorter has purple
             for (int i = currentPos; i < currentPos + 3; i++) { // for every sorter position starting at the current one
                 //if position has purple
-                if (sorterPos[i % 3] == (isGreen? 2 : 1)) {
+                if ((sorterPos[i % 3] == (color==2? 2 : 1) || (sorterPos[i%3] != 0 && color==0))) {
                     stopIntake();
 
-                    launchingGreen = isGreen;
-                    launchingPurple = !isGreen;
+                    launchingGreen = (color == 2 || color == 0);
+                    launchingPurple = (color == 1 || color == 0);
 
                     // TODO: set velocity based on apriltag distance
                     launcherLeft.setVelocity(tps + 20);

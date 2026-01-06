@@ -25,7 +25,7 @@ public class SpeedTest extends LinearOpMode {
                 hardware.outtakeTransfer.setPosition(0.9);
             }
 
-            hardware.tryLaunch(gamepad2.right_bumper, false, testTps);
+            hardware.tryLaunch(gamepad2.right_bumper, 1, testTps);
             if (gamepad2.b && !gamepad2.right_bumper) {
                 hardware.stopLaunch();
             }

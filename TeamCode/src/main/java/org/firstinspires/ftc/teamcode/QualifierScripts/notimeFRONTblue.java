@@ -22,10 +22,10 @@ public class notimeFRONTblue extends LinearOpMode {
         waitForStart();
         rrHardware.launcherTurn.setPower(0d);
         rrHardware.doDrive(0,-.5,0);
-        sleep(1400);
+        sleep(1300);
         rrHardware.doDrive(0,0,0);
         rrHardware.doDrive(0,0,-.5);
-        sleep(1100);
+        sleep(1050);
         rrHardware.doDrive(0,0,0);
 
 //        if (rrHardware != null && rrHardware.limelight != null) {
@@ -73,9 +73,9 @@ public class notimeFRONTblue extends LinearOpMode {
 
         sleep(5000);
         rrHardware.doDrive(0,0,-.5);
-        sleep(600);
+        sleep(800);
         rrHardware.doDrive(0,-.5,0);
-        sleep(1000);
+        sleep(800);
         rrHardware.doDrive(0,0,0);
 
 

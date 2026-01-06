@@ -21,6 +21,17 @@ public class notimeFRONTred extends LinearOpMode {
 
         waitForStart();
         rrHardware.launcherTurn.setPower(0d);
+//        rrHardware.doDrive(0,.5,0);
+//        sleep(1300);
+//        rrHardware.doDrive(0,0,0);
+//        rrHardware.shootpgpclose();
+//        sleep(5000);
+//        rrHardware.doDrive(0,0,.5);
+//        sleep(400);
+//        rrHardware.doDrive(0,.5,0);
+//        sleep(400);
+//        rrHardware.doDrive(0,0,0);
+        
         rrHardware.doDrive(0,-.5,0);
         sleep(1300);
         rrHardware.doDrive(0,0,0);
