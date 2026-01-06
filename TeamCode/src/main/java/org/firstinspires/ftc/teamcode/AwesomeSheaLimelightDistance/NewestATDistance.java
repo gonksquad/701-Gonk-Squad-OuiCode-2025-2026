@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 
 import java.util.List;
 
-@TeleOp(name="a")
+@TeleOp//(name="a")
 
 public class NewestATDistance extends LinearOpMode{
     Limelight3A limelight;
