@@ -30,9 +30,8 @@ public class ApriltagCalculatedDistance extends LinearOpMode {
             } else {
                 telemetry.addLine("No valid target detected.");
             }
-
-
             telemetry.update();
         }
+
     }
 }
