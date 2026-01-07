@@ -13,7 +13,7 @@ public class ApriltagCalculatedDistance extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.setPollRateHz(100);
-        limelight.pipelineSwitch(1);
+        limelight.pipelineSwitch(0);
         waitForStart();
         limelight.start();
 
@@ -34,8 +34,8 @@ public class ApriltagCalculatedDistance extends LinearOpMode {
 
     }
     public double getDistanceFromTag(double ta){
-        double scale = 25149.28;
-        double distance = (scale/ta);
-        return distance;
+        double scale = 181.5366;
+        double dist = (scale * (Math.pow(ta,-0.4924724)));
+        return dist;
     }
 }
