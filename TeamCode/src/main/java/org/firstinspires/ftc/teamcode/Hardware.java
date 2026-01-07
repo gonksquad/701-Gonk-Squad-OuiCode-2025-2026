@@ -28,7 +28,7 @@ public class Hardware {
     int red, green, blue;
     float[] hsvValues = new float[3];
     boolean nextPos = true;
-    public final double[] intakePos = {1.0, 0.6, 0.2}; // sorter servo positions for outtaking
+    public final double[] intakePos =  {1.0, 0.6, 0.2};// sorter servo positions for outtaking
     public final double[] outtakePos = {0.4, 0.0, 0.8}; // sorter servo positions for intaking
     public double sorterOffset = 0d;
     public byte[] sorterPos = {0, 0, 0}; // what is stored in each sorter slot 0 = empty, 1 = purple, 2 = green
@@ -45,10 +45,10 @@ public class Hardware {
     // assign hardware
     public Hardware(HardwareMap hardwareMap) {
         // e0 = expansion hub 0, c2 = control hub 2
-        frontLeft = hardwareMap.get(DcMotor.class, "fl"); // c1
-        frontRight = hardwareMap.get(DcMotor.class, "fr"); // e1
-        backLeft = hardwareMap.get(DcMotor.class, "bl"); // c2
-        backRight = hardwareMap.get(DcMotor.class, "br"); // e2
+        frontLeft = hardwareMap.get(DcMotor.class, "fl");
+        frontRight = hardwareMap.get(DcMotor.class, "fr");
+        backLeft = hardwareMap.get(DcMotor.class, "bl");
+        backRight = hardwareMap.get(DcMotor.class, "br");
 
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -56,11 +56,11 @@ public class Hardware {
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
-        launcherLeft = hardwareMap.get(DcMotorEx.class, "launcherL"); //e0
-        launcherRight = hardwareMap.get(DcMotorEx.class, "launcherR"); //c0
+        launcherLeft = hardwareMap.get(DcMotorEx.class, "launcherL");
+        launcherRight = hardwareMap.get(DcMotorEx.class, "launcherR");
 
-        launcherTurn = hardwareMap.get(CRServo.class, "launcherYaw"); //c1
-        limelightTurn = hardwareMap.get(CRServo.class, "limeservo"); //c0
+        launcherTurn = hardwareMap.get(CRServo.class, "launcherYaw");
+        limelightTurn = hardwareMap.get(CRServo.class, "limeservo");
 
         intake = hardwareMap.get(DcMotor.class, "intake"); // e2
         sorter = hardwareMap.get(Servo.class, "sorter"); //c2
