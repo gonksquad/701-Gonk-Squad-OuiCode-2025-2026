@@ -11,7 +11,9 @@ public class SorterTest extends LinearOpMode {
 
     boolean prevA = false;
     boolean prevB = false;
+    //boolean prevC = false;
     int nextPos = 0;
+    //double[] liftPos = {0.2, 0.9};
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -19,10 +21,10 @@ public class SorterTest extends LinearOpMode {
 
         waitForStart();
         while (opModeIsActive()) {
-            hardware.tryIntake(gamepad1.a);
+            /*hardware.limelightTurn.setPower(0.5);
             if (gamepad1.b && !gamepad1.a) {
-                hardware.stopIntake();
-            }
+                hardware.limelightTurn.setPower(0);
+            }*/
 //
 //            hardware.tryLaunchPurple(gamepad1.x);
 //            if (gamepad1.y && !gamepad1.x) {
@@ -51,8 +53,17 @@ public class SorterTest extends LinearOpMode {
                 prevB = false;
             }
 
+            /*if (gamepad1.left_bumper) {
+                if (!prevC) {
+                    hardware.outtakeTransfer.setPosition(hardware.intakePos[nextPos]);
+                }
+                prevC = true;
+            } else {
+                prevC = false;
+            }*/
+            telemetry.addData("limelight", hardware.limelightTurn.getPower());
             telemetry.addData("Position: ", nextPos);
-            telemetry.addData("Position Value: ", hardware.sorter.getPosition());
+            telemetry.addData("Position Value: ", hardware.outtakeTransfer.getPosition());
             telemetry.update();
         }
     }
