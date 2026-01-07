@@ -14,7 +14,7 @@ public class QualTele extends LinearOpMode {
     double prevOffset = 0d;
     final double offsetAmount = 0d;
     boolean prevSorterL = false;
-    boolean prevSorterR = false;
+     boolean prevSorterR = false;
     boolean prevA = false;
     boolean prevB = false;
 
@@ -23,6 +23,7 @@ public class QualTele extends LinearOpMode {
         Hardware hardware = new Hardware(hardwareMap);
 
         waitForStart();
+        hardware.outtakeTransfer.setPosition(0.85);
         hardware.sorter.setPosition(0.8);
         hardware.launcherTurn.setPower(0d);
 
@@ -104,7 +105,7 @@ public class QualTele extends LinearOpMode {
                 hardware.tryLaunch(gamepad2.right_trigger > 0.125, 1, 1350);
                 hardware.tryLaunch(gamepad2.left_bumper, 2, 1150);
                 hardware.tryLaunch(gamepad2.left_trigger > 0.125, 2, 1350);
-
+                hardware.tryLaunch(gamepad2.x, 0, 1150);
 //                hardware.tryLaunchGreen(gamepad2.dpad_down);
 //                if (gamepad2.dpad_right && !(gamepad2.dpad_up || gamepad2.dpad_down)) {
 //                    hardware.stopLaunch();

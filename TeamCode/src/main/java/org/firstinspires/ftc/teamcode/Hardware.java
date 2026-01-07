@@ -28,13 +28,14 @@ public class Hardware {
     int red, green, blue;
     float[] hsvValues = new float[3];
     boolean nextPos = true;
-    public final double[] intakePos =  {1.0, 0.6, 0.2};// sorter servo positions for outtaking
-    public final double[] outtakePos = {0.4, 0.0, 0.8}; // sorter servo positions for intaking
+    public final double[] intakePos =  {1.0, 0.6, 0.2};//*/{0.4, 0.0, 0.8};// sorter servo positions for outtaking
+    public final double[] outtakePos = {0.4, 0.0, 0.8};//*/{1.0, 0.6, 0.2}; // sorter servo positions for intaking
     public double sorterOffset = 0d;
     public byte[] sorterPos = {0, 0, 0}; // what is stored in each sorter slot 0 = empty, 1 = purple, 2 = green
     public int currentPos = 0; // 0-2
     int targetTps = 0; // protect launcher tps from override
     ElapsedTime changePosTimer = new ElapsedTime();
+    ElapsedTime launchTimer = new ElapsedTime();
 
     // initialize flags
     public boolean intaking = false;
@@ -71,10 +72,10 @@ public class Hardware {
 
         launcherRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         launcherRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        launcherRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         launcherLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         launcherLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        launcherLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -142,15 +143,17 @@ public class Hardware {
 
                     currentPos = i % 3;
                     sorter.setPosition(outtakePos[currentPos]);
+                    launchTimer.reset();
 
                     break;
                 }
             }
         }
-        if ((launchingPurple || launchingGreen) && launcherLeft.getVelocity() > targetTps && outtakeTransfer.getPosition() != 0.2) {
+        if ((launchingPurple || launchingGreen) && launcherLeft.getVelocity() > targetTps && outtakeTransfer.getPosition() != 0.2 && launchTimer.milliseconds() > 600) {
             outtakeTransfer.setPosition(0.2);
             sorterPos[currentPos] = 0;
             changePosTimer.reset();
+            launchTimer.reset();
         }
         if (outtakeTransfer.getPosition() == 0.2 && changePosTimer.milliseconds() > 1000) {
             stopLaunch();
@@ -199,7 +202,7 @@ public class Hardware {
 //    }
 
     public void stopLaunch() {
-        outtakeTransfer.setPosition(0.9);
+        outtakeTransfer.setPosition(0.85);
         launcherLeft.setVelocity(0);
         launcherRight.setVelocity(0);
         launchingPurple = false;
