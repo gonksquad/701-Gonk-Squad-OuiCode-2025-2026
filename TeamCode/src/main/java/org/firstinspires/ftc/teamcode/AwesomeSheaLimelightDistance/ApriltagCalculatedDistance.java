@@ -34,8 +34,9 @@ public class ApriltagCalculatedDistance extends LinearOpMode {
 
     }
     public double getDistanceFromTag(double ta){
-        double scale = 181.5366;
-        double dist = (scale * (Math.pow(ta,-0.4924724)));
+        double scale = 184.8972;
+        double dist = (scale * (Math.pow(ta,-0.5056956)));
         return dist;
+        //y = 184.8972*x^-0.5056956
     }
 }
