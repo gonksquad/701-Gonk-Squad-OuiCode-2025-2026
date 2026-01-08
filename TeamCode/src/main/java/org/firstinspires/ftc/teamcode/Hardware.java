@@ -143,6 +143,7 @@ public class Hardware {
 
                     currentPos = i % 3;
                     sorter.setPosition(outtakePos[currentPos]);
+                    intake.setPower(0.5);
                     launchTimer.reset();
 
                     break;
@@ -205,6 +206,7 @@ public class Hardware {
         outtakeTransfer.setPosition(0.85);
         launcherLeft.setVelocity(0);
         launcherRight.setVelocity(0);
+        intake.setPower(0);
         launchingPurple = false;
         launchingGreen = false;
     }
