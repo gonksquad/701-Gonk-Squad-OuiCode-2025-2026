@@ -246,7 +246,7 @@ public class Hardware {
             pwrX = 0;
         }
         if (Math.abs(pwrYaw) < 0.1) {
-            pwrYaw = 0;
+            //pwrYaw = 0;
         } else if (Math.abs(pwrYaw) < 0.5) {
             pwrYaw = Math.signum(pwrYaw) * 0.5;
         }
@@ -304,18 +304,28 @@ public class Hardware {
                 break;
         }
     }
-    public void autoAimTurret() {
+    public String autoAimTurret(boolean isBlueTeam, float llsP) {
         LLResult result = limelight.getLatestResult();
         double id = -1;
-        //doesn't work for detecting if its true and it doesnt cause
+        //doesn't work for detecting if its true and it doesnt cause...
         //errors not having it so if it aint broke
         //if(true){//result != null && result.isValid()) {
+
         List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
 
         for (LLResultTypes.FiducialResult fiducial : fiducials) {
-            id = fiducial.getTargetXDegrees();
+            id = fiducial.getFiducialId();
         }
-        launcherTurn.setPower(3*0.03*result.getTx());
-        limelightTurn.setPower(0.03*result.getTx());
+        //if((id == 20 && isBlueTeam) || (id == 24 && !isBlueTeam)) {
+        if(result!=null && result.isValid()){
+            launcherTurn.setPower(0.6);// * llsP * result.getTx());
+            limelightTurn.setPower(llsP * result.getTx()*Math.abs(result.getTx()));
+        } else {
+            launcherTurn.setPower(0);
+            limelightTurn.setPower(0);
+        }
+        //}
+
+        return "April tag found at degree, " + result.getTx() + "ID = " + id;
     }
 }
