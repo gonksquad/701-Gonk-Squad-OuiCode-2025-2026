@@ -23,7 +23,7 @@ public class QualTele extends LinearOpMode {
         Hardware hardware = new Hardware(hardwareMap);
 
         waitForStart();
-        hardware.outtakeTransfer.setPosition(0.85);
+        hardware.outtakeTransfer.setPosition(0.2);
         hardware.sorter.setPosition(0.8);
         hardware.launcherTurn.setPower(0d);
 
