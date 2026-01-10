@@ -63,6 +63,9 @@ public class SorterTest extends LinearOpMode {
             } else {
                 prevC = false;
             }
+
+            hardware.launcherTurn.setPower(gamepad1.left_stick_y);
+
             //telemetry.addData("limelight", hardware.limelightTurn.getPower());
             telemetry.addData("Position: ", nextPos1);
             telemetry.addData("Position Value: ", hardware.outtakeTransfer.getPosition());
