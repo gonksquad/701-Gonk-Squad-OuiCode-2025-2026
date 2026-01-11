@@ -25,7 +25,7 @@ public class Hardware {
     int red, green, blue;
     float[] hsvValues = new float[3];
     boolean nextPos = true;
-    public final double[] intakePos =  {1.0, 0.6, 0.2};//*/{0.4, 0.0, 0.8};// sorter servo positions for outtaking
+    public final double[] intakePos = {1.0, 0.6, 0.2};//*/{0.4, 0.0, 0.8};// sorter servo positions for outtaking
     public final double[] outtakePos = {0.4, 0.0, 0.8};//*/{1.0, 0.6, 0.2}; // sorter servo positions for intaking
     public double sorterOffset = 0d;
     public byte[] sorterPos = {0, 0, 0}; // what is stored in each sorter slot 0 = empty, 1 = purple, 2 = green
@@ -122,6 +122,7 @@ public class Hardware {
         intake.setPower(0);
         intaking = false;
     }
+
     public void stopLaunch() {
         outtakeTransferLeft.setPosition(liftPos[0]);
         outtakeTransferRight.setPosition(liftPos[0]);
@@ -131,44 +132,45 @@ public class Hardware {
         launchingPurple = false;
         launchingGreen = false;
     }
+
     // NOTE: if the color is not in the
     public void tryLaunch(boolean button, int color, int tps) { // 1=purple, 2=green, other=any color
         if (button && !(launchingPurple || launchingGreen)) { // on first button press
             // check if sorter has purple
             for (int i = currentPos; i < currentPos + 3; i++) { // for every sorter position starting at the current one
                 //if position has purple
-                if ((sorterPos[i % 3] == (color==2? 2 : 1) || (sorterPos[i%3] != 0 && color==0))) {
-                if (sorterPos[i % 3] == (color==2? 2 : 1) || (sorterPos[i%3] != 0 && color==0)) {
-                    stopLaunch();
-                    stopIntake();
+                if ((sorterPos[i % 3] == (color == 2 ? 2 : 1) || (sorterPos[i % 3] != 0 && color == 0))) {
+                    if (sorterPos[i % 3] == (color == 2 ? 2 : 1) || (sorterPos[i % 3] != 0 && color == 0)) {
+                        stopLaunch();
+                        stopIntake();
 
-                    launchingPurple = sorterPos[i % 3] == 1;
+                        launchingPurple = sorterPos[i % 3] == 1;
 
-                    // TODO: set velocity based on apriltag distance
-                    launcherLeft.setVelocity(tps + 20);
-                    launcherRight.setVelocity(tps + 20);
+                        // TODO: set velocity based on apriltag distance
+                        launcherLeft.setVelocity(tps + 20);
+                        launcherRight.setVelocity(tps + 20);
 
-                    targetTps = tps;
+                        targetTps = tps;
 
-                    currentPos = i % 3;
-                    sorter.setPosition(outtakePos[currentPos]);
-                    intake.setPower(0.5);
-                    launchTimer.reset();
+                        currentPos = i % 3;
+                        sorter.setPosition(outtakePos[currentPos]);
+                        intake.setPower(0.5);
+                        launchTimer.reset();
 
-                    break;
+                        break;
+                    }
                 }
             }
-        }
-        if ((launchingPurple || launchingGreen) && launcherLeft.getVelocity() > targetTps && outtakeTransferLeft.getPosition() != liftPos[1] && launchTimer.milliseconds() > 600) {
-            outtakeTransferLeft.setPosition(liftPos[1]);
-            outtakeTransferRight.setPosition(liftPos[1]);
-            sorterPos[currentPos] = 0;
-        }
-        if (outtakeTransferLeft.getPosition() == liftPos[1] && launchTimer.milliseconds() > 1000) {
-            stopLaunch();
+            if ((launchingPurple || launchingGreen) && launcherLeft.getVelocity() > targetTps && outtakeTransferLeft.getPosition() != liftPos[1] && launchTimer.milliseconds() > 600) {
+                outtakeTransferLeft.setPosition(liftPos[1]);
+                outtakeTransferRight.setPosition(liftPos[1]);
+                sorterPos[currentPos] = 0;
+            }
+            if (outtakeTransferLeft.getPosition() == liftPos[1] && launchTimer.milliseconds() > 1000) {
+                stopLaunch();
+            }
         }
     }
-
 //    public void tryLaunchGreen(boolean button) {
 //        if (button && !launchingGreen) { // on first button press
 //
@@ -209,8 +211,6 @@ public class Hardware {
 //            */
 //        }
 //    }
-
-    public void stopLaunch() {
 
 
     /*public void doDrive(double ctrlX, double ctrlY, double ctrlYaw) {
@@ -299,38 +299,38 @@ public class Hardware {
         return guess;
     }
 
-    public void setSide(String side) {
-        switch (side) {
-            case "blue":
-                limelight.pipelineSwitch(6); // pretend this detects april tag id 20
-                break;
-            case "red":
-                limelight.pipelineSwitch(5); // pretend this detects april tag id 24
-                break;
-        }
-    }
-    public String autoAimTurret(boolean isBlueTeam, float llsP) {
-        LLResult result = limelight.getLatestResult();
-        double id = -1;
-        //doesn't work for detecting if its true and it doesnt cause...
-        //errors not having it so if it aint broke
-        //if(true){//result != null && result.isValid()) {
+            /*public void setSide (String side){
+                switch (side) {
+                    case "blue":
+                        limelight.pipelineSwitch(6); // pretend this detects april tag id 20
+                        break;
+                    case "red":
+                        limelight.pipelineSwitch(5); // pretend this detects april tag id 24
+                        break;
+                }
+            }*/
+            /*public String autoAimTurret ( boolean isBlueTeam, float llsP){
+                LLResult result = limelight.getLatestResult();
+                double id = -1;
+                //doesn't work for detecting if its true and it doesnt cause...
+                //errors not having it so if it aint broke
+                //if(true){//result != null && result.isValid()) {
 
-        List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
+                List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
 
-        for (LLResultTypes.FiducialResult fiducial : fiducials) {
-            id = fiducial.getFiducialId();
-        }
-        //if((id == 20 && isBlueTeam) || (id == 24 && !isBlueTeam)) {
-        if(result!=null && result.isValid()){
-            launcherTurn.setPower(0.6);// * llsP * result.getTx());
-            limelightTurn.setPower(llsP * result.getTx()*Math.abs(result.getTx()));
-        } else {
-            launcherTurn.setPower(0);
-            limelightTurn.setPower(0);
-        }
-        //}
+                for (LLResultTypes.FiducialResult fiducial : fiducials) {
+                    id = fiducial.getFiducialId();
+                }
+                //if((id == 20 && isBlueTeam) || (id == 24 && !isBlueTeam)) {
+                if (result != null && result.isValid()) {
+                    launcherTurn.setPower(0.6);// * llsP * result.getTx());
+                    limelightTurn.setPower(llsP * result.getTx() * Math.abs(result.getTx()));
+                } else {
+                    launcherTurn.setPower(0);
+                    limelightTurn.setPower(0);
+                }
+                //}
 
-        return "April tag found at degree, " + result.getTx() + "ID = " + id;
-    }
+                return "April tag found at degree, " + result.getTx() + "ID = " + id;
+            }*/
 }
