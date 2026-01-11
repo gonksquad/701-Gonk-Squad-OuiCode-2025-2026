@@ -25,19 +25,20 @@ public class StatesTele extends LinearOpMode {
         hardware.limelight.pipelineSwitch(0);
         waitForStart();
         hardware.limelight.start();
-        hardware.outtakeTransfer.setPosition(0.85);
+        hardware.outtakeTransferLeft.setPosition(hardware.liftPos[0]); //down position
+        hardware.outtakeTransferRight.setPosition(hardware.liftPos[0]); // down position
         hardware.sorter.setPosition(0.8);
         hardware.launcherTurn.setPower(0d);
 
         while (opModeIsActive()) {
-            if (gamepad2.guide) { // toggle manual override
+            if (gamepad1.guide) { // toggle manual override
                 if (!prevManual) {
                     manual = !manual;
                     if (manual) {
-                        gamepad2.rumble(200);
+                        gamepad1.rumble(200);
                     } else {
-                        gamepad2.rumble(200);
-                        gamepad2.rumble(200);
+                        gamepad1.rumble(200);
+                        gamepad1.rumble(200);
                     }
                 }
                 prevManual = true;
@@ -113,14 +114,14 @@ public class StatesTele extends LinearOpMode {
 //                    hardware.stopLaunch();
 //                }
 
-                hardware.doDrive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, .75d, .75d, 0.5);
+                hardware.doDrive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x, .75d, .75d, 0.5);
 
                 //odo auto aiming
                 odoteleop.odoAimTurret(true);
                 telemetry.addData("robotX", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.X));
                 telemetry.addData("robotY", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.Y));
                 telemetry.addData("robotRot", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.HEADING));
-                
+
                 //camera auto aiming
                 /*telemetry.addData("yaw speed", hardware.launcherTurn.getPower());
                 // AUTOAIMING RUNS IN THIS TELEMETRY

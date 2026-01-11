@@ -46,6 +46,7 @@ public class odoteleop {
             case HEADING:
                 return follower.getPose().getHeading();
         }
+        return 0;
     }
 
 }

@@ -22,7 +22,7 @@ public class Hardware {
     public DcMotor frontLeft, frontRight, backLeft, backRight, intake;
     public DcMotorEx launcherLeft, launcherRight;
     public CRServo launcherTurn, limelightTurn;
-    public Servo sorter, outtakeTransfer;
+    public Servo sorter, outtakeTransferLeft, outtakeTransferRight;
     public Limelight3A limelight;
     public ColorSensor colorSensor;
     int red, green, blue;
@@ -32,6 +32,8 @@ public class Hardware {
     public final double[] outtakePos = {0.4, 0.0, 0.8};//*/{1.0, 0.6, 0.2}; // sorter servo positions for intaking
     public double sorterOffset = 0d;
     public byte[] sorterPos = {0, 0, 0}; // what is stored in each sorter slot 0 = empty, 1 = purple, 2 = green
+    public double[] liftPos = {0.25, 0.75};
+
     public int currentPos = 0; // 0-2
     int targetTps = 0; // protect launcher tps from override
     ElapsedTime changePosTimer = new ElapsedTime();
@@ -65,7 +67,8 @@ public class Hardware {
 
         intake = hardwareMap.get(DcMotor.class, "intake"); // e2
         sorter = hardwareMap.get(Servo.class, "sorter"); //c2
-        outtakeTransfer = hardwareMap.get(Servo.class, "lift"); // c5
+        outtakeTransferLeft = hardwareMap.get(Servo.class, "liftLeft"); // c5
+        outtakeTransferRight = hardwareMap.get(Servo.class, "liftRight"); // c5
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         colorSensor = hardwareMap.get(ColorSensor.class, "colorSens");
 
@@ -150,13 +153,14 @@ public class Hardware {
                 }
             }
         }
-        if ((launchingPurple || launchingGreen) && launcherLeft.getVelocity() > targetTps && outtakeTransfer.getPosition() != 0.2 && launchTimer.milliseconds() > 600) {
-            outtakeTransfer.setPosition(0.2);
+        if ((launchingPurple || launchingGreen) && launcherLeft.getVelocity() > targetTps && outtakeTransferLeft.getPosition() != liftPos[1] && launchTimer.milliseconds() > 600) {
+            outtakeTransferLeft.setPosition(liftPos[1]);
+            outtakeTransferRight.setPosition(liftPos[1]);
             sorterPos[currentPos] = 0;
             changePosTimer.reset();
             launchTimer.reset();
         }
-        if (outtakeTransfer.getPosition() == 0.2 && changePosTimer.milliseconds() > 1000) {
+        if (outtakeTransferLeft.getPosition() == liftPos[1] && changePosTimer.milliseconds() > 1000) {
             stopLaunch();
         }
     }
@@ -203,7 +207,8 @@ public class Hardware {
 //    }
 
     public void stopLaunch() {
-        outtakeTransfer.setPosition(0.85);
+        outtakeTransferLeft.setPosition(liftPos[0]);
+        outtakeTransferRight.setPosition(liftPos[0]);
         launcherLeft.setVelocity(0);
         launcherRight.setVelocity(0);
         intake.setPower(0);

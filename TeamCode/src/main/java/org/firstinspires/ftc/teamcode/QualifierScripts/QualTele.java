@@ -30,7 +30,8 @@ public class QualTele extends LinearOpMode {
         hardware.limelight.pipelineSwitch(0);
         waitForStart();
         hardware.limelight.start();
-        hardware.outtakeTransfer.setPosition(0.85);
+        hardware.outtakeTransferLeft.setPosition(0.85);
+        hardware.outtakeTransferRight.setPosition(0.85);
         hardware.sorter.setPosition(0.8);
         hardware.launcherTurn.setPower(0d);
 
