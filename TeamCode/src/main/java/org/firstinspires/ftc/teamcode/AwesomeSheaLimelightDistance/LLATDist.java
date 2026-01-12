@@ -8,7 +8,7 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 //import org.firstinspires.ftc.teamcode.mechanisms.TestBench;
 
 
-@TeleOp(name = "Limelight Servo Tracker")
+@TeleOp//(name = "Limelight Servo Tracker")
 public class LLATDist extends LinearOpMode {
 
     private Servo camServo;

@@ -1,20 +1,15 @@
 // used to be TeleopFromHardware
-package org.firstinspires.ftc.teamcode.QualifierScripts;
+package org.firstinspires.ftc.teamcode.StatesScripts;
 
-import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Hardware;
 
-import java.util.List;
-
-@TeleOp //(name="QualTele")
-public class QualTele extends LinearOpMode {
+@TeleOp (name="StatesTele")
+public class StatesTele extends LinearOpMode {
 
     boolean manual = false;
-    float llsP;
     boolean prevManual = false;
     double prevOffset = 0d;
     final double offsetAmount = 0d;
@@ -25,44 +20,31 @@ public class QualTele extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        llsP = 0.005f;
         Hardware hardware = new Hardware(hardwareMap);
+        odoteleop odoteleop = new odoteleop(hardwareMap);
         hardware.limelight.pipelineSwitch(0);
         waitForStart();
         hardware.limelight.start();
-        hardware.outtakeTransferLeft.setPosition(0.85);
-        hardware.outtakeTransferRight.setPosition(0.85);
+        hardware.outtakeTransferLeft.setPosition(hardware.liftPos[0]); //down position
+        hardware.outtakeTransferRight.setPosition(hardware.liftPos[0]); // down position
         hardware.sorter.setPosition(0.8);
         hardware.launcherTurn.setPower(0d);
 
         while (opModeIsActive()) {
-            if (gamepad2.guide) { // toggle manual override
+            if (gamepad1.guide) { // toggle manual override
                 if (!prevManual) {
                     manual = !manual;
                     if (manual) {
-                        gamepad2.rumble(200);
+                        gamepad1.rumble(200);
                     } else {
-                        gamepad2.rumble(200);
-                        gamepad2.rumble(200);
+                        gamepad1.rumble(200);
+                        gamepad1.rumble(200);
                     }
                 }
                 prevManual = true;
             } else {
                 prevManual = false;
             }
-
-            if(gamepad1.dpad_up) {
-                llsP += 0.00001f;
-            }
-
-            if(gamepad1.dpad_down) {
-                llsP -= 0.00001f;
-            }
-            // AUTOAIMING RUNS IN THIS TELEMETRY
-            // VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-            telemetry.addData("yaw speed", hardware.launcherTurn.getPower());
-            telemetry.addData("April tag found at degree", hardware.autoAimTurret(true, llsP));
-            telemetry.addData("lllll", llsP);
 
 //            if(gamepad1.xWasPressed()) {
 //                hardware.outtakeTransfer.setPosition(0.2);
@@ -132,13 +114,20 @@ public class QualTele extends LinearOpMode {
 //                    hardware.stopLaunch();
 //                }
 
-                hardware.doDrive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, .75d, .75d, 0.5);
+                hardware.doDrive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x, .75d, .75d, 0.5);
 
+                //odo auto aiming
+                odoteleop.odoAimTurret(true);
+                telemetry.addData("robotX", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.X));
+                telemetry.addData("robotY", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.Y));
+                telemetry.addData("robotRot", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.HEADING));
+
+                //camera auto aiming
+                /*telemetry.addData("yaw speed", hardware.launcherTurn.getPower());
                 // AUTOAIMING RUNS IN THIS TELEMETRY
                 // VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-                telemetry.addData("yaw speed", hardware.launcherTurn.getPower());
-                telemetry.addData("April tag found at degree", hardware.autoAimTurret(true, llsP));
-                telemetry.addData("lllll", llsP);
+                telemetry.addData("April tag found at degree", hardware.autoAimTurret(true, 0.005f));
+                */
 
                 telemetry.addData("Position Value: ", hardware.sorter.getPosition());
                 telemetry.addData("Sorter Contents: ", "%d, %d, %d", hardware.sorterPos[0], hardware.sorterPos[1], hardware.sorterPos[2]);

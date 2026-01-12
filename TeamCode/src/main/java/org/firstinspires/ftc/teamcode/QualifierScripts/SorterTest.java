@@ -11,18 +11,20 @@ public class SorterTest extends LinearOpMode {
 
     boolean prevA = false;
     boolean prevB = false;
-    int nextPos = 0;
+    boolean prevC = false;
+    int nextPos, nextPos1 = 0;
+    double[] liftPos;
 
     @Override
     public void runOpMode() throws InterruptedException {
         Hardware hardware = new Hardware(hardwareMap);
-
+        liftPos = hardware.liftPos;
         waitForStart();
         while (opModeIsActive()) {
-            hardware.tryIntake(gamepad1.a);
+            /*hardware.limelightTurn.setPower(0.5);
             if (gamepad1.b && !gamepad1.a) {
-                hardware.stopIntake();
-            }
+                hardware.limelightTurn.setPower(0);
+            }*/
 //
 //            hardware.tryLaunchPurple(gamepad1.x);
 //            if (gamepad1.y && !gamepad1.x) {
@@ -42,17 +44,32 @@ public class SorterTest extends LinearOpMode {
 
             if (gamepad1.dpad_down) {
                 if (!prevB) {
-                    hardware.sorter.setPosition(hardware.outtakePos[nextPos]);
+                    //hardware.sorter.setPosition(hardware.outtakePos[nextPos]);
+                    hardware.outtakeTransferLeft.setPosition(liftPos[nextPos]);
+                    hardware.outtakeTransferRight.setPosition(liftPos[nextPos]);
+                    telemetry.addLine("sigma");
+
                     nextPos ++;
-                    if (nextPos >= 3) nextPos -= 3;
+                    if (nextPos >= 2) nextPos -= 2;
                 }
                 prevB = true;
             } else {
                 prevB = false;
             }
 
-            telemetry.addData("Position: ", nextPos);
-            telemetry.addData("Position Value: ", hardware.sorter.getPosition());
+            if (gamepad1.left_bumper) {
+                if (!prevC) {
+                }
+                prevC = true;
+            } else {
+                prevC = false;
+            }
+
+            hardware.launcherTurn.setPower(gamepad1.left_stick_y);
+
+            //telemetry.addData("limelight", hardware.limelightTurn.getPower());
+            telemetry.addData("Position: ", nextPos1);
+            telemetry.addData("Position Value: ", hardware.outtakeTransferLeft.getPosition());
             telemetry.update();
         }
     }

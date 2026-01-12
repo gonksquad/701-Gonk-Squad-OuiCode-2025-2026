@@ -19,10 +19,12 @@ public class SpeedTest extends LinearOpMode {
                 testTps -= 100;
             }
 
-            if (gamepad2.y && hardware.outtakeTransfer.getPosition() != 0.2) {
-                hardware.outtakeTransfer.setPosition(0.2);
-            } else if (hardware.outtakeTransfer.getPosition() != 0.9) {
-                hardware.outtakeTransfer.setPosition(0.9);
+            if (gamepad2.y && hardware.outtakeTransferLeft.getPosition() != 0.2) {
+                hardware.outtakeTransferLeft.setPosition(0.2);
+                hardware.outtakeTransferRight.setPosition(0.2);
+            } else if (hardware.outtakeTransferLeft.getPosition() != 0.9) {
+                hardware.outtakeTransferLeft.setPosition(0.9);
+                hardware.outtakeTransferRight.setPosition(0.9);
             }
 
             hardware.tryLaunch(gamepad2.right_bumper, 1, testTps);
