@@ -101,7 +101,7 @@ public class StatesTele extends LinearOpMode {
                 hardware.tryIntake(gamepad2.a);
                 if (gamepad2.b && !gamepad2.a && !gamepad2.right_bumper) {
                     hardware.stopIntake();
-                    hardware.stopLaunch();
+                    hardware.stopLaunch(0);
                 }
                 // 1 = purple, 2 = green. did this so that 0 can be either to help drivers
                 hardware.tryLaunch(gamepad2.right_bumper, 1, 1150);
@@ -109,6 +109,9 @@ public class StatesTele extends LinearOpMode {
                 hardware.tryLaunch(gamepad2.left_bumper, 2, 1150);
                 hardware.tryLaunch(gamepad2.left_trigger > 0.125, 2, 1350);
                 hardware.tryLaunch(gamepad2.x, 0, 1150);
+                if(gamepad2.dpad_down){
+                    hardware.stopLaunch(0);
+                }
 //                hardware.tryLaunchGreen(gamepad2.dpad_down);
 //                if (gamepad2.dpad_right && !(gamepad2.dpad_up || gamepad2.dpad_down)) {
 //                    hardware.stopLaunch();
