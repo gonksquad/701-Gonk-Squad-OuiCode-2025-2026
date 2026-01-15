@@ -119,7 +119,7 @@ public class QualTele extends LinearOpMode {
                 hardware.tryIntake(gamepad2.a);
                 if (gamepad2.b && !gamepad2.a && !gamepad2.right_bumper) {
                     hardware.stopIntake();
-                    hardware.stopLaunch();
+                    hardware.stopLaunch(0);
                 }
                 // 1 = purple, 2 = green. did this so that 0 can be either to help drivers
                 hardware.tryLaunch(gamepad2.right_bumper, 1, 1150);

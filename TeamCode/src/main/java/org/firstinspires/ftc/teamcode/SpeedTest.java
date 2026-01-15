@@ -29,7 +29,7 @@ public class SpeedTest extends LinearOpMode {
 
             hardware.tryLaunch(gamepad2.right_bumper, 1, testTps);
             if (gamepad2.b && !gamepad2.right_bumper) {
-                hardware.stopLaunch();
+                hardware.stopLaunch(0);
             }
 
             telemetry.addData("Launcher TPS: ", testTps);
