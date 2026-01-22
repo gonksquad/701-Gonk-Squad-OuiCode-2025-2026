@@ -29,7 +29,7 @@ public class Hardware {
     public final double[] outtakePos = {0.4, 0.0, 0.8};//*/{1.0, 0.6, 0.2}; // sorter servo positions for intaking
     public double sorterOffset = 0d;
     public byte[] sorterPos = {0, 0, 0}; // what is stored in each sorter slot 0 = empty, 1 = purple, 2 = green
-    public double[] liftPos = {0.25, 0.75};
+    public double[] liftPos = {0.1, 0.75};
 
     public int currentPos = 0; // 0-2
     int targetTps = 0; // protect launcher tps from override
