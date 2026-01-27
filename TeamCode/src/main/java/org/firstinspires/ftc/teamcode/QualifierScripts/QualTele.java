@@ -23,7 +23,7 @@ public class QualTele extends LinearOpMode {
      boolean prevSorterR = false;
     boolean prevA = false;
     boolean prevB = false;
-    
+
     /// touch sensor stuff is temp, just for testing
     TouchSensor limitLeft, limitRight;
 

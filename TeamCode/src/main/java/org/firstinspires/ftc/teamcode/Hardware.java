@@ -12,6 +12,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 import java.util.List;
 
 public class Hardware {
@@ -29,12 +31,12 @@ public class Hardware {
     public final double[] outtakePos = {0.4, 0.0, 0.8};//*/{1.0, 0.6, 0.2}; // sorter servo positions for intaking
     public double sorterOffset = 0d;
     public byte[] sorterPos = {0, 0, 0}; // what is stored in each sorter slot 0 = empty, 1 = purple, 2 = green
-    public double[] liftPos = {0.1, 0.75};
+    public double[] liftPos = {0.6, 0.2};
 
     public int currentPos = 0; // 0-2
     int targetTps = 0; // protect launcher tps from override
     ElapsedTime intakeTimer = new ElapsedTime();
-    ElapsedTime launchTimer = new ElapsedTime();
+    public ElapsedTime launchTimer = new ElapsedTime();
 
     // initialize flags
     public boolean intaking = false;
@@ -126,7 +128,7 @@ public class Hardware {
 
     public void stopLaunch(int tps) {
         outtakeTransferLeft.setPosition(liftPos[0]);
-        outtakeTransferRight.setPosition(liftPos[0]);
+        outtakeTransferRight.setPosition(1-liftPos[0]);
         launcherLeft.setVelocity(tps);
         launcherRight.setVelocity(tps);
         intake.setPower(0);
@@ -171,12 +173,12 @@ public class Hardware {
                     }
                 }
             }
-            if ((launchingPurple || launchingGreen) && launcherLeft.getVelocity() > targetTps && outtakeTransferLeft.getPosition() != liftPos[1] && launchTimer.milliseconds() > 600) {
+            if (/*(launchingPurple || launchingGreen) &&*/ launcherLeft.getVelocity() > targetTps && outtakeTransferLeft.getPosition() != liftPos[1] && launchTimer.milliseconds() > 600) {
                 outtakeTransferLeft.setPosition(liftPos[1]);
-                outtakeTransferRight.setPosition(liftPos[1]);
+                outtakeTransferRight.setPosition(1-liftPos[1]);
                 sorterPos[currentPos] = 0;
             }
-            if (outtakeTransferLeft.getPosition() == liftPos[1] && launchTimer.milliseconds() > 1000) {
+            if (outtakeTransferLeft.getPosition() == liftPos[1] && launchTimer.milliseconds() > 4000) {
                 tryLaunch(true, lastColor, lasttps);
             }
         }

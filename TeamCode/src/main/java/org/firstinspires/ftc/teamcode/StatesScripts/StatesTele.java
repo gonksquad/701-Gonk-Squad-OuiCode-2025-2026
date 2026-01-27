@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.StatesScripts;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.Hardware;
 
@@ -17,16 +18,22 @@ public class StatesTele extends LinearOpMode {
      boolean prevSorterR = false;
     boolean prevA = false;
     boolean prevB = false;
+    /// touch sensor stuff is temp, just for testing
+    TouchSensor limitLeft, limitRight;
 
     @Override
     public void runOpMode() throws InterruptedException {
         Hardware hardware = new Hardware(hardwareMap);
         odoteleop odoteleop = new odoteleop(hardwareMap);
+        /// touch sensor stuff is temp, just for testing
+        limitLeft = hardwareMap.touchSensor.get("limitLeft");
+        limitRight = hardwareMap.touchSensor.get("limitRight");
+
         hardware.limelight.pipelineSwitch(0);
         waitForStart();
         hardware.limelight.start();
-        hardware.outtakeTransferLeft.setPosition(hardware.liftPos[0]); //down position
-        hardware.outtakeTransferRight.setPosition(hardware.liftPos[0]); // down position
+        hardware.outtakeTransferLeft.setPosition(hardware.liftPos[1]); //down position
+        hardware.outtakeTransferRight.setPosition(1-hardware.liftPos[1]); // down position
         hardware.sorter.setPosition(0.8);
         hardware.launcherTurn.setPower(0d);
 
@@ -135,6 +142,13 @@ public class StatesTele extends LinearOpMode {
                 telemetry.addData("Position Value: ", hardware.sorter.getPosition());
                 telemetry.addData("Sorter Contents: ", "%d, %d, %d", hardware.sorterPos[0], hardware.sorterPos[1], hardware.sorterPos[2]);
                 telemetry.addData("Launch Speed: ", hardware.launcherLeft.getVelocity());
+
+                /// touch sensor stuff is temp, just for testing
+                telemetry.addData("limit left", limitLeft.isPressed());
+                telemetry.addData("limit right", limitRight.isPressed());
+
+                telemetry.addData("lift pos left", hardware.outtakeTransferLeft.getPosition());
+                telemetry.addData("launch timer", hardware.launchTimer.milliseconds());
                 telemetry.update();
             }
         }
