@@ -44,6 +44,7 @@ public class Hardware {
     private boolean launchingGreen = false;
     private int lastColor = -1;
     private int lasttps = 0;
+
     // CONSTRUCTOR
     // assign hardware
     public Hardware(HardwareMap hardwareMap) {
@@ -94,6 +95,7 @@ public class Hardware {
                 //if spot is empty, set to that pos
                 if (sorterPos[i] == 0) {
                     stopLaunch(0);
+                    stopLaunch();
 
                     intaking = true;
                     intake.setPower(1);
@@ -127,14 +129,16 @@ public class Hardware {
     }
 
     public void stopLaunch(int tps) {
+    public void stopLaunch() {
         outtakeTransferLeft.setPosition(liftPos[0]);
         outtakeTransferRight.setPosition(1-liftPos[0]);
-        launcherLeft.setVelocity(tps);
-        launcherRight.setVelocity(tps);
+        launcherLeft.setVelocity(0);
+        outtakeTransferRight.setPosition(liftPos[0]);
+        launcherLeft.setVelocity(0);
+        launcherRight.setVelocity(0);
         intake.setPower(0);
         launchingPurple = false;
         launchingGreen = false;
-
         if (tps == 0) {
             lastColor = -1;
             lasttps = 0;
@@ -145,16 +149,14 @@ public class Hardware {
     public void tryLaunch(boolean button, int color, int tps) { // 1=purple, 2=green, other=any color
         if (button && !(launchingPurple || launchingGreen)) { // on first button press
             // check if sorter has purple
-            for (int i = currentPos; i < currentPos + 4; i++) { // for every sorter position starting at the current one
                 if(currentPos>=4) {
                     stopLaunch(0);
                     break;
                 }
                 //if position has purple
                 if ((sorterPos[i % 3] == (color == 2 ? 2 : 1) || (sorterPos[i % 3] != 0 && color == 0))) {
-                        stopLaunch(lasttps);
+                        stopLaunch();
                         stopIntake();
-                        lastColor = color;
                         lasttps = tps;
                         launchingPurple = sorterPos[i % 3] == 1;
 
@@ -178,11 +180,11 @@ public class Hardware {
                 outtakeTransferRight.setPosition(1-liftPos[1]);
                 sorterPos[currentPos] = 0;
             }
-            if (outtakeTransferLeft.getPosition() == liftPos[1] && launchTimer.milliseconds() > 4000) {
                 tryLaunch(true, lastColor, lasttps);
+            if (outtakeTransferLeft.getPosition() == liftPos[1] && launchTimer.milliseconds() > 1000) {
+                stopLaunch();
             }
         }
-
 //    public void tryLaunchGreen(boolean button) {
 //        if (button && !launchingGreen) { // on first button press
 //
