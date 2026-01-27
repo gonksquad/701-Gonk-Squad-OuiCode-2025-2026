@@ -130,9 +130,6 @@ public class Hardware {
         outtakeTransferRight.setPosition(1-liftPos[0]);
         launcherLeft.setVelocity(0);
         launcherRight.setVelocity(0);
-        outtakeTransferRight.setPosition(liftPos[0]);
-        launcherLeft.setVelocity(0);
-        launcherRight.setVelocity(0);
         intake.setPower(0);
         launchingPurple = false;
         launchingGreen = false;
@@ -145,7 +142,6 @@ public class Hardware {
             for (int i = currentPos; i < currentPos + 3; i++) { // for every sorter position starting at the current one
                 //if position has purple
                 if ((sorterPos[i % 3] == (color == 2 ? 2 : 1) || (sorterPos[i % 3] != 0 && color == 0))) {
-                    if (sorterPos[i % 3] == (color == 2 ? 2 : 1) || (sorterPos[i % 3] != 0 && color == 0)) {
                         stopLaunch();
                         stopIntake();
 
@@ -175,7 +171,6 @@ public class Hardware {
                 stopLaunch();
             }
         }
-    }
 //    public void tryLaunchGreen(boolean button) {
 //        if (button && !launchingGreen) { // on first button press
 //
