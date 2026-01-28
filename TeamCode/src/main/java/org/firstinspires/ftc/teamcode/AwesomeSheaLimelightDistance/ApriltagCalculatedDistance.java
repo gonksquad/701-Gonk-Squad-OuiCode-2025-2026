@@ -41,8 +41,8 @@ public class ApriltagCalculatedDistance extends LinearOpMode {
             if (result != null && result.isValid()) {
                 if (result.getTx() >5){
                     while (result.getTx() >5){
-                        servoPosition = limelightServo.getPosition() + 0.05;
-                        limelightServo.setPosition(betweenOneAndZero(servoPosition));
+                        servoPosition = betweenOneAndZero(limelightServo.getPosition() + 0.05);
+                        limelightServo.setPosition(servoPosition);
                         telemetry.addData("Should be moving left... Servo Position:", limelightServo.getPosition());
                         telemetry.update();
                         result = limelight.getLatestResult();
@@ -50,8 +50,8 @@ public class ApriltagCalculatedDistance extends LinearOpMode {
                     }
                 } else if (result.getTx() < -5){
                     while (result.getTx() <-5){
-                        servoPosition = limelightServo.getPosition() - 0.01;
-                        limelightServo.setPosition(betweenOneAndZero(servoPosition));
+                        servoPosition = betweenOneAndZero(limelightServo.getPosition() - 0.01);
+                        limelightServo.setPosition(servoPosition);
                         telemetry.addData("Should be moving right... Servo Position:", limelightServo.getPosition());
                         telemetry.update();
                         result = limelight.getLatestResult();
