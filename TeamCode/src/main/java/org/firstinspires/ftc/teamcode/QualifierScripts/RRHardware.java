@@ -1,8 +1,11 @@
 package org.firstinspires.ftc. teamcode. QualifierScripts;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+
 import com.qualcomm.hardware.limelightvision. Limelight3A;
 import com.qualcomm.hardware. rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com. qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore. hardware.DcMotor;
@@ -18,11 +21,12 @@ public class RRHardware{
     private HardwareMap hwMap; // Store hardware map
 
     public DcMotor frontLeft, frontRight, backLeft, backRight, intake;
-    public DcMotorEx launcherLeft, launcherRight; //limelightturn
-    public CRServo launcherTurn;
-    public Servo sorter, outtakeTransfer;
+    public DcMotorEx launcherLeft, launcherRight;
+    public CRServo launcherTurn, limelightTurn;
+    public Servo sorter, outtakeTransferLeft, outtakeTransferRight;
     public Limelight3A limelight;
     public ColorSensor colorSensor;
+
     int red, green, blue;
     float[] hsvValues = new float[3];
     boolean nextPos = true;
@@ -43,40 +47,42 @@ public class RRHardware{
     }
 
     public void init() {
-        frontLeft = hwMap.get(DcMotor.class, "fl");
-        frontRight = hwMap. get(DcMotor.class, "fr");
-        backLeft = hwMap.get(DcMotor.class, "bl");
-        backRight = hwMap. get(DcMotor.class, "br");
+        frontLeft = hardwareMap.get(DcMotor.class, "fl");
+        frontRight = hardwareMap.get(DcMotor.class, "fr");
+        backLeft = hardwareMap.get(DcMotor.class, "bl");
+        backRight = hardwareMap.get(DcMotor.class, "br");
 
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior. BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        launcherLeft = hwMap.get(DcMotorEx.class, "launcherL");
-        launcherRight = hwMap.get(DcMotorEx.class, "launcherR");
 
-        launcherTurn = hwMap.get(CRServo.class, "launcherYaw");
-        //limelightTurn = hwMap. get(Servo.class, "limeservo");
+        launcherLeft = hardwareMap.get(DcMotorEx.class, "launcherL");
+        launcherRight = hardwareMap.get(DcMotorEx.class, "launcherR");
 
-        intake = hwMap.get(DcMotor.class, "intake");
-        sorter = hwMap.get(Servo.class, "sorter");
-        outtakeTransfer = hwMap.get(Servo.class, "lift");
-        limelight = hwMap.get(Limelight3A.class, "limelight");
-        colorSensor = hwMap.get(RevColorSensorV3.class, "colorSens");
+        launcherTurn = hardwareMap.get(CRServo.class, "launcherYaw");
+        limelightTurn = hardwareMap.get(CRServo.class, "limeservo");
+
+        intake = hardwareMap.get(DcMotor.class, "intake"); // e2
+        sorter = hardwareMap.get(Servo.class, "sorter"); //c2
+        outtakeTransferLeft = hardwareMap.get(Servo.class, "liftLeft"); // c5
+        outtakeTransferRight = hardwareMap.get(Servo.class, "liftRight"); // c5
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        colorSensor = hardwareMap.get(ColorSensor.class, "colorSens");
+
 
         launcherRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         launcherRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        launcherRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         launcherLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         launcherLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        launcherLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        frontRight.setDirection(DcMotorSimple. Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
-
         double x = 0.75;
     }
 
@@ -153,135 +159,135 @@ public class RRHardware{
         launcherRight.setVelocity(0);
     }
 
-    public void shootgppfar() {
-        launchOnFar();
-        sorter.setPosition(.4);
-        sleep(1000);
-        outtakeTransfer.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(.9);
-        sleep(1000);
-        sorter.setPosition(.8);
-        sleep(1000);
-        outtakeTransfer.setPosition(0);
-        sleep(1000);
-        outtakeTransfer. setPosition(.9);
-        sleep(1000);
-        sorter.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(.9);
-        launchOff();
-    }
-
-    public void shootpgpfar() {
-        launchOnFar();
-        sorter.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(.9);
-        sleep(1000);
-        sorter.setPosition(.4);
-        sleep(1000);
-        outtakeTransfer.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(.9);
-        sleep(1000);
-        sorter.setPosition(.8);
-        sleep(1000);
-        outtakeTransfer.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(.9);
-        launchOff();
-    }
-
-    public void shootppgfar() {
-        launchOnFar();
-        sorter.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(.9);
-        sleep(1000);
-        sorter.setPosition(.8);
-        sleep(1000);
-        outtakeTransfer.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(.9);
-        sleep(1000);
-        sorter.setPosition(.4);
-        sleep(1000);
-        outtakeTransfer.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(.9);
-        launchOff();
-    }
-    public void shootgppclose() {
-        launchOnClose();
-        sorter.setPosition(.4);
-        sleep(1000);
-        outtakeTransfer.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(.9);
-        sleep(1000);
-        sorter.setPosition(.8);
-        sleep(1000);
-        outtakeTransfer.setPosition(0);
-        sleep(1000);
-        outtakeTransfer. setPosition(.9);
-        sleep(1000);
-        sorter.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(.9);
-        launchOff();
-    }
-
-    public void shootpgpclose() {
-        launchOnClose();
-        sleep(3000);
-        sorter.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(.9);
-        sleep(1000);
-        sorter.setPosition(.4);
-        sleep(5000);
-        outtakeTransfer.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(.9);
-        sleep(1000);
-        sorter.setPosition(.8);
-        sleep(3500);
-        outtakeTransfer.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(.9);
-        launchOff();
-    }
-
-    public void shootppgclose() {
-        launchOnClose();
-        sorter.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(.9);
-        sleep(1000);
-        sorter.setPosition(.8);
-        sleep(1000);
-        outtakeTransfer.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(.9);
-        sleep(1000);
-        sorter.setPosition(.4);
-        sleep(1000);
-        outtakeTransfer.setPosition(0);
-        sleep(1000);
-        outtakeTransfer.setPosition(.9);
-        launchOff();
-    }
+//    public void shootgppfar() {
+//        launchOnFar();
+//        sorter.setPosition(.4);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(.8);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer. setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        launchOff();
+//    }
+//
+//    public void shootpgpfar() {
+//        launchOnFar();
+//        sorter.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(.4);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(.8);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        launchOff();
+//    }
+//
+//    public void shootppgfar() {
+//        launchOnFar();
+//        sorter.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(.8);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(.4);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        launchOff();
+//    }
+//    public void shootgppclose() {
+//        launchOnClose();
+//        sorter.setPosition(.4);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(.8);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer. setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        launchOff();
+//    }
+//
+//    public void shootpgpclose() {
+//        launchOnClose();
+//        sleep(3000);
+//        sorter.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(.4);
+//        sleep(5000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(.8);
+//        sleep(3500);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        launchOff();
+//    }
+//
+//    public void shootppgclose() {
+//        launchOnClose();
+//        sorter.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(.8);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(.4);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        launchOff();
+//    }
 }

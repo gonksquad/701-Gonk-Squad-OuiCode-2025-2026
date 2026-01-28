@@ -61,7 +61,7 @@ public class notimeBACKred extends LinearOpMode {
 //            rrHardware.shootgppclose();
 //            telemetry.addLine("no apriltag found, using default");
 //        }
-        rrHardware.shootpgpclose();
+//        rrHardware.shootpgpclose(); aah
 
         sleep(5000);
         rrHardware.doDrive(0,-.5,-.05);

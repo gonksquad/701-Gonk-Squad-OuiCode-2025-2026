@@ -69,11 +69,11 @@ public class QualTele extends LinearOpMode {
             // AUTOAIMING RUNS IN THIS TELEMETRY
             // VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
             telemetry.addData("yaw speed", hardware.launcherTurn.getPower());
-<<<<<<< Updated upstream
+
             //telemetry.addData("April tag found at degree", hardware.autoAimTurret(true, llsP));
-=======
+
 //            telemetry.addData("April tag found at degree", hardware.autoAimTurret(true, llsP));
->>>>>>> Stashed changes
+
             telemetry.addData("lllll", llsP);
 
 //            if(gamepad1.xWasPressed()) {
@@ -149,15 +149,15 @@ public class QualTele extends LinearOpMode {
                 // AUTOAIMING RUNS IN THIS TELEMETRY
                 // VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
                 telemetry.addData("yaw speed", hardware.launcherTurn.getPower());
-<<<<<<< Updated upstream
+
                 //telemetry.addData("April tag found at degree", hardware.autoAimTurret(true, llsP));
-=======
+
 //                telemetry.addData("April tag found at degree", hardware.autoAimTurret(true, llsP));
->>>>>>> Stashed changes
+
                 telemetry.addData("lllll", llsP);
 
                 telemetry.addData("Position Value: ", hardware.sorter.getPosition());
-                telemetry.addData("Sorter Contents: ", "%d, %d, %d", hardware.sorterPos[0], hardware.sorterPos[1], hardware.sorterPos[2]);
+//                telemetry.addData("Sorter Contents: ", "%d, %d, %d", hardware.sorterPos[0], hardware.sorterPos[1], hardware.sorterPos[2]); //should not be commented tbh
                 telemetry.addData("Launch Speed: ", hardware.launcherLeft.getVelocity());
 
                 /// touch sensor stuff is temp, just for testing
