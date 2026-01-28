@@ -141,6 +141,11 @@ public class StatesTele extends LinearOpMode {
 
                 telemetry.addData("lift pos left", hardware.outtakeTransferLeft.getPosition());
                 telemetry.addData("launch timer", hardware.launchTimer.milliseconds());
+
+                double fgVolts = hardware.floodgate.getVoltage();
+
+                telemetry.addData("Battery Voltage", fgVolts);
+                telemetry.addData("Battery Amperage", fgVolts * 80.0 / 3.3);
                 telemetry.update();
             }
         }
