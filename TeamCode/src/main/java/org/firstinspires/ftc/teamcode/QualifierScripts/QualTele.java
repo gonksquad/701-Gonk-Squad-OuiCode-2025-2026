@@ -5,6 +5,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.Hardware;
 
@@ -23,10 +24,17 @@ public class QualTele extends LinearOpMode {
     boolean prevA = false;
     boolean prevB = false;
 
+    /// touch sensor stuff is temp, just for testing
+    TouchSensor limitLeft, limitRight;
+
     @Override
     public void runOpMode() throws InterruptedException {
         llsP = 0.005f;
         Hardware hardware = new Hardware(hardwareMap);
+        /// touch sensor stuff is temp, just for testing
+        limitLeft = hardwareMap.touchSensor.get("limitLeft");
+        limitRight = hardwareMap.touchSensor.get("limitRight");
+
         hardware.limelight.pipelineSwitch(0);
         waitForStart();
         hardware.limelight.start();
@@ -61,7 +69,7 @@ public class QualTele extends LinearOpMode {
             // AUTOAIMING RUNS IN THIS TELEMETRY
             // VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
             telemetry.addData("yaw speed", hardware.launcherTurn.getPower());
-            telemetry.addData("April tag found at degree", hardware.autoAimTurret(true, llsP));
+            //telemetry.addData("April tag found at degree", hardware.autoAimTurret(true, llsP));
             telemetry.addData("lllll", llsP);
 
 //            if(gamepad1.xWasPressed()) {
@@ -137,12 +145,17 @@ public class QualTele extends LinearOpMode {
                 // AUTOAIMING RUNS IN THIS TELEMETRY
                 // VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
                 telemetry.addData("yaw speed", hardware.launcherTurn.getPower());
-                telemetry.addData("April tag found at degree", hardware.autoAimTurret(true, llsP));
+                //telemetry.addData("April tag found at degree", hardware.autoAimTurret(true, llsP));
                 telemetry.addData("lllll", llsP);
 
                 telemetry.addData("Position Value: ", hardware.sorter.getPosition());
                 telemetry.addData("Sorter Contents: ", "%d, %d, %d", hardware.sorterPos[0], hardware.sorterPos[1], hardware.sorterPos[2]);
                 telemetry.addData("Launch Speed: ", hardware.launcherLeft.getVelocity());
+
+                /// touch sensor stuff is temp, just for testing
+                telemetry.addData("limit left", limitLeft.isPressed());
+                telemetry.addData("limit right", limitRight.isPressed());
+
                 telemetry.update();
             }
         }

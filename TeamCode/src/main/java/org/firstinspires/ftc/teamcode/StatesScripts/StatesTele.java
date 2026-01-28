@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.StatesScripts;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.Hardware;
 
@@ -10,56 +11,59 @@ import org.firstinspires.ftc.teamcode.Hardware;
 public class StatesTele extends LinearOpMode {
 
     boolean manual = false;
-    boolean prevManual = false;
     double prevOffset = 0d;
     final double offsetAmount = 0d;
     boolean prevSorterL = false;
      boolean prevSorterR = false;
     boolean prevA = false;
     boolean prevB = false;
+    boolean slowMode = false;
+    /// touch sensor stuff is temp, just for testing
+    TouchSensor limitLeft, limitRight;
 
     @Override
     public void runOpMode() throws InterruptedException {
         Hardware hardware = new Hardware(hardwareMap);
         odoteleop odoteleop = new odoteleop(hardwareMap);
+        /// touch sensor stuff is temp, just for testing
+        limitLeft = hardwareMap.touchSensor.get("limitLeft");
+        limitRight = hardwareMap.touchSensor.get("limitRight");
+
         hardware.limelight.pipelineSwitch(0);
         waitForStart();
         hardware.limelight.start();
         hardware.outtakeTransferLeft.setPosition(hardware.liftPos[0]); //down position
-        hardware.outtakeTransferRight.setPosition(hardware.liftPos[0]); // down position
+        hardware.outtakeTransferRight.setPosition(1-hardware.liftPos[0]); // down position
         hardware.sorter.setPosition(0.8);
         hardware.launcherTurn.setPower(0d);
 
         while (opModeIsActive()) {
-            if (gamepad1.guide) { // toggle manual override
-                if (!prevManual) {
-                    manual = !manual;
-                    if (manual) {
-                        gamepad1.rumble(200);
-                    } else {
-                        gamepad1.rumble(200);
-                        gamepad1.rumble(200);
-                    }
+            if (gamepad2.psWasPressed()) { // toggle manual override
+                manual = !manual;
+                hardware.stopLaunch();
+                hardware.stopIntake();
+                if (manual) {
+                    gamepad1.rumble(200);
+                } else {
+                    gamepad1.rumble(200);
+                    gamepad1.rumble(200);
                 }
-                prevManual = true;
-            } else {
-                prevManual = false;
             }
 
-//            if(gamepad1.xWasPressed()) {
-//                hardware.outtakeTransfer.setPosition(0.2);
-//            }
+            if (gamepad1.leftBumperWasPressed()) {
 
-//            double launchTurnPower = gamepad2.right_trigger - gamepad2.left_trigger;
-//            if (Math.abs(launchTurnPower) > 0.125) {
-//                hardware.launcherTurn.setPower(launchTurnPower * 0.5);
-//            } else {
-//                hardware.launcherTurn.setPower(0d);
-//            }
+            }
 
-            if (gamepad2.y && !gamepad2.a) {
+            if (gamepad2.y && !(gamepad2.a || gamepad2.b)) {
                 hardware.intaking = false;
                 hardware.intake.setPower(-1);
+            }
+
+            slowMode = gamepad1.left_bumper;
+            if (slowMode) {
+                hardware.doDrive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, .75, .75, 0.5);
+            } else {
+                hardware.doDrive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, 1d, 1d, 0.67);
             }
 
             if (manual) {
@@ -104,34 +108,44 @@ public class StatesTele extends LinearOpMode {
                     hardware.stopLaunch();
                 }
                 // 1 = purple, 2 = green. did this so that 0 can be either to help drivers
-                hardware.tryLaunch(gamepad2.right_bumper, 1, 1150);
+                hardware.tryLaunch(gamepad2.right_bumper,          1, 1150);
                 hardware.tryLaunch(gamepad2.right_trigger > 0.125, 1, 1350);
-                hardware.tryLaunch(gamepad2.left_bumper, 2, 1150);
-                hardware.tryLaunch(gamepad2.left_trigger > 0.125, 2, 1350);
-                hardware.tryLaunch(gamepad2.x, 0, 1150);
+                hardware.tryLaunch(gamepad2.left_bumper,           2, 1150);
+                hardware.tryLaunch(gamepad2.left_trigger > 0.125,  2, 1350);
+                hardware.tryLaunch(gamepad2.x,                     0, 1150);
 //                hardware.tryLaunchGreen(gamepad2.dpad_down);
 //                if (gamepad2.dpad_right && !(gamepad2.dpad_up || gamepad2.dpad_down)) {
 //                    hardware.stopLaunch();
 //                }
 
-                hardware.doDrive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x, .75d, .75d, 0.5);
-
                 //odo auto aiming
-                odoteleop.odoAimTurret(true);
-                telemetry.addData("robotX", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.X));
-                telemetry.addData("robotY", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.Y));
-                telemetry.addData("robotRot", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.HEADING));
-
-                //camera auto aiming
-                /*telemetry.addData("yaw speed", hardware.launcherTurn.getPower());
-                // AUTOAIMING RUNS IN THIS TELEMETRY
-                // VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-                telemetry.addData("April tag found at degree", hardware.autoAimTurret(true, 0.005f));
-                */
-
-                telemetry.addData("Position Value: ", hardware.sorter.getPosition());
-                telemetry.addData("Sorter Contents: ", "%d, %d, %d", hardware.sorterPos[0], hardware.sorterPos[1], hardware.sorterPos[2]);
+//                odoteleop.odoAimTurret(true);
+//                telemetry.addData("robotX", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.X));
+//                telemetry.addData("robotY", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.Y));
+//                telemetry.addData("robotRot", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.HEADING));
+//
+//                //camera auto aiming
+//                /*telemetry.addData("yaw speed", hardware.launcherTurn.getPower());
+//                // AUTOAIMING RUNS IN THIS TELEMETRY
+//                // VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+//                telemetry.addData("April tag found at degree", hardware.autoAimTurret(true, 0.005f));
+//                */
+//
+                telemetry.addData("Sorter Position: ", hardware.sorter.getPosition());
+                telemetry.addData("Sorter Contents: ", "%d, %d, %d", hardware.sorterContents[0], hardware.sorterContents[1], hardware.sorterContents[2]);
                 telemetry.addData("Launch Speed: ", hardware.launcherLeft.getVelocity());
+
+                /// touch sensor stuff is temp, just for testing
+                telemetry.addData("limit left", limitLeft.isPressed());
+                telemetry.addData("limit right", limitRight.isPressed());
+
+                telemetry.addData("lift pos left", hardware.outtakeTransferLeft.getPosition());
+                telemetry.addData("launch timer", hardware.launchTimer.milliseconds());
+
+                double fgVolts = hardware.floodgate.getVoltage();
+
+                telemetry.addData("Battery Voltage", fgVolts);
+                telemetry.addData("Battery Amperage", fgVolts * 80.0 / 3.3);
                 telemetry.update();
             }
         }

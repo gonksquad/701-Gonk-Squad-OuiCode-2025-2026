@@ -1,8 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.limelightvision.Limelight3A;
-import com.qualcomm.hardware.limelightvision.LLResult;
-import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -12,8 +11,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import java.util.List;
-
 public class Hardware {
     // declare hardware
     public DcMotor frontLeft, frontRight, backLeft, backRight, intake;
@@ -22,19 +19,21 @@ public class Hardware {
     public Servo sorter, outtakeTransferLeft, outtakeTransferRight;
     public Limelight3A limelight;
     public ColorSensor colorSensor;
+    public AnalogInput floodgate;
+
     int red, green, blue;
     float[] hsvValues = new float[3];
     boolean nextPos = true;
     public final double[] intakePos = {1.0, 0.6, 0.2};//*/{0.4, 0.0, 0.8};// sorter servo positions for outtaking
     public final double[] outtakePos = {0.4, 0.0, 0.8};//*/{1.0, 0.6, 0.2}; // sorter servo positions for intaking
     public double sorterOffset = 0d;
-    public byte[] sorterPos = {0, 0, 0}; // what is stored in each sorter slot 0 = empty, 1 = purple, 2 = green
-    public double[] liftPos = {0.25, 0.75};
+    public byte[] sorterContents = {0, 0, 0}; // what is stored in each sorter slot 0 = empty, 1 = purple, 2 = green
+    public double[] liftPos = {0.6, 0.2};
 
     public int currentPos = 0; // 0-2
     int targetTps = 0; // protect launcher tps from override
     ElapsedTime intakeTimer = new ElapsedTime();
-    ElapsedTime launchTimer = new ElapsedTime();
+    public ElapsedTime launchTimer = new ElapsedTime();
 
     // initialize flags
     public boolean intaking = false;
@@ -69,6 +68,8 @@ public class Hardware {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         colorSensor = hardwareMap.get(ColorSensor.class, "colorSens");
 
+        floodgate = hardwareMap.get(AnalogInput.class, "floodgate");
+
 
         launcherRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         launcherRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -89,7 +90,7 @@ public class Hardware {
             // set sorter position
             for (int i = 0; i < 3; i++) {
                 //if spot is empty, set to that pos
-                if (sorterPos[i] == 0) {
+                if (sorterContents[i] == 0) {
                     stopLaunch();
 
                     intaking = true;
@@ -107,7 +108,7 @@ public class Hardware {
             byte guess = detectFilled();
             if (guess == 0) return;
             //set current sorter pos to color-sensor-detected color
-            sorterPos[currentPos] = guess;
+            sorterContents[currentPos] = guess;
             currentPos = (currentPos + 2) % 3;
             //change to outtake
             sorter.setPosition(outtakePos[currentPos]);
@@ -125,95 +126,53 @@ public class Hardware {
 
     public void stopLaunch() {
         outtakeTransferLeft.setPosition(liftPos[0]);
-        outtakeTransferRight.setPosition(liftPos[0]);
+        outtakeTransferRight.setPosition(1-liftPos[0]);
         launcherLeft.setVelocity(0);
         launcherRight.setVelocity(0);
-        intake.setPower(0);
         launchingPurple = false;
         launchingGreen = false;
     }
 
     // NOTE: if the color is not in the
     public void tryLaunch(boolean button, int color, int tps) { // 1=purple, 2=green, other=any color
-        if (button && !(launchingPurple || launchingGreen)) { // on first button press
+        if (button && !(launchingPurple || launchingGreen) && launchTimer.milliseconds() > 200) { // on first button press
             // check if sorter has purple
             for (int i = currentPos; i < currentPos + 3; i++) { // for every sorter position starting at the current one
                 //if position has purple
-                if ((sorterPos[i % 3] == (color == 2 ? 2 : 1) || (sorterPos[i % 3] != 0 && color == 0))) {
-                    if (sorterPos[i % 3] == (color == 2 ? 2 : 1) || (sorterPos[i % 3] != 0 && color == 0)) {
-                        stopLaunch();
-                        stopIntake();
+                if (sorterContents[i % 3] != 0 && (sorterContents[i % 3] == color || color == 0)) {
+                    stopLaunch();
+                    stopIntake();
 
-                        launchingPurple = sorterPos[i % 3] == 1;
+                    launchingPurple = sorterContents[i % 3] == 1;
+                    launchingGreen = sorterContents[i % 3] == 2;
 
-                        // TODO: set velocity based on apriltag distance
-                        launcherLeft.setVelocity(tps + 20);
-                        launcherRight.setVelocity(tps + 20);
+                    // TODO: set velocity based on apriltag distance
+                    launcherLeft.setVelocity(tps + 20);
+                    launcherRight.setVelocity(tps + 20);
 
-                        targetTps = tps;
+                    targetTps = tps;
 
-                        currentPos = i % 3;
-                        sorter.setPosition(outtakePos[currentPos]);
-                        intake.setPower(0.5);
-                        launchTimer.reset();
+                    currentPos = i % 3;
+                    sorter.setPosition(outtakePos[currentPos]);
+                    launchTimer.reset();
 
-                        break;
-                    }
+                    break;
                 }
             }
-            if ((launchingPurple || launchingGreen) && launcherLeft.getVelocity() > targetTps && outtakeTransferLeft.getPosition() != liftPos[1] && launchTimer.milliseconds() > 600) {
-                outtakeTransferLeft.setPosition(liftPos[1]);
-                outtakeTransferRight.setPosition(liftPos[1]);
-                sorterPos[currentPos] = 0;
-            }
-            if (outtakeTransferLeft.getPosition() == liftPos[1] && launchTimer.milliseconds() > 1000) {
-                stopLaunch();
-            }
+        }
+        if ((launchingPurple || launchingGreen) && launcherLeft.getVelocity() > targetTps && outtakeTransferLeft.getPosition() != liftPos[1] && launchTimer.milliseconds() > 600) {
+            outtakeTransferLeft.setPosition(liftPos[1]);
+            outtakeTransferRight.setPosition(1-liftPos[1]);
+            sorterContents[currentPos] = 0;
+            launchTimer.reset();
+        }
+        if (outtakeTransferLeft.getPosition() == liftPos[1] && launchTimer.milliseconds() > 1000) {
+            stopLaunch();
+            launchTimer.reset();
         }
     }
-//    public void tryLaunchGreen(boolean button) {
-//        if (button && !launchingGreen) { // on first button press
-//
-//            // check if sorter has green
-//            boolean sorterSuccess = false;
-//            for (int i = getCurrentPos(); i < sorterPos.length + getCurrentPos(); i = (i + 1) % 3) { // for every sorter position starting at the current one
-//                if (sorterPos[i] == 2) { // if the position has a green inside of it
-//                    sorterSuccess = true;
-//                    sorter.setPosition((outtakePos[i] + sorterOffset) % 1d);
-//                    changePosTimer.reset();
-//                    break;
-//                }
-//            }
-//
-//            if (sorterSuccess) {
-//                launchingPurple = false;
-//                launchingGreen = true;
-//                // TODO: set velocity based on apriltag distance
-//                launcherLeft.setVelocity(6000);
-//                launcherRight.setVelocity(6000);
-//            }
-//        }
-//        if (launchingGreen) {
-//            if(changePosTimer.milliseconds() >= 750 && sorterPos[getCurrentPos()] == 1) {
-//                outtakeTransfer.setPosition(1);
-//                sorterPos[getCurrentPos()] = 0;
-//            }
-//            if(changePosTimer.milliseconds() >= 1250){
-//                outtakeTransfer.setPosition(0);
-//            }
-//            // treat this as a loop
-//            /*
-//            Check for the following:
-//              - sorter position
-//              - robot position
-//              - launcher speed?
-//            if all are correct, push artifact into launcher
-//            */
-//        }
-//    }
 
-
-    /*public void doDrive(double ctrlX, double ctrlY, double ctrlYaw) {
+    public void doDrive(double ctrlX, double ctrlY, double ctrlYaw) {
         if (Math.abs(ctrlY) < 0.1) {
             ctrlY = 0;
         }
@@ -237,7 +196,7 @@ public class Hardware {
         frontRight.setPower(frPwr / denominator);
         backLeft.setPower(blPwr / denominator);
         backRight.setPower(brPwr / denominator);
-    }*/
+    }
 
     public void doDrive(double ctrlX, double ctrlY, double ctrlYaw, double speedX, double speedY, double speedYaw) {
         double pwrY = ctrlY * speedY;
@@ -251,7 +210,7 @@ public class Hardware {
             pwrX = 0;
         }
         if (Math.abs(pwrYaw) < 0.1) {
-            //pwrYaw = 0;
+            pwrYaw = 0;
         } else if (Math.abs(pwrYaw) < 0.5) {
             pwrYaw = Math.signum(pwrYaw) * 0.5;
         }
@@ -270,7 +229,7 @@ public class Hardware {
     }
 
     public int getCurrentPos() {
-        for (int i = 0; i < sorterPos.length; i++) {
+        for (int i = 0; i < sorterContents.length; i++) {
             if (sorter.getPosition() == intakePos[i] || sorter.getPosition() == outtakePos[i]) {
                 return i;
             }
