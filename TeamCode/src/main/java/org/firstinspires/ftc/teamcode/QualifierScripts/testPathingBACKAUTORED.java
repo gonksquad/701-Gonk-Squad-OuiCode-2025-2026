@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.Hardware;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Disabled
+@Autonomous
 public class testPathingBACKAUTORED extends OpMode {
     int id = -1;
     String motif = "null";

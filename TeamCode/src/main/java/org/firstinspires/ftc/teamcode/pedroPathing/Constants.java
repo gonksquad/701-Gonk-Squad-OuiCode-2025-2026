@@ -17,20 +17,24 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class Constants {
     // TODO: Set the proper mass
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .forwardZeroPowerAcceleration(-46)
-            .lateralZeroPowerAcceleration(-59)
-            .translationalPIDFCoefficients(new PIDFCoefficients(0.9, 0, 0.01, 0))
-            .headingPIDFCoefficients(new PIDFCoefficients(1, 0, 0.01, 0))
-            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.025,0.0,0.001,0.6,0.0))
-            .mass(10.61); //should be right for states robot
+            .forwardZeroPowerAcceleration(-39)
+            .lateralZeroPowerAcceleration(-72)
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.06, 0, 0.0005, 0.025))
+            .headingPIDFCoefficients(new PIDFCoefficients(0.7, 0, 0.0005, 0.025))
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.03,0,0.001,0.6,0.025))
+            .centripetalScaling(0.0005)
+            .mass(13.6); //should be right for battlebot
 
-    public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
+    public static PathConstraints pathConstraints = new PathConstraints(0.99,
+            100,
+            1.5,
+            1);
 
     // TODO: Set the proper directions and update motor names if needed
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(.5)
-            .xVelocity(64.29)
-            .yVelocity(58.39)
+            .xVelocity(42.284)
+            .yVelocity(28.7)
             .leftFrontMotorName("fl")
             .rightFrontMotorName("fr")
             .leftRearMotorName("bl")
@@ -49,11 +53,11 @@ public class Constants {
     }
 
     public static PinpointConstants localizerConstants = new PinpointConstants()
-            .forwardPodY(-5.125)
-            .strafePodX(6.4375)
+            .forwardPodY(-5.125) //these are for wooden robot 2
+            .strafePodX(-6.4375)
             .distanceUnit(DistanceUnit.MM)
             .hardwareMapName("pinpoint")
             .encoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD)
-            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED)
+            .forwardEncoderDirection(GoBildaPinpointDriver.EncoderDirection.FORWARD) //why does reversing this do nothing?
             .strafeEncoderDirection(GoBildaPinpointDriver.EncoderDirection.REVERSED);
 }

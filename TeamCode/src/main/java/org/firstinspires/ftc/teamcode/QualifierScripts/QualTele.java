@@ -69,7 +69,11 @@ public class QualTele extends LinearOpMode {
             // AUTOAIMING RUNS IN THIS TELEMETRY
             // VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
             telemetry.addData("yaw speed", hardware.launcherTurn.getPower());
+<<<<<<< Updated upstream
             //telemetry.addData("April tag found at degree", hardware.autoAimTurret(true, llsP));
+=======
+//            telemetry.addData("April tag found at degree", hardware.autoAimTurret(true, llsP));
+>>>>>>> Stashed changes
             telemetry.addData("lllll", llsP);
 
 //            if(gamepad1.xWasPressed()) {
@@ -145,7 +149,11 @@ public class QualTele extends LinearOpMode {
                 // AUTOAIMING RUNS IN THIS TELEMETRY
                 // VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
                 telemetry.addData("yaw speed", hardware.launcherTurn.getPower());
+<<<<<<< Updated upstream
                 //telemetry.addData("April tag found at degree", hardware.autoAimTurret(true, llsP));
+=======
+//                telemetry.addData("April tag found at degree", hardware.autoAimTurret(true, llsP));
+>>>>>>> Stashed changes
                 telemetry.addData("lllll", llsP);
 
                 telemetry.addData("Position Value: ", hardware.sorter.getPosition());
