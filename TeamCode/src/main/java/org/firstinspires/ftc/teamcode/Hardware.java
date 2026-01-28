@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -18,6 +19,8 @@ public class Hardware {
     public Servo sorter, outtakeTransferLeft, outtakeTransferRight;
     public Limelight3A limelight;
     public ColorSensor colorSensor;
+    public AnalogInput floodgate;
+
     int red, green, blue;
     float[] hsvValues = new float[3];
     boolean nextPos = true;
@@ -64,6 +67,8 @@ public class Hardware {
         outtakeTransferRight = hardwareMap.get(Servo.class, "liftRight"); // c5
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         colorSensor = hardwareMap.get(ColorSensor.class, "colorSens");
+
+        floodgate = hardwareMap.get(AnalogInput.class, "floodgate");
 
 
         launcherRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
@@ -130,7 +135,7 @@ public class Hardware {
 
     // NOTE: if the color is not in the
     public void tryLaunch(boolean button, int color, int tps) { // 1=purple, 2=green, other=any color
-        if (button && !(launchingPurple || launchingGreen)) { // on first button press
+        if (button && !(launchingPurple || launchingGreen) && launchTimer.milliseconds() > 200) { // on first button press
             // check if sorter has purple
             for (int i = currentPos; i < currentPos + 3; i++) { // for every sorter position starting at the current one
                 //if position has purple
@@ -163,6 +168,7 @@ public class Hardware {
         }
         if (outtakeTransferLeft.getPosition() == liftPos[1] && launchTimer.milliseconds() > 1000) {
             stopLaunch();
+            launchTimer.reset();
         }
     }
 
