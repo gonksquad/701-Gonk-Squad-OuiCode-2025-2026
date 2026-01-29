@@ -20,7 +20,6 @@ import org.firstinspires.ftc.teamcode.Hardware;
 public class RRHardware{
     private HardwareMap hwMap; // Store hardware map
 
-
     public DcMotor frontLeft, frontRight, backLeft, backRight, intake;
     public DcMotorEx launcherLeft, launcherRight;
     public CRServo launcherTurn, limelightTurn;
@@ -50,9 +49,6 @@ public class RRHardware{
 
     public RRHardware(HardwareMap hardwareMap) {
         this.hwMap = hardwareMap;
-    }
-
-    public void init() {
         frontLeft = hardwareMap.get(DcMotor.class, "fl");
         frontRight = hardwareMap.get(DcMotor.class, "fr");
         backLeft = hardwareMap.get(DcMotor.class, "bl");
@@ -180,13 +176,15 @@ public class RRHardware{
 
     // NOTE: if the color is not in the
     public void tryLaunch(boolean button, int color, int tps) { // 1=purple, 2=green, other=any color
-        if (button && !(launchingPurple || launchingGreen) && launchTimer.milliseconds() > 200) { // on first button press
+        sleep(1000); //prev 200
+        if (button && !(launchingPurple || launchingGreen)) { // on first button press
             // check if sorter has purple
             for (int i = currentPos; i < currentPos + 3; i++) { // for every sorter position starting at the current one
                 //if position has purple
                 if (sorterContents[i % 3] != 0 && (sorterContents[i % 3] == color || color == 0)) {
-                    stopLaunch();
-                    stopIntake();
+                   stopLaunch();
+                   intake.setPower(1);
+//                   stopIntake();
 
                     launchingPurple = sorterContents[i % 3] == 1;
                     launchingGreen = sorterContents[i % 3] == 2;
@@ -206,7 +204,9 @@ public class RRHardware{
             }
         }
 
-        sleep(600);
+        sleep(1000); //prev 600
+        intake.setPower(0);
+        while (launcherLeft.getVelocity() < targetTps);
 //        while ((launchingPurple || launchingGreen) && launcherLeft.getVelocity() > targetTps && outtakeTransferLeft.getPosition() != liftPos[1]) {
             outtakeTransferLeft.setPosition(liftPos[1]);
             outtakeTransferRight.setPosition(1-liftPos[1]);

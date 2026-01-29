@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.QualifierScripts;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous
+@Disabled
 public class notimeBACKred extends LinearOpMode {
 
     RRHardware rrHardware;
@@ -13,7 +14,7 @@ public class notimeBACKred extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         RRHardware rrHardware;
         rrHardware = new RRHardware(hardwareMap);
-        rrHardware.init();
+       // rrHardware.init();
 
         String motif = "null";
         int id = 0;
