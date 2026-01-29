@@ -2,6 +2,8 @@ package org.firstinspires.ftc. teamcode. QualifierScripts;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 
+import android.annotation.SuppressLint;
+
 import com.qualcomm.hardware.limelightvision. Limelight3A;
 import com.qualcomm.hardware. rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -22,8 +24,7 @@ public class RRHardware{
 
     public DcMotor frontLeft, frontRight, backLeft, backRight, intake;
     public DcMotorEx launcherLeft, launcherRight;
-    public CRServo launcherTurn, limelightTurn;
-    public Servo sorter, outtakeTransferLeft, outtakeTransferRight;
+    public Servo sorter, outtakeTransferLeft, outtakeTransferRight, limelightTurn, launcherTurn;
     public Limelight3A limelight;
     public ColorSensor colorSensor;
     public AnalogInput floodgate;
@@ -63,8 +64,8 @@ public class RRHardware{
         launcherLeft = hardwareMap.get(DcMotorEx.class, "launcherL");
         launcherRight = hardwareMap.get(DcMotorEx.class, "launcherR");
 
-        launcherTurn = hardwareMap.get(CRServo.class, "launcherYaw");
-        limelightTurn = hardwareMap.get(CRServo.class, "limeservo");
+        launcherTurn = hardwareMap.get(Servo.class, "launcherYaw");
+        limelightTurn = hardwareMap.get(Servo.class, "limeservo");
 
         intake = hardwareMap.get(DcMotor.class, "intake"); // e2
         sorter = hardwareMap.get(Servo.class, "sorter"); //c2
@@ -126,6 +127,21 @@ public class RRHardware{
         backRight.setPower(brPwr / denominator);
     }
 
+    public void doIntakeGreen() {
+        if (!intaking) {
+            stopLaunch();
+
+            intaking = true;
+
+            sorter.setPosition(intakePos[0]);
+
+            intake.setPower(1);
+
+            sleep(3000);
+            
+            intakeTimer.reset();
+        }
+    }
     public void tryIntake(boolean button) {
         // check if intake button is being pressed and not currently intaking
         if (button && !intaking) {
@@ -154,11 +170,13 @@ public class RRHardware{
             currentPos = (currentPos + 2) % 3;
             //change to outtake
             sorter.setPosition(outtakePos[currentPos]);
-            stopIntake();
+
+
             // treat this as a loop
             // try to go to the artifact (maybe split int tryIntakePurple and tryIntakeGreen)
             // check if intaking was completed -> store color at position
         }
+
     }
     public void stopIntake() {
         intake.setPower(0);
@@ -175,6 +193,7 @@ public class RRHardware{
     }
 
     // NOTE: if the color is not in the
+    @SuppressLint("SuspiciousIndentation")
     public void tryLaunch(boolean button, int color, int tps) { // 1=purple, 2=green, other=any color
         sleep(1000); //prev 200
         if (button && !(launchingPurple || launchingGreen)) { // on first button press
@@ -204,11 +223,11 @@ public class RRHardware{
             }
         }
 
-        sleep(1000); //prev 600
+        sleep(1500); //prev 600
         intake.setPower(0);
         while (launcherLeft.getVelocity() < targetTps);
 //        while ((launchingPurple || launchingGreen) && launcherLeft.getVelocity() > targetTps && outtakeTransferLeft.getPosition() != liftPos[1]) {
-            outtakeTransferLeft.setPosition(liftPos[1]);
+            outtakeTransferLeft.setPosition(liftPos[1]); //launch here
             outtakeTransferRight.setPosition(1-liftPos[1]);
             sorterContents[currentPos] = 0;
     //}

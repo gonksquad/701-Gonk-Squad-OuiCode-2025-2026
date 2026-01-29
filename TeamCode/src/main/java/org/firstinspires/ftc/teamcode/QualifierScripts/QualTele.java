@@ -41,7 +41,7 @@ public class QualTele extends LinearOpMode {
         hardware.outtakeTransferLeft.setPosition(0.85);
         hardware.outtakeTransferRight.setPosition(0.85);
         hardware.sorter.setPosition(0.8);
-        hardware.launcherTurn.setPower(0d);
+     //   hardware.launcherTurn.setPower(0d); SHOULDNT BECOMMENTED
 
         while (opModeIsActive()) {
             if (gamepad2.guide) { // toggle manual override
@@ -68,7 +68,7 @@ public class QualTele extends LinearOpMode {
             }
             // AUTOAIMING RUNS IN THIS TELEMETRY
             // VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-            telemetry.addData("yaw speed", hardware.launcherTurn.getPower());
+         //   telemetry.addData("yaw speed", hardware.launcherTurn.getPower()); SHOULDNT BE COMMENTED
 
             //telemetry.addData("April tag found at degree", hardware.autoAimTurret(true, llsP));
 
@@ -148,7 +148,7 @@ public class QualTele extends LinearOpMode {
 
                 // AUTOAIMING RUNS IN THIS TELEMETRY
                 // VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-                telemetry.addData("yaw speed", hardware.launcherTurn.getPower());
+            //    telemetry.addData("yaw speed", hardware.launcherTurn.getPower()); shOULDNT BE COMMENTED
 
                 //telemetry.addData("April tag found at degree", hardware.autoAimTurret(true, llsP));
 
