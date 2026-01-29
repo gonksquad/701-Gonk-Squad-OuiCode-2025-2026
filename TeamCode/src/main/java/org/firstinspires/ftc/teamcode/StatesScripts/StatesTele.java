@@ -35,7 +35,7 @@ public class StatesTele extends LinearOpMode {
         hardware.outtakeTransferLeft.setPosition(hardware.liftPos[0]); //down position
         hardware.outtakeTransferRight.setPosition(1-hardware.liftPos[0]); // down position
         hardware.sorter.setPosition(0.8);
-        hardware.launcherTurn.setPower(0d);
+     //   hardware.launcherTurn.setPower(0d); SHOULDNT BE COMMENTED
 
         while (opModeIsActive()) {
             if (gamepad2.psWasPressed()) { // toggle manual override

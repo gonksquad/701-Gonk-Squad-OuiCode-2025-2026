@@ -20,7 +20,7 @@ public class notimeBACKblue extends LinearOpMode {
         int id = 0;
 
         waitForStart();
-        rrHardware.launcherTurn.setPower(0d);
+       // rrHardware.launcherTurn.setPower(0d); SHOULDNT BE COMMENTED
 //        if (rrHardware != null && rrHardware.limelight != null) {
 //            LLResult result = rrHardware.limelight.getLatestResult();
 //            if(result != null && result.isValid()) {

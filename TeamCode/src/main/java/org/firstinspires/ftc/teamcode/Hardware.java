@@ -15,8 +15,7 @@ public class Hardware {
     // declare hardware
     public DcMotor frontLeft, frontRight, backLeft, backRight, intake;
     public DcMotorEx launcherLeft, launcherRight;
-    public CRServo launcherTurn, limelightTurn;
-    public Servo sorter, outtakeTransferLeft, outtakeTransferRight;
+    public Servo sorter, outtakeTransferLeft, outtakeTransferRight, limelightTurn, launcherTurn;
     public Limelight3A limelight;
     public ColorSensor colorSensor;
     public AnalogInput floodgate;
@@ -58,8 +57,8 @@ public class Hardware {
         launcherLeft = hardwareMap.get(DcMotorEx.class, "launcherL");
         launcherRight = hardwareMap.get(DcMotorEx.class, "launcherR");
 
-        launcherTurn = hardwareMap.get(CRServo.class, "launcherYaw");
-        limelightTurn = hardwareMap.get(CRServo.class, "limeservo");
+        launcherTurn = hardwareMap.get(Servo.class, "launcherYaw");
+        limelightTurn = hardwareMap.get(Servo.class, "limeservo");
 
         intake = hardwareMap.get(DcMotor.class, "intake"); // e2
         sorter = hardwareMap.get(Servo.class, "sorter"); //c2

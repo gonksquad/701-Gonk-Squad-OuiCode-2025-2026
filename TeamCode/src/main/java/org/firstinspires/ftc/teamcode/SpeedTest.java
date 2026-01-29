@@ -12,7 +12,7 @@ public class SpeedTest extends LinearOpMode {
 
         waitForStart();
 
-        hardware.launcherTurn.setPower(0d);
+       // hardware.launcherTurn.setPower(0d); SHOULDNT BE  COMMENTED
 
         while (opModeIsActive()) {
             if (gamepad2.xWasPressed()) {

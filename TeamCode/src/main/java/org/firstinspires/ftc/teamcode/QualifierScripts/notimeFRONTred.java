@@ -21,7 +21,7 @@ public class notimeFRONTred extends LinearOpMode {
         int id = 0;
 
         waitForStart();
-        rrHardware.launcherTurn.setPower(0d);
+      //  rrHardware.launcherTurn.setPower(0d); SHOULDNT BE COMMENTED
 //        rrHardware.doDrive(0,.5,0);
 //        sleep(1300);
 //        rrHardware.doDrive(0,0,0);

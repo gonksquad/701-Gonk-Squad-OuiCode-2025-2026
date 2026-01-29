@@ -32,7 +32,7 @@ public class odoteleop {
         int angleOffset = (isBlue) ? 90 : 0;
         Pose pose = follower.getPose();
         double theta = (angleOffset + Math.atan2(Math.abs(goalX-pose.getX()), Math.abs(144-pose.getY()))) % 360; //angle to the goal from 0-360
-        hardware.launcherTurn.setPower((theta - lastTheta));
+    //    hardware.launcherTurn.setPower((theta - lastTheta)); SHOULDNT BE COMMENTED
         lastTheta = theta;
     }
 
