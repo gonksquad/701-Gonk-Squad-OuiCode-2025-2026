@@ -6,6 +6,8 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -15,10 +17,14 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Hardware;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+
+import java.util.List;
 
 @Autonomous
 public class backendAutoBLUE extends OpMode {
@@ -116,67 +122,77 @@ public class backendAutoBLUE extends OpMode {
                 .build();
     }
 
+    public void aprilTagOuttake() {
+        if (id == 21) { //gpp (1150 close, 1350 far)
+            rrHardware.tryLaunch(true, 2, 1350);
+            rrHardware.tryLaunch(true, 1, 1350);
+            rrHardware.tryLaunch(true, 1, 1350);
+        }
+        if (id == 22) { //pgp
+            rrHardware.tryLaunch(true, 1, 1350);
+            rrHardware.tryLaunch(true, 2, 1350);
+            rrHardware.tryLaunch(true, 1, 1350);
+        }
+        if (id == 23) { //ppg
+            rrHardware.tryLaunch(true, 1, 1350);
+            rrHardware.tryLaunch(true, 1, 1350);
+            rrHardware.tryLaunch(true, 2, 1350);
+        } else { //gpp
+            rrHardware.tryLaunch(true, 2, 1350);
+            rrHardware.tryLaunch(true, 1, 1350);
+            rrHardware.tryLaunch(true, 1, 1350);
+        }
+    }
     public void statePathUpdate() {
         switch(pathState) {
-//            case APRILTAGLOOKSIES:
-//                LLResult result = limelight.getLatestResult();
-//                //BoundingBox();
-//                if(result != null && result.isValid()) {
-//                    String motif = "null";
-//                    int id = 0;
-//                    if (result != null && result.isValid()) {
-//                        List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
-//
-//                        for (LLResultTypes.FiducialResult fiducial : fiducials) {
-//                            id = fiducial.getFiducialId();
-//                        }
-//
-//                        if (id == 21) {
-//                            motif = "gpp";
-//                        } else if (id == 22) {
-//                            motif = "pgp";
-//                        } else if (id == 23) {
-//                            motif = "ppg";
-//                        }
-//
-//                        telemetry.addData("tag found", id);
-//                        telemetry.addData("motif", motif);
-//
-//                        telemetry.update();
-//                    } else {
-//                        telemetry.addLine("No apriltag found");
-//                        telemetry.update();
-//                    }
-//                }
-//                setPathState(pathState.SHOOT); //reset timer and make new state
-//                break;
-//            case SHOOT:
-//                if (!follower.isBusy()) {
-//                    if(id == 21) {
-//                        rrHardware.shootgpp();
-//                    }
-//                    if(id == 22) {
-//                        rrHardware.shootpgp();
-//                    }
-//                    if(id == 23) {
-//                        rrHardware.shootppg();
-//                    }
-//                    else {
-//                        rrHardware.shootgpp();
-//                    }
-//                }
-//                setPathState(pathState.STARTTOBEFOREPICKUP);
-//                break;
+            case APRILTAGLOOKSIES:
+                LLResult result = limelight.getLatestResult();
+                //BoundingBox();
+                if (result != null && result.isValid()) { //add time elapsed too?
+                    String motif = "null";
+                    int id = 0;
+                    if (result != null && result.isValid()) {
+                        List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
+
+                        for (LLResultTypes.FiducialResult fiducial : fiducials) {
+                            id = fiducial.getFiducialId();
+                        }
+
+                        if (id == 21) {
+                            motif = "gpp";
+                        } else if (id == 22) {
+                            motif = "pgp";
+                        } else if (id == 23) {
+                            motif = "ppg";
+                        }
+
+                        telemetry.addData("tag found", id);
+                        telemetry.addData("motif", motif);
+
+                        telemetry.update();
+                    } else {
+                        telemetry.addLine("No apriltag found");
+                        telemetry.update();
+                    }
+                }
+                setPathState(pathState.SHOOT); //reset timer and make new state
+                break;
+            case SHOOT:
+                if (!follower.isBusy()) {
+                    aprilTagOuttake();
+                    setPathState(pathState.STARTTOBEFOREPICKUP);
+                }
+                break;
             case STARTTOBEFOREPICKUP:
                 if (!follower.isBusy()) { //note: after shoot and change time to something for whole auto
                     follower.followPath(start_driveToFirstSpike, true);
-                    //pathState = pathState.FIRSTSPIKEDRIVE;
                     setPathState(pathState.PICKUP1);
                 }
                 telemetry.addLine(" done to pickup");
                 break;
             case PICKUP1:
                 if (!follower.isBusy()) {
+                    rrHardware.tryIntake(true);
                     // rrHardware.intake1(); //make sure this doesn't stop other functions
                     follower.followPath(firstSpike_firstArtifactCollect, true);
                     setPathState(pathState.PICKUP2);
@@ -185,7 +201,7 @@ public class backendAutoBLUE extends OpMode {
                 break;
             case PICKUP2:
                 if (!follower.isBusy()) {
-                    // rrHardware.intake2();
+                    rrHardware.tryIntake(true);
                     follower.followPath(firstSpike_secondArtifactCollect, true);
                     setPathState(pathState.PICKUP3);
                 }
@@ -193,7 +209,7 @@ public class backendAutoBLUE extends OpMode {
                 break;
             case PICKUP3:
                 if (!follower.isBusy()) {
-                    // rrHardware.intake3();
+                    rrHardware.tryIntake(true);
                     follower.followPath(firstSpike_thirdArtifactCollect, true);
                     setPathState(pathState.PICKUPTOSHOOT);
                 }
@@ -202,28 +218,16 @@ public class backendAutoBLUE extends OpMode {
             case PICKUPTOSHOOT:
                 if (!follower.isBusy()) {
                     follower.followPath(firstSpike_shoot, true);
-//                    rrHardware.shootpgpfar(); aah
                     setPathState(pathState.SHOOTFORWARD);
                 }
                 telemetry.addLine(" done shooting");
                 break;
-//            case SHOOT2:
-//                if (!follower.isBusy()) {
-//                    if(id == 21) {
-//                        rrHardware.shootgpp();
-//                    }
-//                    if(id == 22) {
-//                        rrHardware.shootpgp();
-//                    }
-//                    if(id == 23) {
-//                        rrHardware.shootppg();
-//                    }
-//                    else {
-//                        rrHardware.shootppg();
-//                    }
-//                }
-//                setPathState(pathState.SHOOTFORWARD);
-//                break;
+            case SHOOT2:
+                if (!follower.isBusy()) {
+                    aprilTagOuttake();
+                    setPathState(pathState.SHOOTFORWARD);
+                }
+                break;
             case SHOOTFORWARD:
                 if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 30) { //note: change time to something for whole auto
                     follower.followPath(shoot_forward, true);
@@ -297,7 +301,13 @@ public class backendAutoBLUE extends OpMode {
 
         limelight.start();
 
-        pathState = pathState.STARTTOBEFOREPICKUP;
+        rrHardware = new RRHardware(hardwareMap);
+
+        rrHardware.sorterContents[0] = 1;
+        rrHardware.sorterContents[1] = 1; //purple
+        rrHardware.sorterContents[2] = 2; //green
+
+        pathState = pathState.APRILTAGLOOKSIES;
         pathTimer = new Timer();
         opModeTimer = new Timer();
         follower = Constants.createFollower(hardwareMap);
@@ -330,7 +340,7 @@ public class backendAutoBLUE extends OpMode {
 
 /* process:
     1. Start pose
-        - 180 deg angle
+        - 90 deg angle
         - 2 purple and 1 green preloaded ball, order known and defined
             ex. slot 1,2,3 with servo positions = green, purple, purple
     2. View april tag and detect pattern
@@ -342,37 +352,7 @@ public class backendAutoBLUE extends OpMode {
         - repeat 1/3
     4. move to collect 3 balls on spike mark in GPP order
     5. move back to initial position, repeat step 3 with new sorter store
-        - note: color sensor not needed
+        - note: color sensor not needed (edit: we're using it)
 
 also how to get extra (?)ranking points like moving off the baselines?
 */
-
-//sorter
-//    public void sorter() {
-//        int array[] = {1, 2, 3}; //where physical slots are
-//        String colors[] = {"P", "G", "P"}; //color in each slot
-//    }
-
-//    //apriltag
-//    public void AprilTagIdentifier() {
-//        //get apriltag id!!!
-//            //id 21 = GPP
-//            //id 22 = PGP
-//            //id 23 = PPG
-//        //start 1 = P, 2 = P, 3 = G
-//        if (apriltagid = 21) {
-//            first = 3;
-//            second = 2;
-//            third = 1;
-//        }
-//        if (apriltagid = 22) {
-//            first = 2;
-//            second = 3;
-//            third = 1;
-//        }
-//        if (apriltagid = 23) {
-//            first = 1;
-//            second = 2;
-//            third = 3;
-//        }
-//    }
