@@ -41,7 +41,7 @@ public class ApriltagCalculatedDistance extends LinearOpMode {
             if (result != null && result.isValid()) {
                 if (result.getTx() >5){
                     while (result.getTx() >5){
-                        servoPosition = betweenLimAndLim(limelightServo.getPosition() + 0.05, 1, 0); //change limTwo from 0 to measured limit with protractor
+                        servoPosition = betweenOneAndZero(limelightServo.getPosition() + 0.05); //change limTwo from 0 to measured limit with protractor
                         limelightServo.setPosition(servoPosition);
                         telemetry.addData("Should be moving left... Servo Position:", limelightServo.getPosition());
                         telemetry.update();
@@ -50,7 +50,7 @@ public class ApriltagCalculatedDistance extends LinearOpMode {
                     }
                 } else if (result.getTx() < -5){
                     while (result.getTx() <-5){
-                        servoPosition = betweenLimAndLim(limelightServo.getPosition() - 0.01,1,0);//change limTwo from 0 to measured limit with protractor
+                        servoPosition = betweenOneAndZero(limelightServo.getPosition() - 0.01);//change limTwo from 0 to measured limit with protractor
                         limelightServo.setPosition(servoPosition);
                         telemetry.addData("Should be moving right... Servo Position:", limelightServo.getPosition());
                         telemetry.update();
@@ -60,7 +60,7 @@ public class ApriltagCalculatedDistance extends LinearOpMode {
                 }
 
                 distance = getDistanceFromTag(result.getTa());
-                //turretServo.setPosition(betweenLimAndLim(getTurretAngle(distance, limelightServo.getPosition()),1, 0)); //change limTwo from 0 to measured limit with protractor
+                turretServo.setPosition(betweenOneAndZero(getTurretAngle(distance, limelightServo.getPosition()))); //change limTwo from 0 to measured limit with protractor, .3??
                 //turretServo.setPosition(1-servoPosition);
                 telemetry.addData("Calculated Distance:", distance);
                 telemetry.addData("ty:", result.getTy());
@@ -83,6 +83,16 @@ public class ApriltagCalculatedDistance extends LinearOpMode {
         //y = 184.8972*x^-0.5056956
         //y = 176.3168*x^-0.4998937
     }
+
+    public double betweenOneAndZero(double number){
+        if (number>1){
+            number = 1;
+        } else if (number < 0){
+            number = 0;
+        }
+        return number;
+    }
+
     public double betweenLimAndLim(double number, double limOne, double limTwo){
         if (number>limOne){
             number = limOne;
@@ -93,11 +103,11 @@ public class ApriltagCalculatedDistance extends LinearOpMode {
     }
 
     public double getTurretAngle (double calcDist, double camPosition){
-        double measuredCamOffspace = 0; //replace
-        double measuredTurretOffspace = 0; //replace
-        camPosition = camPosition*270 - measuredCamOffspace; //270 or whatever range of motion
+        double measuredTurretOffspace = 120; //replace
+        camPosition = camPosition*270; //270 or whatever range of motion
         double turretAngle = Math.atan((Math.sqrt(Math.pow(distance,2)-Math.pow(distance*Math.cos(camPosition),2)))/(27.023-(distance*Math.cos(camPosition))));
-        turretAngle = turretAngle - measuredTurretOffspace/120; //120 or whatever range of motion
+        turretAngle = (turretAngle + measuredTurretOffspace)/120; //120 or whatever range of motion
+        turretAngle = betweenLimAndLim(turretAngle,1,0);
         return turretAngle;
     }
 }
