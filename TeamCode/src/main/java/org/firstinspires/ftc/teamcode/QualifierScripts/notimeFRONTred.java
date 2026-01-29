@@ -80,7 +80,7 @@ public class notimeFRONTred extends LinearOpMode {
 //            telemetry.update();
 //        }
 
-        rrHardware.shootpgpclose();
+//        rrHardware.shootpgpclose(); aah
 
         sleep(5000);
         rrHardware.doDrive(0,0,.5);

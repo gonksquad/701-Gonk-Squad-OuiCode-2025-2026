@@ -8,25 +8,52 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Hardware;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 @Autonomous
-public class testPathingBACKAUTORED extends OpMode {
+public class testPathingBACKAUTOBLUE extends OpMode {
     int id = -1;
     String motif = "null";
-    Hardware hardware = new Hardware(hardwareMap);
 
-    public Hardware getHardware() {
-        return hardware;
-    }
+    public DcMotor frontLeft, frontRight, backLeft, backRight, intake;
+    public DcMotorEx launcherLeft, launcherRight;
+    public CRServo launcherTurn, limelightTurn;
+    public Servo sorter, outtakeTransferLeft, outtakeTransferRight;
+    public Limelight3A limelight;
+    public ColorSensor colorSensor;
+    public AnalogInput floodgate;
 
+    int red, green, blue;
+    float[] hsvValues = new float[3];
+    boolean nextPos = true;
+    public final double[] intakePos = {1.0, 0.6, 0.2};//*/{0.4, 0.0, 0.8};// sorter servo positions for outtaking
+    public final double[] outtakePos = {0.4, 0.0, 0.8};//*/{1.0, 0.6, 0.2}; // sorter servo positions for intaking
+    public double sorterOffset = 0d;
+    public byte[] sorterContents = {0, 0, 0}; // what is stored in each sorter slot 0 = empty, 1 = purple, 2 = green
+    public double[] liftPos = {0.6, 0.2};
+
+    public int currentPos = 0; // 0-2
+    int targetTps = 0; // protect launcher tps from override
+    ElapsedTime intakeTimer = new ElapsedTime();
+    public ElapsedTime launchTimer = new ElapsedTime();
+
+    // initialize flags
+    public boolean intaking = false;
+    private boolean launchingPurple = false;
+    private boolean launchingGreen = false;
     RRHardware rrHardware;
 
-    private Limelight3A limelight;
+
     private Follower follower;
     private Timer pathTimer, actionTimer, opModeTimer;
     //private ElapsedTime runtime = new ElapsedTime();
@@ -41,7 +68,8 @@ public class testPathingBACKAUTORED extends OpMode {
         PICKUP3,
         PICKUPTOSHOOT,
         SHOOT2,
-        SHOOTFORWARD
+        SHOOTFORWARD,
+        END
 
     }
     float bounds_X = 4f;
@@ -51,7 +79,7 @@ public class testPathingBACKAUTORED extends OpMode {
             firstSpike_thirdArtifactCollect, firstSpike_shoot, shoot_forward;
 
     //poses initialized
-    private final Pose startPose = new Pose(48, 9, Math.toRadians(180));
+    private final Pose startPose = new Pose(48, 9, Math.toRadians(90));
     private final Pose forward = new Pose(48, 21, Math.toRadians(90));
     private final Pose beforeFirstSpike = new Pose(44,36, Math.toRadians(180));
 
@@ -79,8 +107,8 @@ public class testPathingBACKAUTORED extends OpMode {
                 .setLinearHeadingInterpolation(firstSpike2.getHeading(), firstSpike3.getHeading())
                 .build();
         firstSpike_shoot = follower.pathBuilder()
-                .addPath(new BezierCurve(firstSpike3, startPose))
-                .setLinearHeadingInterpolation(firstSpike3.getHeading(), startPose.getHeading()).setReversed() //hopefully backwards drive
+                .addPath(new BezierLine(firstSpike3, startPose))
+                .setLinearHeadingInterpolation(firstSpike3.getHeading(), startPose.getHeading()) //.setReversed() //hopefully backwards drive
                 .build();
         shoot_forward = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, forward))
@@ -140,43 +168,43 @@ public class testPathingBACKAUTORED extends OpMode {
 //                setPathState(pathState.STARTTOBEFOREPICKUP);
 //                break;
             case STARTTOBEFOREPICKUP:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 10) { //note: after shoot and change time to something for whole auto
+                if (!follower.isBusy()) { //note: after shoot and change time to something for whole auto
                     follower.followPath(start_driveToFirstSpike, true);
                     //pathState = pathState.FIRSTSPIKEDRIVE;
+                    setPathState(pathState.PICKUP1);
                 }
-                setPathState(pathState.PICKUP1);
                 telemetry.addLine(" done to pickup");
                 break;
             case PICKUP1:
                 if (!follower.isBusy()) {
                    // rrHardware.intake1(); //make sure this doesn't stop other functions
                     follower.followPath(firstSpike_firstArtifactCollect, true);
+                    setPathState(pathState.PICKUP2);
                 }
-                setPathState(pathState.PICKUP2);
                 telemetry.addLine(" done pickup 1");
                 break;
             case PICKUP2:
                 if (!follower.isBusy()) {
                    // rrHardware.intake2();
                     follower.followPath(firstSpike_secondArtifactCollect, true);
+                    setPathState(pathState.PICKUP3);
                 }
-                setPathState(pathState.PICKUP3);
                 telemetry.addLine(" done pickup 2");
                 break;
             case PICKUP3:
                 if (!follower.isBusy()) {
                    // rrHardware.intake3();
                     follower.followPath(firstSpike_thirdArtifactCollect, true);
+                    setPathState(pathState.PICKUPTOSHOOT);
                 }
-                setPathState(pathState.PICKUPTOSHOOT);
                 telemetry.addLine(" done pickup 3");
                 break;
             case PICKUPTOSHOOT:
                 if (!follower.isBusy()) {
                     follower.followPath(firstSpike_shoot, true);
-                    rrHardware.shootpgpfar();
+//                    rrHardware.shootpgpfar(); aah
+                    setPathState(pathState.SHOOTFORWARD);
                 }
-                setPathState(pathState.SHOOTFORWARD);
                 telemetry.addLine(" done shooting");
                 break;
 //            case SHOOT2:
@@ -197,13 +225,19 @@ public class testPathingBACKAUTORED extends OpMode {
 //                setPathState(pathState.SHOOTFORWARD);
 //                break;
             case SHOOTFORWARD:
-                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() > 25) { //note: change time to something for whole auto
+                if (!follower.isBusy() && pathTimer.getElapsedTimeSeconds() < 30) { //note: change time to something for whole auto
                     follower.followPath(shoot_forward, true);
+                    setPathState(pathState.END);
                 }
                 telemetry.addLine(" done! :)");
                 break;
+
+            case END:
+                telemetry.addLine("Nothing running");
+                break;
+
             default:
-                telemetry.addLine("Nothing runnnning");
+                telemetry.addLine("death");
                 break;
         }
     }
@@ -215,6 +249,45 @@ public class testPathingBACKAUTORED extends OpMode {
 
     @Override
     public void init() {
+        frontLeft = hardwareMap.get(DcMotor.class, "fl");
+        frontRight = hardwareMap.get(DcMotor.class, "fr");
+        backLeft = hardwareMap.get(DcMotor.class, "bl");
+        backRight = hardwareMap.get(DcMotor.class, "br");
+
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+
+        launcherLeft = hardwareMap.get(DcMotorEx.class, "launcherL");
+        launcherRight = hardwareMap.get(DcMotorEx.class, "launcherR");
+
+        launcherTurn = hardwareMap.get(CRServo.class, "launcherYaw");
+        limelightTurn = hardwareMap.get(CRServo.class, "limeservo");
+
+        intake = hardwareMap.get(DcMotor.class, "intake"); // e2
+        sorter = hardwareMap.get(Servo.class, "sorter"); //c2
+        outtakeTransferLeft = hardwareMap.get(Servo.class, "liftLeft"); // c5
+        outtakeTransferRight = hardwareMap.get(Servo.class, "liftRight"); // c5
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        colorSensor = hardwareMap.get(ColorSensor.class, "colorSens");
+
+        floodgate = hardwareMap.get(AnalogInput.class, "floodgate");
+
+
+        launcherRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        launcherRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        launcherRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        launcherLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        launcherLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
+
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
 
         //turretAxon = hardwareMap.get(CRServo.class, "axon");
@@ -242,6 +315,10 @@ public class testPathingBACKAUTORED extends OpMode {
     public void loop() {
         follower.update();
         statePathUpdate();
+
+        if (pathState == pathState.END) {
+            return;
+        }
 
         telemetry.addData("path state", pathState.toString());
         telemetry.addData("x", follower.getPose().getX());
