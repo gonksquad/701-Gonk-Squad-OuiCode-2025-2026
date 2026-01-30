@@ -19,7 +19,7 @@ public class odoteleop {
     }
     public odoteleop(HardwareMap hardwareMap) {
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(0, 0, 0));
+        follower.setStartingPose(new Pose(0, 0, 0)); //remove later
         hardware = new Hardware(hardwareMap);
     }
 
@@ -30,15 +30,16 @@ public class odoteleop {
         follower.update();
         int goalX = (isBlue) ? 0 : 144;
         int goalY = 144;
-        double angleOffset = (isBlue) ? 0 : -90;
-        angleOffset += getOdoData(odoDataTypes.HEADING);
+        //double angleOffset = (isBlue) ? 0 : -90;
         Pose pose = follower.getPose();
+        double angleOffset = pose.getHeading();
         double theta = Math.round(180*(angleOffset + Math.atan2(goalY-pose.getY(), goalX-pose.getX()))/Math.PI % 360); //angle to the goal from 0-360
         //hardware.launcherTurn.setPower((theta - lastTheta)/10); for cr servo
-        hardware.launcherTurn.setPosition(-0.5+theta/180); //assuming that  0 = 90deg right, 0.5 = forawrd, 1 = 90deg left
-        lastTheta = theta;
+        hardware.limelightTurn.setPosition((theta-90)/180); //assuming that  0 = 90deg right, 0.5 = forawrd, 1 = 90deg left
+        //lastTheta = theta; for cr servo
+        //return to add to telemtry bc this script deosnt have telemetry
         return theta + "=theta, " + 180*angleOffset/Math.PI + "=angleoffset, " + 180*Math.atan2(goalY-pose.getY(), goalX-pose.getX())/Math.PI + "=atan2func" + hardware.launcherTurn.getPosition() + "=launchturnpos";
-    }
+    }   //0 = left, 1 = right
 
     public double getOdoData(odoDataTypes odt) {
         follower.update();

@@ -118,10 +118,10 @@ public class StatesTele extends LinearOpMode {
 //                }
 
                 //odo auto aiming
-                //if(hardware.launchTimer.milliseconds() > 0) {
-                    hardware.launchTimer.reset();
-                    hardware.launcherTurn.setPosition(hardware.launcherTurn.getPosition()+gamepad2.left_stick_x/100f);
-                    telemetry.addData("YURRRRR:    ", odoteleop.odoAimTurret(true));
+                telemetry.addData("limelightpos", hardware.limelightTurn.getPosition());
+                hardware.launchTimer.reset();
+                hardware.launcherTurn.setPosition(hardware.launcherTurn.getPosition()+gamepad2.left_stick_x/100f);
+                telemetry.addData("YURRRRR:    ", odoteleop.odoAimTurret(true));
                 telemetry.addData("robotX", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.X));
                 telemetry.addData("robotY", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.Y));
                 telemetry.addData("robotRot", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.HEADING));
