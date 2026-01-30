@@ -84,17 +84,17 @@ public class backendAutoBLUE extends OpMode {
     //poses initialized
     private final Pose startPose = new Pose(48, 9, Math.toRadians(90));
     private final Pose forward = new Pose(48, 21, Math.toRadians(90));
-    private final Pose beforeFirstSpike = new Pose(48,34, Math.toRadians(180));
+    private final Pose beforeFirstSpike = new Pose(46,25, Math.toRadians(135));
 
     private final Pose firstSpike1 = new Pose(44.5,34, Math.toRadians(180)); //5.5 in artifact
-    private final Pose firstSpike2 = new Pose(41.5,34, Math.toRadians(180));
-    private final Pose firstSpike3 = new Pose(38.5,34, Math.toRadians(180));
+    private final Pose firstSpike2 = new Pose(42.5,34, Math.toRadians(180));
+    private final Pose firstSpike3 = new Pose(40.5,34, Math.toRadians(180));
 
 
     //path initializing
     public void buildPaths() {
         start_driveToFirstSpike = follower.pathBuilder()
-                .addPath(new BezierCurve(startPose, beforeFirstSpike))
+                .addPath(new BezierLine(startPose, beforeFirstSpike))
                 .setLinearHeadingInterpolation(startPose.getHeading(), beforeFirstSpike.getHeading())
                 .build();
         firstSpike_firstArtifactCollect = follower.pathBuilder()
@@ -120,7 +120,7 @@ public class backendAutoBLUE extends OpMode {
     }
 
     public void aprilTagOuttake() {
-        launcherTurn.setPosition(0.18);
+        launcherTurn.setPosition(0.15);
         if (id == 21) { //gpp (1150 close, 1350 far)
             rrHardware.tryLaunch(true, 2, 1350);
             rrHardware.tryLaunch(true, 1, 1350);
@@ -141,6 +141,7 @@ public class backendAutoBLUE extends OpMode {
             rrHardware.tryLaunch(true, 1, 1350);
         }
     }
+
     public void statePathUpdate() {
         switch(pathState) {
             case APRILTAGLOOKSIES:
@@ -186,13 +187,14 @@ public class backendAutoBLUE extends OpMode {
             case STARTTOBEFOREPICKUP:
                 if (!follower.isBusy()) { //note: after shoot and change time to something for whole auto
                     follower.followPath(start_driveToFirstSpike, true);
+                    sleep(1000); //for testing
                     setPathState(pathState.PICKUP1);
                 }
                 telemetry.addLine(" done to pickup");
                 break;
             case PICKUP1:
                 if (!follower.isBusy()) {
-                    rrHardware.tryIntake(true);
+                    rrHardware.doIntakeGreen();
                     sleep(4000);
                     // rrHardware.intake1(); //make sure this doesn't stop other functions
                     follower.followPath(firstSpike_firstArtifactCollect, true);
@@ -202,7 +204,7 @@ public class backendAutoBLUE extends OpMode {
                 break;
             case PICKUP2:
                 if (!follower.isBusy()) {
-                    rrHardware.tryIntake(true);
+                    rrHardware.doIntakePurple1();
                     sleep(4000);
                     follower.followPath(firstSpike_secondArtifactCollect, true);
                     setPathState(pathState.PICKUP3);
@@ -211,9 +213,10 @@ public class backendAutoBLUE extends OpMode {
                 break;
             case PICKUP3:
                 if (!follower.isBusy()) {
-                    rrHardware.tryIntake(true);
+                    rrHardware.doIntakePurple2();
                     sleep(4000);
                     follower.followPath(firstSpike_thirdArtifactCollect, true);
+                    rrHardware.dontFallOut();
                     rrHardware.stopIntake();
                     setPathState(pathState.PICKUPTOSHOOT);
                 }
@@ -222,14 +225,14 @@ public class backendAutoBLUE extends OpMode {
             case PICKUPTOSHOOT:
                 if (!follower.isBusy()) {
                     follower.followPath(firstSpike_shoot, true);
-                    setPathState(pathState.SHOOTFORWARD);
+                    setPathState(pathState.SHOOT2);
                 }
                 telemetry.addLine(" done shooting");
                 break;
             case SHOOT2:
                 if (!follower.isBusy()) {
                     aprilTagOuttake();
-                    sleep(5000);
+//                    sleep(5000);
                     setPathState(pathState.SHOOTFORWARD);
                 }
                 break;
@@ -335,18 +338,23 @@ public class backendAutoBLUE extends OpMode {
 
     @Override
     public void loop() {
-        follower.update();
-        statePathUpdate();
+        if (getRuntime() < 30) {
+            follower.update();
+            statePathUpdate();
 
-        if (pathState == pathState.END) {
-            return;
+            if (pathState == pathState.END) {
+                return;
+            }
+
+            telemetry.addData("path state", pathState.toString());
+            telemetry.addData("x", follower.getPose().getX());
+            telemetry.addData("y", follower.getPose().getY());
+            telemetry.addData("heading", follower.getPose().getHeading());
+            telemetry.addData("path time", pathTimer.getElapsedTimeSeconds());
         }
-
-        telemetry.addData("path state", pathState.toString());
-        telemetry.addData("x", follower.getPose().getX());
-        telemetry.addData("y", follower.getPose().getY());
-        telemetry.addData("heading", follower.getPose().getHeading());
-        telemetry.addData("path time", pathTimer.getElapsedTimeSeconds());
+        else {
+            requestOpModeStop();
+        }
     }
 }
 

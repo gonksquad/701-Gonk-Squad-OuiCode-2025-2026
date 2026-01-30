@@ -130,18 +130,67 @@ public class RRHardware{
     public void doIntakeGreen() {
         if (!intaking) {
             stopLaunch();
-
             intaking = true;
 
             sorter.setPosition(intakePos[0]);
-
             intake.setPower(1);
 
+            sorterContents[0] = 2;
             sleep(3000);
-            
+
+            sorter.setPosition(outtakePos[2]);
             intakeTimer.reset();
         }
+        if (intaking && intakeTimer.milliseconds() > 1000) {
+            intaking = false;
+            intake.setPower(0);
+        }
     }
+
+    public void doIntakePurple1() {
+        if (!intaking) {
+            stopLaunch();
+            intaking = true;
+
+            sorter.setPosition(intakePos[1]);
+            intake.setPower(1);
+
+            sorterContents[1] = 1;
+            sleep(3000);
+
+            sorter.setPosition(outtakePos[0]);
+            intakeTimer.reset();
+        }
+        if (intaking && intakeTimer.milliseconds() > 1000) {
+            intaking = false;
+            intake.setPower(0);
+        }
+    }
+
+    public void doIntakePurple2() {
+        if (!intaking) {
+            stopLaunch();
+            intaking = true;
+
+            sorter.setPosition(intakePos[2]);
+            intake.setPower(1);
+
+            sorterContents[2] = 1;
+            sleep(3000);
+
+            sorter.setPosition(outtakePos[1]);
+            intakeTimer.reset();
+        }
+        if (intaking && intakeTimer.milliseconds() > 1000) {
+            intaking = false;
+            intake.setPower(0);
+        }
+    }
+
+    public void dontFallOut() {
+        sorter.setPosition(outtakePos[0]);
+    }
+
     public void tryIntake(boolean button) {
         // check if intake button is being pressed and not currently intaking
         if (button && !intaking) {
