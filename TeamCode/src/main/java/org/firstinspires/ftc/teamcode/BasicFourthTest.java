@@ -4,15 +4,13 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.AnalogInput;
-import com.qualcomm.robotcore.hardware.AnalogSensor;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.Servo;
 
 @Disabled
-public class FourthWireTest extends LinearOpMode {
+public class BasicFourthTest extends LinearOpMode {
 
     public CRServo servo;
-    public AnalogInput sensor, limitL, limitR;
+    public AnalogInput sensor;
 
     private int revolution = 1;
     private double prevVoltage = 1.5;
@@ -26,31 +24,19 @@ public class FourthWireTest extends LinearOpMode {
     public void runOpMode() {
         servo = hardwareMap.get(CRServo.class, "axon");
         sensor = hardwareMap.get(AnalogInput.class, "fourth");
-        limitL = hardwareMap.get(AnalogInput.class, "left");
-        limitR = hardwareMap.get(AnalogInput.class, "right");
 
         waitForStart();
 
         // find the voltage limits
         telemetry.addLine("Calibrating...");
         telemetry.update();
-        servo.setPower(0.125);
-        while (limitL.getVoltage() < 1 && opModeIsActive()) {
-            double crntVoltage = sensor.getVoltage();
-            if (crntVoltage < minVoltage) minVoltage = crntVoltage;
-            if (crntVoltage > maxVoltage) maxVoltage = crntVoltage;
-        }
-        servo.setPower(-0.125);
-        while (limitR.getVoltage() < 1 && opModeIsActive()) {
-            double crntVoltage = sensor.getVoltage();
-            if (crntVoltage < minVoltage) minVoltage = crntVoltage;
-            if (crntVoltage > maxVoltage) maxVoltage = crntVoltage;
-        }
-        servo.setPower(0.125);
-        sleep(500);
+        servo.setPower(0);
 
         while (opModeIsActive()) {
             double crntVoltage = sensor.getVoltage();
+
+            if (crntVoltage > maxVoltage) maxVoltage = crntVoltage;
+            if (crntVoltage < minVoltage) minVoltage = crntVoltage;
 
             while (gamepad1.b) sleep(100);
 
@@ -60,10 +46,13 @@ public class FourthWireTest extends LinearOpMode {
             double guess = 90d * ((crntVoltage - minVoltage) / (maxVoltage - minVoltage)) + 45d;
             double overallGuess = guess + (double)(120 * revolution);
 
-            if (gamepad1.yWasPressed()) target += 10d;
-            if (gamepad1.aWasPressed()) target -= 10d;
-            if (target < 0d) target = 0d;
-            if (target > 180d) target = 180d;
+            if (gamepad1.y) {
+                servo.setPower(-1);
+            } else if (gamepad1.a) {
+                servo.setPower(1);
+            } else {
+                servo.setPower(0);
+            }
 
 //            if (overallGuess > target - 8d) {
 //                servo.setPower(0.0625);
@@ -72,18 +61,6 @@ public class FourthWireTest extends LinearOpMode {
 //            } else {
 //                servo.setPower(0);
 //            }
-
-            if (limitL.getVoltage() > 1d) {
-                limit = 1;
-                revolution = -1;
-                servo.setPower(0);
-                target = 60d;
-            } else if (limitR.getVoltage() > 1d) {
-                limit = 2;
-                revolution = 1;
-                servo.setPower(0);
-                target = 120d;
-            }
 
             telemetry.addData("Voltage: ", sensor.getVoltage());
             telemetry.addData("Direction: ", servo.getPower());
@@ -94,8 +71,7 @@ public class FourthWireTest extends LinearOpMode {
             telemetry.addData("Revolution: ", revolution);
             telemetry.addData("Max Voltage: ", maxVoltage);
             telemetry.addData("Min Voltage: ", minVoltage);
-            telemetry.addData("LimitL: ", limitL.getVoltage());
-            telemetry.addData("LimitR: ", limitR.getVoltage());
+
             if (crntVoltage > maxVoltage - 0.02 || crntVoltage < minVoltage + 0.02) telemetry.addData("!!UNSURE!!    ", "(");
             telemetry.update();
 
