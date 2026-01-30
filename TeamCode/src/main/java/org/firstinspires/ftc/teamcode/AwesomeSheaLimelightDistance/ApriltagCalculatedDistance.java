@@ -1,10 +1,3 @@
-// CHANGE TURRET AND CAM ZERO LIMIT TO BE FACING EACH OTHER
-
-
-
-
-
-
 package org.firstinspires.ftc.teamcode.AwesomeSheaLimelightDistance;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -33,46 +26,74 @@ public class ApriltagCalculatedDistance extends LinearOpMode {
         limelight.pipelineSwitch(0);
         waitForStart();
         limelight.start();
-        limelightServo.setPosition(servoPosition);
-        turretServo.setPosition(turretPosition);
+//        limelightServo.setPosition(servoPosition);
+//        turretServo.setPosition(turretPosition);
+        boolean buttonTesty = false;
 
         while (opModeIsActive()) {
-            LLResult result = limelight.getLatestResult();
-            if (result != null && result.isValid()) {
-                if (result.getTx() >5){
-                    while (result.getTx() >5){
-                        servoPosition = betweenOneAndZero(limelightServo.getPosition() + 0.05); //change limTwo from 0 to measured limit with protractor
-                        limelightServo.setPosition(servoPosition);
-                        telemetry.addData("Should be moving left... Servo Position:", limelightServo.getPosition());
-                        telemetry.update();
-                        result = limelight.getLatestResult();
-                        sleep(100);
-                    }
-                } else if (result.getTx() < -5){
-                    while (result.getTx() <-5){
-                        servoPosition = betweenOneAndZero(limelightServo.getPosition() - 0.01);//change limTwo from 0 to measured limit with protractor
-                        limelightServo.setPosition(servoPosition);
-                        telemetry.addData("Should be moving right... Servo Position:", limelightServo.getPosition());
-                        telemetry.update();
-                        result = limelight.getLatestResult();
-                        sleep(100);
-                    }
-                }
-
-                distance = getDistanceFromTag(result.getTa());
-                turretServo.setPosition(betweenOneAndZero(getTurretAngle(distance, limelightServo.getPosition()))); //change limTwo from 0 to measured limit with protractor, .3??
-                //turretServo.setPosition(1-servoPosition);
-                telemetry.addData("Calculated Distance:", distance);
-                telemetry.addData("ty:", result.getTy());
-                telemetry.addData("ta:", result.getTa());
-                telemetry.addData("tx", result.getTx());
-                telemetry.addData("Limelight position:", limelightServo.getPosition());
-                telemetry.addData("Turret position:", turretServo.getPosition());
-                telemetry.update();
-            } else {
-                telemetry.addLine("No valid target detected.");
-                telemetry.update();
+            if(gamepad1.a){
+                buttonTesty = false;
+            }else if (gamepad1.b){
+                buttonTesty = true;
             }
+
+            if(buttonTesty == false){
+                //limelightServo.setPosition(0.25);
+                turretServo.setPosition(0);
+                telemetry.addLine("0.10");
+                telemetry.update();
+                sleep(1000);
+//                limelightServo.setPosition(0.5);
+//                turretServo.setPosition(0.5);
+//                telemetry.addLine("0.5");
+//                telemetry.update();
+//                sleep(1000);
+                //limelightServo.setPosition(0.75);
+                turretServo.setPosition(0.92);
+                telemetry.addLine("0.9");
+                telemetry.update();
+                sleep(1000);
+//                limelightServo.setPosition(0.5);
+//                turretServo.setPosition(0.5);
+//                telemetry.addLine("0.5");
+//                telemetry.update();
+//                sleep(1000);
+            } else {
+                LLResult result = limelight.getLatestResult();
+                if (result != null && result.isValid()) {
+                    if (result.getTx() >5){
+                        while (result.getTx() >5){
+                            servoPosition = betweenOneAndZero(limelightServo.getPosition() + 0.05);
+                            limelightServo.setPosition(servoPosition);
+                            telemetry.addData("Should be moving left... Servo Position:", limelightServo.getPosition());
+                            telemetry.update();
+                            result = limelight.getLatestResult();
+                            sleep(100);
+                        }
+                    } else if (result.getTx() < -5){
+                        while (result.getTx() <-5){
+                            servoPosition = betweenOneAndZero(limelightServo.getPosition() - 0.05);
+                            limelightServo.setPosition(servoPosition);
+                            telemetry.addData("Should be moving right... Servo Position:", limelightServo.getPosition());
+                            telemetry.update();
+                            result = limelight.getLatestResult();
+                            sleep(100);
+                        }
+                    }
+
+                    distance = getDistanceFromTag(result.getTa());
+                    turretServo.setPosition(betweenOneAndZero(getTurretAngle(distance, limelightServo.getPosition()))); //change limTwo from 0 to measured limit with protractor, .3??
+                    //turretServo.setPosition(1-servoPosition);
+                    telemetry.addData("Calculated Distance:", distance);
+                    telemetry.addData("Limelight position:", limelightServo.getPosition());
+                    telemetry.addData("Turret position:", turretServo.getPosition());
+                    telemetry.update();
+                } else {
+                    telemetry.addLine("No valid target detected.");
+                    telemetry.update();
+                }
+            }
+
 
         }
     }
@@ -105,9 +126,9 @@ public class ApriltagCalculatedDistance extends LinearOpMode {
     public double getTurretAngle (double calcDist, double camPosition){
         double measuredTurretOffspace = 120; //replace
         camPosition = camPosition*270; //270 or whatever range of motion
-        double turretAngle = Math.atan((Math.sqrt(Math.pow(distance,2)-Math.pow(distance*Math.cos(camPosition),2)))/(27.023-(distance*Math.cos(camPosition))));
+        double turretAngle = Math.atan((Math.sqrt(Math.pow(calcDist,2)-Math.pow(calcDist*Math.cos(camPosition),2)))/(27.023-(calcDist*Math.cos(camPosition))));
         turretAngle = (turretAngle + measuredTurretOffspace)/120; //120 or whatever range of motion
-        turretAngle = betweenLimAndLim(turretAngle,1,0);
+        turretAngle = betweenOneAndZero(turretAngle);
         return turretAngle;
     }
 }
