@@ -129,14 +129,15 @@ public class RRHardware{
 
     public void doIntakeGreen() {
         if (!intaking) {
+            sorter.setPosition(intakePos[0]);
             stopLaunch();
             intaking = true;
 
-            sorter.setPosition(intakePos[0]);
+            sleep(1000);
             intake.setPower(1);
 
             sorterContents[0] = 2;
-            sleep(3000);
+            sleep(2000);
 
             sorter.setPosition(outtakePos[2]);
             intakeTimer.reset();
@@ -149,14 +150,15 @@ public class RRHardware{
 
     public void doIntakePurple1() {
         if (!intaking) {
+            sorter.setPosition(intakePos[1]);
             stopLaunch();
             intaking = true;
 
-            sorter.setPosition(intakePos[1]);
+            sleep(1000);
             intake.setPower(1);
 
             sorterContents[1] = 1;
-            sleep(3000);
+            sleep(2000);
 
             sorter.setPosition(outtakePos[0]);
             intakeTimer.reset();
@@ -169,14 +171,15 @@ public class RRHardware{
 
     public void doIntakePurple2() {
         if (!intaking) {
+            sorter.setPosition(intakePos[2]);
             stopLaunch();
             intaking = true;
 
-            sorter.setPosition(intakePos[2]);
+            sleep(1000);
             intake.setPower(1);
 
             sorterContents[2] = 1;
-            sleep(3000);
+            sleep(2000);
 
             sorter.setPosition(outtakePos[1]);
             intakeTimer.reset();
@@ -189,6 +192,8 @@ public class RRHardware{
 
     public void dontFallOut() {
         sorter.setPosition(outtakePos[0]);
+        intake.setPower(0);
+        intaking = false;
     }
 
     public void tryIntake(boolean button) {
@@ -226,10 +231,6 @@ public class RRHardware{
             // check if intaking was completed -> store color at position
         }
 
-    }
-    public void stopIntake() {
-        intake.setPower(0);
-        intaking = false;
     }
 
     public void stopLaunch() {

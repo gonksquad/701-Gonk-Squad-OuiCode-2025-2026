@@ -5,10 +5,11 @@ import com.pedropathing.geometry.Pose;
 
 import org.firstinspires.ftc.teamcode.Hardware;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-
 public class odoteleop {
+
     Hardware hardware;
     private Follower follower;
     double lastTheta;
@@ -18,39 +19,77 @@ public class odoteleop {
         Y,
         HEADING
     }
+
+    // ===== 100 DEGREE SERVO TUNING =====
+
+    private static final double TURRET_CENTER = 0.50; // adjust until forward is perfect
+    private static final double SERVO_TOTAL_DEGREES = 100.0;
+    private static final double TURRET_MAX_DEGREES = 45.0; // safe turret swing each side
+
+    // ==================================
+
     public odoteleop(HardwareMap hardwareMap) {
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(8.5, 7.625, 0)); //remove later
+        follower.setStartingPose(new Pose(8.5, 7.625, 0)); // remove later
         hardware = new Hardware(hardwareMap);
     }
-    //private ElapsedTime runtime = new ElapsedTime();
 
     public String odoAimTurret(boolean isBlue) {
+
         follower.update();
+
         int goalX = (isBlue) ? 0 : 144;
         int goalY = 144;
-        //double angleOffset = (isBlue) ? 0 : -90;
+
         Pose pose = follower.getPose();
+
         double angleOffset = pose.getHeading();
-        double theta = Math.round(180*(angleOffset + Math.atan2(goalY-pose.getY(), goalX-pose.getX()))/Math.PI % 360); //angle to the goal from 0-360
-        //hardware.launcherTurn.setPower((theta - lastTheta)/10); for cr servo
-        hardware.limelightTurn.setPosition((theta-90)/180); //assuming that  0 = 90deg right, 0.5 = forawrd, 1 = 90deg left
-        //lastTheta = theta; for cr servo
-        //return to add to telemtry bc this script deosnt have telemetry
-        return "totalheading: " + follower.getTotalHeading() + ", heading:" + follower.getHeading() + ", pose:" + follower.getPose();
-        //return theta + "=theta, " + 180*angleOffset/Math.PI + "=angleoffset, " + 180*Math.atan2(goalY-pose.getY(), goalX-pose.getX())/Math.PI + "=atan2func" + hardware.launcherTurn.getPosition() + "=launchturnpos";
+
+        // -------- HEADING MATH --------
+
+        double targetAngle = Math.atan2(goalY - pose.getY(), goalX - pose.getX());
+
+        double theta = targetAngle - angleOffset;
+
+        theta = Math.toDegrees(theta);
+
+        while (theta > 180) theta -= 360;
+        while (theta < -180) theta += 360;
+
+        // Limit to what turret is allowed to rotate
+        theta = Math.max(-TURRET_MAX_DEGREES, Math.min(TURRET_MAX_DEGREES, theta));
+
+        // ------------------------------
+
+        // Convert turret angle to servo position
+        double servoScale = TURRET_MAX_DEGREES / SERVO_TOTAL_DEGREES;
+
+        // Inverted for your mounting orientation
+        double servoPos = TURRET_CENTER - (theta * servoScale / TURRET_MAX_DEGREES);
+
+        servoPos = Math.max(0, Math.min(1, servoPos));
+
+        hardware.launcherTurn.setPosition(servoPos);
+
+        return "heading: " + follower.getHeading()
+                + ", pose: " + follower.getPose();
     }
 
     public double getOdoData(odoDataTypes odt) {
+
         follower.update();
-        switch(odt) {
+
+        switch (odt) {
             case X:
                 return follower.getPose().getX();
+
             case Y:
                 return follower.getPose().getY();
+
             case HEADING:
-                return follower.getTotalHeading();
+                return follower.getHeading();
         }
+
         return 0;
     }
 
