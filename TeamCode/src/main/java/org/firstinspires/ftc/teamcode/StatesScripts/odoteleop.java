@@ -26,14 +26,18 @@ public class odoteleop {
     private final Follower follower;
     //private ElapsedTime runtime = new ElapsedTime();
 
-    public void odoAimTurret(boolean isBlue) {
+    public String odoAimTurret(boolean isBlue) {
         follower.update();
         int goalX = (isBlue) ? 0 : 144;
-        int angleOffset = (isBlue) ? 90 : 0;
+        int goalY = 144;
+        double angleOffset = (isBlue) ? 0 : -90;
+        angleOffset += getOdoData(odoDataTypes.HEADING);
         Pose pose = follower.getPose();
-        double theta = (angleOffset + Math.atan2(Math.abs(goalX-pose.getX()), Math.abs(144-pose.getY()))) % 360; //angle to the goal from 0-360
-    //    hardware.launcherTurn.setPower((theta - lastTheta)); SHOULDNT BE COMMENTED
+        double theta = Math.round(180*(angleOffset + Math.atan2(goalY-pose.getY(), goalX-pose.getX()))/Math.PI % 360); //angle to the goal from 0-360
+        //hardware.launcherTurn.setPower((theta - lastTheta)/10); for cr servo
+        hardware.launcherTurn.setPosition(-0.5+theta/180); //assuming that  0 = 90deg right, 0.5 = forawrd, 1 = 90deg left
         lastTheta = theta;
+        return theta + "=theta, " + 180*angleOffset/Math.PI + "=angleoffset, " + 180*Math.atan2(goalY-pose.getY(), goalX-pose.getX())/Math.PI + "=atan2func" + hardware.launcherTurn.getPosition() + "=launchturnpos";
     }
 
     public double getOdoData(odoDataTypes odt) {

@@ -35,7 +35,6 @@ public class StatesTele extends LinearOpMode {
         hardware.outtakeTransferLeft.setPosition(hardware.liftPos[0]); //down position
         hardware.outtakeTransferRight.setPosition(1-hardware.liftPos[0]); // down position
         hardware.sorter.setPosition(0.8);
-     //   hardware.launcherTurn.setPower(0d); SHOULDNT BE COMMENTED
 
         while (opModeIsActive()) {
             if (gamepad2.psWasPressed()) { // toggle manual override
@@ -119,17 +118,14 @@ public class StatesTele extends LinearOpMode {
 //                }
 
                 //odo auto aiming
-//                odoteleop.odoAimTurret(true);
-//                telemetry.addData("robotX", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.X));
-//                telemetry.addData("robotY", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.Y));
-//                telemetry.addData("robotRot", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.HEADING));
+                //if(hardware.launchTimer.milliseconds() > 0) {
+                    hardware.launchTimer.reset();
+                    hardware.launcherTurn.setPosition(hardware.launcherTurn.getPosition()+gamepad2.left_stick_x/100f);
+                    telemetry.addData("YURRRRR:    ", odoteleop.odoAimTurret(true));
+                telemetry.addData("robotX", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.X));
+                telemetry.addData("robotY", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.Y));
+                telemetry.addData("robotRot", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.HEADING));
 //
-//                //camera auto aiming
-//                /*telemetry.addData("yaw speed", hardware.launcherTurn.getPower());
-//                // AUTOAIMING RUNS IN THIS TELEMETRY
-//                // VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-//                telemetry.addData("April tag found at degree", hardware.autoAimTurret(true, 0.005f));
-//                */
 //
                 telemetry.addData("Sorter Position: ", hardware.sorter.getPosition());
                 telemetry.addData("Sorter Contents: ", "%d, %d, %d", hardware.sorterContents[0], hardware.sorterContents[1], hardware.sorterContents[2]);
