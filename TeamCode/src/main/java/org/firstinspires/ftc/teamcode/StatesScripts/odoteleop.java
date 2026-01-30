@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class odoteleop {
     Hardware hardware;
+    private Follower follower;
     double lastTheta;
 
     public enum odoDataTypes {
@@ -19,11 +20,9 @@ public class odoteleop {
     }
     public odoteleop(HardwareMap hardwareMap) {
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(0, 0, 0)); //remove later
+        follower.setStartingPose(new Pose(8.5, 7.625, 0)); //remove later
         hardware = new Hardware(hardwareMap);
     }
-
-    private final Follower follower;
     //private ElapsedTime runtime = new ElapsedTime();
 
     public String odoAimTurret(boolean isBlue) {
@@ -38,8 +37,9 @@ public class odoteleop {
         hardware.limelightTurn.setPosition((theta-90)/180); //assuming that  0 = 90deg right, 0.5 = forawrd, 1 = 90deg left
         //lastTheta = theta; for cr servo
         //return to add to telemtry bc this script deosnt have telemetry
-        return theta + "=theta, " + 180*angleOffset/Math.PI + "=angleoffset, " + 180*Math.atan2(goalY-pose.getY(), goalX-pose.getX())/Math.PI + "=atan2func" + hardware.launcherTurn.getPosition() + "=launchturnpos";
-    }   //0 = left, 1 = right
+        return "totalheading: " + follower.getTotalHeading() + ", heading:" + follower.getHeading() + ", pose:" + follower.getPose();
+        //return theta + "=theta, " + 180*angleOffset/Math.PI + "=angleoffset, " + 180*Math.atan2(goalY-pose.getY(), goalX-pose.getX())/Math.PI + "=atan2func" + hardware.launcherTurn.getPosition() + "=launchturnpos";
+    }
 
     public double getOdoData(odoDataTypes odt) {
         follower.update();
@@ -49,7 +49,7 @@ public class odoteleop {
             case Y:
                 return follower.getPose().getY();
             case HEADING:
-                return follower.getPose().getHeading();
+                return follower.getTotalHeading();
         }
         return 0;
     }
