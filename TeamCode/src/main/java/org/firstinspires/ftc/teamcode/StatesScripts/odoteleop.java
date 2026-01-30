@@ -45,6 +45,7 @@ public class odoteleop {
 
         double angleOffset = pose.getHeading();
 
+
         // -------- HEADING MATH --------
 
         double targetAngle = Math.atan2(goalY - pose.getY(), goalX - pose.getX());
@@ -64,7 +65,6 @@ public class odoteleop {
         // Convert turret angle to servo position
         double servoScale = TURRET_MAX_DEGREES / SERVO_TOTAL_DEGREES;
 
-        // Inverted for your mounting orientation
         double servoPos = TURRET_CENTER - (theta * servoScale / TURRET_MAX_DEGREES);
 
         servoPos = Math.max(0, Math.min(1, servoPos));

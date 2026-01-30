@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import org.firstinspires.ftc.teamcode.Hardware;
 
 @TeleOp (name="StatesTele")
-public class StatesTele extends LinearOpMode {
+public class StatesTeleBlue extends LinearOpMode {
 
     boolean manual = false;
     double prevOffset = 0d;
@@ -60,9 +60,9 @@ public class StatesTele extends LinearOpMode {
 
             slowMode = gamepad1.left_bumper;
             if (slowMode) {
-                hardware.doDrive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, .75, .75, 0.5);
+                hardware.doDrive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x, .75, .75, 0.5);
             } else {
-                hardware.doDrive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, 1d, 1d, 0.67);
+                hardware.doDrive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x, 1d, 1d, 0.67);
             }
 
             if (manual) {
