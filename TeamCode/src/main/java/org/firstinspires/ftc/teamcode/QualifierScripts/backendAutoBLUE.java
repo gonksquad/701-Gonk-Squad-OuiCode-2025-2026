@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.QualifierScripts;
 
 import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
@@ -11,14 +12,17 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import org.firstinspires.ftc.teamcode.StatesScripts.odoteleop;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.Hardware;
+import org.firstinspires.ftc.teamcode.StatesScripts.odoteleop;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
@@ -52,9 +56,7 @@ public class backendAutoBLUE extends OpMode {
     private boolean launchingPurple = false;
     private boolean launchingGreen = false;
     RRHardware rrHardware;
-
     odoteleop odoTeleop;
-
 
     private Follower follower;
     private Timer pathTimer, actionTimer, opModeTimer;
@@ -77,42 +79,42 @@ public class backendAutoBLUE extends OpMode {
     float bounds_X = 4f;
     String lastPos = "None";
 
-    private PathChain start_forward, forward_firstpickup1, fp1_secondpickup1,
-            sp1_thirdpickup1, tp1_start, start_forward2;
+    private PathChain start_driveToFirstSpike, firstSpike_firstArtifactCollect, firstSpike_secondArtifactCollect,
+            firstSpike_thirdArtifactCollect, firstSpike_shoot, shoot_forward;
 
     //poses initialized
-    private final Pose startPose = new Pose(56, 9, Math.toRadians(90));
-    private final Pose forward = new Pose(56, 12, Math.toRadians(90));
-    //private final Pose beforeFirstSpike = new Pose(46,25, Math.toRadians(135));
+    private final Pose startPose = new Pose(48, 9, Math.toRadians(90));
+    private final Pose forward = new Pose(48, 21, Math.toRadians(90));
+    private final Pose beforeFirstSpike = new Pose(46,25, Math.toRadians(135));
 
-    private final Pose firstSpike1 = new Pose(38,36, Math.toRadians(180)); //5.5 in artifact
-    private final Pose firstSpike2 = new Pose(33,36, Math.toRadians(180));
-    private final Pose firstSpike3 = new Pose(28,36, Math.toRadians(180));
+    private final Pose firstSpike1 = new Pose(44.5,34, Math.toRadians(180)); //5.5 in artifact
+    private final Pose firstSpike2 = new Pose(42.5,34, Math.toRadians(180));
+    private final Pose firstSpike3 = new Pose(40.5,34, Math.toRadians(180));
 
 
     //path initializing
     public void buildPaths() {
-        start_forward = follower.pathBuilder()
-                .addPath(new BezierLine(startPose, forward))
-                .setLinearHeadingInterpolation(startPose.getHeading(), forward.getHeading())
+        start_driveToFirstSpike = follower.pathBuilder()
+                .addPath(new BezierLine(startPose, beforeFirstSpike))
+                .setLinearHeadingInterpolation(startPose.getHeading(), beforeFirstSpike.getHeading())
                 .build();
-        forward_firstpickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(forward, firstSpike1))
-                .setLinearHeadingInterpolation(forward.getHeading(), firstSpike1.getHeading())
+        firstSpike_firstArtifactCollect = follower.pathBuilder()
+                .addPath(new BezierLine(beforeFirstSpike, firstSpike1))
+                .setLinearHeadingInterpolation(beforeFirstSpike.getHeading(), firstSpike1.getHeading())
                 .build();
-        fp1_secondpickup1 = follower.pathBuilder()
+        firstSpike_secondArtifactCollect = follower.pathBuilder()
                 .addPath(new BezierLine(firstSpike1, firstSpike2))
                 .setLinearHeadingInterpolation(firstSpike1.getHeading(), firstSpike2.getHeading())
                 .build();
-        sp1_thirdpickup1 = follower.pathBuilder()
+        firstSpike_thirdArtifactCollect = follower.pathBuilder()
                 .addPath(new BezierLine(firstSpike2, firstSpike3))
                 .setLinearHeadingInterpolation(firstSpike2.getHeading(), firstSpike3.getHeading())
                 .build();
-        tp1_start = follower.pathBuilder()
+        firstSpike_shoot = follower.pathBuilder()
                 .addPath(new BezierLine(firstSpike3, startPose))
                 .setLinearHeadingInterpolation(firstSpike3.getHeading(), startPose.getHeading()) //.setReversed() //hopefully backwards drive
                 .build();
-        start_forward2 = follower.pathBuilder()
+        shoot_forward = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, forward))
                 .setLinearHeadingInterpolation(90, forward.getHeading())
                 .build();
@@ -146,7 +148,7 @@ public class backendAutoBLUE extends OpMode {
             case APRILTAGLOOKSIES:
                 LLResult result = limelight.getLatestResult();
                 //BoundingBox();
-                actionTimer.resetTimer();
+//                actionTimer.resetTimer();
                 if (result != null && result.isValid()) { //add time elapsed too?
                     String motif = "null";
                     int id = 0;
@@ -186,35 +188,36 @@ public class backendAutoBLUE extends OpMode {
                 break;
             case STARTTOBEFOREPICKUP:
                 if (!follower.isBusy()) { //note: after shoot and change time to something for whole auto
-                    follower.followPath(start_forward, true);
+                    follower.followPath(start_driveToFirstSpike, true);
+                    sleep(1000); //for testing
                     setPathState(pathState.PICKUP1);
                 }
                 telemetry.addLine(" done to pickup");
                 break;
             case PICKUP1:
                 if (!follower.isBusy()) {
-                    follower.followPath(forward_firstpickup1);
                     rrHardware.doIntakeGreen();
                     sleep(4000);
                     // rrHardware.intake1(); //make sure this doesn't stop other functions
+                    follower.followPath(firstSpike_firstArtifactCollect, true);
                     setPathState(pathState.PICKUP2);
                 }
                 telemetry.addLine(" done pickup 1");
                 break;
             case PICKUP2:
                 if (!follower.isBusy()) {
-                    follower.followPath(fp1_secondpickup1);
                     rrHardware.doIntakePurple1();
                     sleep(4000);
+                    follower.followPath(firstSpike_secondArtifactCollect, true);
                     setPathState(pathState.PICKUP3);
                 }
                 telemetry.addLine(" done pickup 2");
                 break;
             case PICKUP3:
                 if (!follower.isBusy()) {
-                    follower.followPath(sp1_thirdpickup1);
                     rrHardware.doIntakePurple2();
                     sleep(4000);
+                    follower.followPath(firstSpike_thirdArtifactCollect, true);
                     rrHardware.dontFallOut();
                     setPathState(pathState.PICKUPTOSHOOT);
                 }
@@ -222,7 +225,7 @@ public class backendAutoBLUE extends OpMode {
                 break;
             case PICKUPTOSHOOT:
                 if (!follower.isBusy()) {
-                    follower.followPath(tp1_start, true);
+                    follower.followPath(firstSpike_shoot, true);
                     setPathState(pathState.SHOOT2);
                 }
                 telemetry.addLine(" done shooting");
@@ -236,7 +239,7 @@ public class backendAutoBLUE extends OpMode {
                 break;
             case SHOOTFORWARD:
                 if (!follower.isBusy()) { //note: change time to something for whole auto
-                    follower.followPath(start_forward2, true);
+                    follower.followPath(shoot_forward, true);
                     setPathState(pathState.END);
                 }
                 telemetry.addLine(" done! :)");
@@ -324,8 +327,6 @@ public class backendAutoBLUE extends OpMode {
         pathState = pathState.APRILTAGLOOKSIES;
         pathTimer = new Timer();
         opModeTimer = new Timer();
-        actionTimer = new Timer();
-
         follower = Constants.createFollower(hardwareMap);
 
         buildPaths();
