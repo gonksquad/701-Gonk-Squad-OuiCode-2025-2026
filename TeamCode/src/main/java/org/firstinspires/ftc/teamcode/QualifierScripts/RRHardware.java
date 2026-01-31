@@ -137,12 +137,12 @@ public class RRHardware{
             intake.setPower(1);
 
             sorterContents[0] = 2;
-            sleep(2000);
+            sleep(1000);
 
             sorter.setPosition(outtakePos[2]);
             intakeTimer.reset();
         }
-        if (intaking && intakeTimer.milliseconds() > 1000) {
+        if (intaking && intakeTimer.milliseconds() > 500) {
             intaking = false;
             intake.setPower(0);
         }
@@ -158,12 +158,12 @@ public class RRHardware{
             intake.setPower(1);
 
             sorterContents[1] = 1;
-            sleep(2000);
+            sleep(1000);
 
             sorter.setPosition(outtakePos[0]);
             intakeTimer.reset();
         }
-        if (intaking && intakeTimer.milliseconds() > 1000) {
+        if (intaking && intakeTimer.milliseconds() > 500) {
             intaking = false;
             intake.setPower(0);
         }
@@ -179,12 +179,12 @@ public class RRHardware{
             intake.setPower(1);
 
             sorterContents[2] = 1;
-            sleep(2000);
+            sleep(1000);
 
             sorter.setPosition(outtakePos[1]);
             intakeTimer.reset();
         }
-        if (intaking && intakeTimer.milliseconds() > 1000) {
+        if (intaking && intakeTimer.milliseconds() > 500) {
             intaking = false;
             intake.setPower(0);
         }

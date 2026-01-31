@@ -30,7 +30,7 @@ public class odoteleop {
 
     public odoteleop(HardwareMap hardwareMap) {
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(8.5, 7.625, 0)); // remove later
+        follower.setStartingPose(new Pose(56, 9, 90)); // remove later
         hardware = new Hardware(hardwareMap);
     }
 
