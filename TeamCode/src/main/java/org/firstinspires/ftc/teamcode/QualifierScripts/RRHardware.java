@@ -1,6 +1,7 @@
 package org.firstinspires.ftc. teamcode. QualifierScripts;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.linearOpMode;
 
 import android.annotation.SuppressLint;
 
@@ -128,72 +129,87 @@ public class RRHardware{
     }
 
     public void doIntakeGreen() {
-        if (!intaking) {
-            sorter.setPosition(intakePos[0]);
-            stopLaunch();
-            intaking = true;
+        sorterContents[0] = 2;
+        sorter.setPosition(intakePos[0]);
+        intake.setPower(1);
 
-            sleep(1000);
-            intake.setPower(1);
-
-            sorterContents[0] = 2;
-            sleep(1000);
-
-            sorter.setPosition(outtakePos[2]);
-            intakeTimer.reset();
-        }
-        if (intaking && intakeTimer.milliseconds() > 500) {
-            intaking = false;
-            intake.setPower(0);
-        }
+//        if (!intaking) {
+//            sorterContents[0] = 2;
+//            sorter.setPosition(intakePos[0]);
+//            stopLaunch();
+//
+//            sleep(1000);
+//            intake.setPower(1);
+//
+//            sleep(1000);
+//
+//           // sorter.setPosition(outtakePos[2]);
+//            intakeTimer.reset();
+//        }
+//        if (intaking && intakeTimer.milliseconds() > 500) {
+//            intaking = false;
+//            intake.setPower(0);
+//        }
     }
 
     public void doIntakePurple1() {
-        if (!intaking) {
-            sorter.setPosition(intakePos[1]);
-            stopLaunch();
-            intaking = true;
+        sorterContents[1] = 1;
+        sorter.setPosition(intakePos[1]);
+        intake.setPower(1);
 
-            sleep(1000);
-            intake.setPower(1);
-
-            sorterContents[1] = 1;
-            sleep(1000);
-
-            sorter.setPosition(outtakePos[0]);
-            intakeTimer.reset();
-        }
-        if (intaking && intakeTimer.milliseconds() > 500) {
-            intaking = false;
-            intake.setPower(0);
-        }
+//        if (!intaking) {
+//            sorter.setPosition(intakePos[1]);
+//            stopLaunch();
+//            intaking = true;
+//
+//            sleep(1000);
+//            intake.setPower(1);
+//
+//            sorterContents[1] = 1;
+//            sleep(1000);
+//
+//           // sorter.setPosition(outtakePos[0]);
+//            intakeTimer.reset();
+//        }
+//        if (intaking && intakeTimer.milliseconds() > 500) {
+//            intaking = false;
+//            intake.setPower(0);
+//        }
     }
 
     public void doIntakePurple2() {
-        if (!intaking) {
-            sorter.setPosition(intakePos[2]);
-            stopLaunch();
-            intaking = true;
+        sorterContents[2] = 1;
+        sorter.setPosition(intakePos[2]);
+        intake.setPower(1);
 
-            sleep(1000);
-            intake.setPower(1);
-
-            sorterContents[2] = 1;
-            sleep(1000);
-
-            sorter.setPosition(outtakePos[1]);
-            intakeTimer.reset();
-        }
-        if (intaking && intakeTimer.milliseconds() > 500) {
-            intaking = false;
-            intake.setPower(0);
-        }
+//        if (!intaking) {
+//            sorter.setPosition(intakePos[2]);
+//            stopLaunch();
+//            intaking = true;
+//
+//            sleep(1000);
+//            intake.setPower(1);
+//
+//            sorterContents[2] = 1;
+//            sleep(1000);
+//
+//         //   sorter.setPosition(outtakePos[1]);
+//            intakeTimer.reset();
+//        }
+//        if (intaking && intakeTimer.milliseconds() > 500) {
+//            intaking = false;
+//            intake.setPower(0);
+//        }
     }
 
     public void dontFallOut() {
         sorter.setPosition(outtakePos[0]);
         intake.setPower(0);
-        intaking = false;
+        //intaking = false;
+    }
+
+    public void stopIntake() {
+        intake.setPower(0);
     }
 
     public void tryIntake(boolean button) {
@@ -275,7 +291,7 @@ public class RRHardware{
 
         sleep(1500); //prev 600
         intake.setPower(0);
-        while (launcherLeft.getVelocity() < targetTps);
+       // while (launcherLeft.getVelocity() < targetTps);
 //        while ((launchingPurple || launchingGreen) && launcherLeft.getVelocity() > targetTps && outtakeTransferLeft.getPosition() != liftPos[1]) {
             outtakeTransferLeft.setPosition(liftPos[1]); //launch here
             outtakeTransferRight.setPosition(1-liftPos[1]);

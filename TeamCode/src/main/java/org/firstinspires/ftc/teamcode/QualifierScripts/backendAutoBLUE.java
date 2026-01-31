@@ -10,6 +10,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -28,7 +29,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import java.util.List;
 
 @Autonomous
-public class backendAutoBLUE extends OpMode {
+public class backendAutoBLUE extends LinearOpMode {
     int id = -1;
     String motif = "null";
 
@@ -83,14 +84,13 @@ public class backendAutoBLUE extends OpMode {
             firstSpike_thirdArtifactCollect, firstSpike_shoot, shoot_forward;
 
     //poses initialized
-    private final Pose startPose = new Pose(48, 9, Math.toRadians(90));
-    private final Pose forward = new Pose(48, 21, Math.toRadians(90));
-    private final Pose beforeFirstSpike = new Pose(46,25, Math.toRadians(135));
+    private final Pose startPose = new Pose(56, 9, Math.toRadians(90));
+    private final Pose beforeFirstSpike = new Pose(56,25, Math.toRadians(180));
 
-    private final Pose firstSpike1 = new Pose(44.5,34, Math.toRadians(180)); //5.5 in artifact
-    private final Pose firstSpike2 = new Pose(42.5,34, Math.toRadians(180));
-    private final Pose firstSpike3 = new Pose(40.5,34, Math.toRadians(180));
-
+    private final Pose firstSpike1 = new Pose(48,34, Math.toRadians(180)); //5.5 in artifact
+    private final Pose firstSpike2 = new Pose(46,34, Math.toRadians(180));
+    private final Pose firstSpike3 = new Pose(44,34, Math.toRadians(180));
+    private final Pose forward = new Pose(56, 21, Math.toRadians(90));
 
     //path initializing
     public void buildPaths() {
@@ -99,7 +99,7 @@ public class backendAutoBLUE extends OpMode {
                 .setLinearHeadingInterpolation(startPose.getHeading(), beforeFirstSpike.getHeading())
                 .build();
         firstSpike_firstArtifactCollect = follower.pathBuilder()
-                .addPath(new BezierLine(beforeFirstSpike, firstSpike1))
+                .addPath(new BezierCurve(beforeFirstSpike, firstSpike1))
                 .setLinearHeadingInterpolation(beforeFirstSpike.getHeading(), firstSpike1.getHeading())
                 .build();
         firstSpike_secondArtifactCollect = follower.pathBuilder()
@@ -116,39 +116,17 @@ public class backendAutoBLUE extends OpMode {
                 .build();
         shoot_forward = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, forward))
-                .setLinearHeadingInterpolation(90, forward.getHeading())
+                .setLinearHeadingInterpolation(startPose.getHeading(), forward.getHeading())
                 .build();
-    }
-
-    public void aprilTagOuttake() {
-        odoTeleop.odoAimTurret(true);
-        if (id == 21) { //gpp (1150 close, 1350 far)
-            rrHardware.tryLaunch(true, 2, 1350);
-            rrHardware.tryLaunch(true, 1, 1350);
-            rrHardware.tryLaunch(true, 1, 1350);
-        }
-        if (id == 22) { //pgp
-            rrHardware.tryLaunch(true, 1, 1350);
-            rrHardware.tryLaunch(true, 2, 1350);
-            rrHardware.tryLaunch(true, 1, 1350);
-        }
-        if (id == 23) { //ppg
-            rrHardware.tryLaunch(true, 1, 1350);
-            rrHardware.tryLaunch(true, 1, 1350);
-            rrHardware.tryLaunch(true, 2, 1350);
-        } else { //gpp
-            rrHardware.tryLaunch(true, 2, 1350);
-            rrHardware.tryLaunch(true, 1, 1350);
-            rrHardware.tryLaunch(true, 1, 1350);
-        }
     }
 
     public void statePathUpdate() {
         switch(pathState) {
             case APRILTAGLOOKSIES:
+                limelight.pipelineSwitch(0);
+                limelightTurn.setPosition(.4);
                 LLResult result = limelight.getLatestResult();
-                //BoundingBox();
-//                actionTimer.resetTimer();
+
                 if (result != null && result.isValid()) { //add time elapsed too?
                     String motif = "null";
                     int id = 0;
@@ -189,35 +167,32 @@ public class backendAutoBLUE extends OpMode {
             case STARTTOBEFOREPICKUP:
                 if (!follower.isBusy()) { //note: after shoot and change time to something for whole auto
                     follower.followPath(start_driveToFirstSpike, true);
-                    sleep(1000); //for testing
                     setPathState(pathState.PICKUP1);
                 }
                 telemetry.addLine(" done to pickup");
                 break;
             case PICKUP1:
                 if (!follower.isBusy()) {
-                    rrHardware.doIntakeGreen();
-                    sleep(4000);
-                    // rrHardware.intake1(); //make sure this doesn't stop other functions
                     follower.followPath(firstSpike_firstArtifactCollect, true);
+                    rrHardware.doIntakeGreen();
                     setPathState(pathState.PICKUP2);
                 }
                 telemetry.addLine(" done pickup 1");
                 break;
             case PICKUP2:
                 if (!follower.isBusy()) {
-                    rrHardware.doIntakePurple1();
-                    sleep(4000);
+                    rrHardware.stopIntake();
                     follower.followPath(firstSpike_secondArtifactCollect, true);
+                    rrHardware.doIntakePurple1();
                     setPathState(pathState.PICKUP3);
                 }
                 telemetry.addLine(" done pickup 2");
                 break;
             case PICKUP3:
                 if (!follower.isBusy()) {
-                    rrHardware.doIntakePurple2();
-                    sleep(4000);
+                    rrHardware.stopIntake();
                     follower.followPath(firstSpike_thirdArtifactCollect, true);
+                    rrHardware.doIntakePurple2();
                     rrHardware.dontFallOut();
                     setPathState(pathState.PICKUPTOSHOOT);
                 }
@@ -233,17 +208,17 @@ public class backendAutoBLUE extends OpMode {
             case SHOOT2:
                 if (!follower.isBusy()) {
                     aprilTagOuttake();
-//                    sleep(5000);
-                    setPathState(pathState.SHOOTFORWARD);
-                }
-                break;
-            case SHOOTFORWARD:
-                if (!follower.isBusy()) { //note: change time to something for whole auto
                     follower.followPath(shoot_forward, true);
                     setPathState(pathState.END);
                 }
-                telemetry.addLine(" done! :)");
                 break;
+//            case SHOOTFORWARD:
+//                if (!follower.isBusy()) {
+//                    follower.followPath(shoot_forward, true);
+//                    setPathState(pathState.END);
+//                }
+//                telemetry.addLine(" done! :)");
+//                break;
 
             case END:
                 telemetry.addLine("Nothing running");
@@ -255,20 +230,42 @@ public class backendAutoBLUE extends OpMode {
         }
     }
 
-    public final void sleep(long milliseconds) {
-        try {
-            Thread.sleep(milliseconds);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
     public void setPathState(pathState newState) {
         pathState = newState;
         pathTimer.resetTimer();
     }
 
+    public void aprilTagOuttake() {
+        rrHardware.sorterContents[0] = 1;
+        rrHardware.sorterContents[1] = 1; //purple
+        rrHardware.sorterContents[2] = 2; //green
+
+        odoTeleop.odoAimTurret(true);
+        if (motif == "gpp") { //gpp (1150 close, 1350 far)
+            rrHardware.tryLaunch(true, 2, 1350);
+            rrHardware.tryLaunch(true, 1, 1350);
+            rrHardware.tryLaunch(true, 1, 1350);
+        }
+        if (motif == "pgp") { //pgp
+            rrHardware.tryLaunch(true, 1, 1350);
+            rrHardware.tryLaunch(true, 2, 1350);
+            rrHardware.tryLaunch(true, 1, 1350);
+        }
+        if (motif == "ppg") { //ppg
+            rrHardware.tryLaunch(true, 1, 1350);
+            rrHardware.tryLaunch(true, 1, 1350);
+            rrHardware.tryLaunch(true, 2, 1350);
+        } else { //gpp
+            telemetry.addData("tag found", id);
+            telemetry.addData("motif", motif);
+            rrHardware.tryLaunch(true, 2, 1350);
+            rrHardware.tryLaunch(true, 1, 1350);
+            rrHardware.tryLaunch(true, 1, 1350);
+        }
+    }
+
     @Override
-    public void init() {
+    public void runOpMode() {
         frontLeft = hardwareMap.get(DcMotor.class, "fl");
         frontRight = hardwareMap.get(DcMotor.class, "fr");
         backLeft = hardwareMap.get(DcMotor.class, "bl");
@@ -312,17 +309,13 @@ public class backendAutoBLUE extends OpMode {
 
         //turretAxon = hardwareMap.get(CRServo.class, "axon");
         limelight.setPollRateHz(90);
-        limelight.pipelineSwitch(1); // motif pipeline (ID=21,22,23)
+       // limelight.pipelineSwitch(1); // motif pipeline (ID=21,22,23)
         //limelight.pipelineSwitch(1); // this is for left goal (ID=20)
 
         limelight.start();
 
         rrHardware = new RRHardware(hardwareMap);
         odoTeleop = new odoteleop(hardwareMap);
-
-        rrHardware.sorterContents[0] = 1;
-        rrHardware.sorterContents[1] = 1; //purple
-        rrHardware.sorterContents[2] = 2; //green
 
         pathState = pathState.APRILTAGLOOKSIES;
         pathTimer = new Timer();
@@ -331,15 +324,12 @@ public class backendAutoBLUE extends OpMode {
 
         buildPaths();
         follower.setPose(startPose);
-    }
-    @Override
-    public void start(){
+
+        waitForStart();
+
         opModeTimer.resetTimer();
         setPathState(pathState);
-    }
-
-    @Override
-    public void loop() {
+        while (opModeIsActive()) {
         if (getRuntime() < 30) {
             follower.update();
             statePathUpdate();
@@ -352,15 +342,7 @@ public class backendAutoBLUE extends OpMode {
             telemetry.addData("x", follower.getPose().getX());
             telemetry.addData("y", follower.getPose().getY());
             telemetry.addData("heading", follower.getPose().getHeading());
-            telemetry.addData("path time", pathTimer.getElapsedTimeSeconds());
-            return;
-        }
-        else {
-            requestOpModeStop();
-            return;
-        }
-    }
-}
+            telemetry.addData("path time", pathTimer.getElapsedTimeSeconds()); }}}}
 
 /* process:
     1. Start pose
