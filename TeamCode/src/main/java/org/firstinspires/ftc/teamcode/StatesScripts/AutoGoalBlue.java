@@ -40,7 +40,7 @@ public class AutoGoalBlue extends LinearOpMode {
         panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(20, 122, Math.toRadians(144)));
+        follower.setStartingPose(new Pose(16, 122, Math.toRadians(144)));
 
         paths = new Paths(follower); // Build paths
 
@@ -298,7 +298,7 @@ public class AutoGoalBlue extends LinearOpMode {
                 break;
             case 5:
                 if(!follower.isBusy() && pathTimer.milliseconds() > 1000) {
-                    hardware.sorter.setPosition(hardware.outtakePos[2]);
+                    hardware.sorter.setPosition(hardware.intakePos[2]);
                     sleep(1000);
                     follower.followPath(paths.Intake13,true);
                     setPathState(6);
@@ -311,9 +311,7 @@ public class AutoGoalBlue extends LinearOpMode {
                 }
                 break;
             case 7:
-                if (!follower.isBusy()) {
-                    launchAndSetState(-1);
-                }
+                launchAndSetState(-1);
                 break;
             case 8:
                 if(!follower.isBusy()) {
@@ -386,26 +384,26 @@ public class AutoGoalBlue extends LinearOpMode {
 
     public void launchAndSetState(int state) {
         if (follower.isBusy() || hardware.launcherLeft.getVelocity() < 1150) return;
-        if (sorterPos == 2) {
+        hardware.intake.setPower(0.5);
+        hardware.sorter.setPosition(hardware.outtakePos[sorterPos]);
+        sleep(1000);
+        hardware.intake.setPower(0);
+        if (sorterPos > 0) {
             hardware.outtakeTransferLeft.setPosition(hardware.liftPos[1]);
+            hardware.outtakeTransferRight.setPosition(1 - hardware.liftPos[1]);
             sleep(1000);
             hardware.outtakeTransferLeft.setPosition(hardware.liftPos[0]);
+            hardware.outtakeTransferRight.setPosition(1 - hardware.liftPos[0]);
             sleep(400);
-            sorterPos = 1;
-        } else if (sorterPos == 1){
-            hardware.sorter.setPosition(hardware.outtakePos[1]);
-            sleep(600);
-            hardware.outtakeTransferLeft.setPosition(hardware.liftPos[1]);
-            sleep(1000);
-            hardware.outtakeTransferLeft.setPosition(hardware.liftPos[0]);
-            sleep(400);
-            sorterPos = 0;
+            sorterPos--;
         } else {
-            hardware.sorter.setPosition(hardware.outtakePos[0]);
-            sleep(600);
             hardware.outtakeTransferLeft.setPosition(hardware.liftPos[1]);
+            hardware.outtakeTransferRight.setPosition(1 - hardware.liftPos[1]);
             sleep(1000);
             hardware.outtakeTransferLeft.setPosition(hardware.liftPos[0]);
+            hardware.outtakeTransferRight.setPosition(1 - hardware.liftPos[0]);
+            sorterPos = 2;
+            sleep(400);
             setPathState(state);
         }
     }

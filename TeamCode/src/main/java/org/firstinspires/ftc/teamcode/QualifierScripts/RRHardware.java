@@ -130,8 +130,13 @@ public class RRHardware{
 
     public void doIntakeGreen() {
         sorterContents[0] = 2;
+       // sleep(1000);
+
         sorter.setPosition(intakePos[0]);
-        intake.setPower(1);
+       // stopIntake();
+       // sleep(1000);
+       // intake.setPower(1);
+       // sleep(1000);
 
 //        if (!intaking) {
 //            sorterContents[0] = 2;
@@ -154,8 +159,12 @@ public class RRHardware{
 
     public void doIntakePurple1() {
         sorterContents[1] = 1;
+      //  sleep(1000);
         sorter.setPosition(intakePos[1]);
-        intake.setPower(1);
+//        stopIntake();
+//        sleep(1000);
+//        intake.setPower(1);
+//        sleep(1000);
 
 //        if (!intaking) {
 //            sorter.setPosition(intakePos[1]);
@@ -179,8 +188,12 @@ public class RRHardware{
 
     public void doIntakePurple2() {
         sorterContents[2] = 1;
+        //sleep(1000);
         sorter.setPosition(intakePos[2]);
-        intake.setPower(1);
+//        stopIntake();
+//        sleep(1000);
+//        intake.setPower(1);
+//        sleep(1000);
 
 //        if (!intaking) {
 //            sorter.setPosition(intakePos[2]);
@@ -210,6 +223,10 @@ public class RRHardware{
 
     public void stopIntake() {
         intake.setPower(0);
+    }
+
+    public void startIntake() {
+        intake.setPower(1);
     }
 
     public void tryIntake(boolean button) {
