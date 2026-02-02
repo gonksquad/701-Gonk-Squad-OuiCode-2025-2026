@@ -34,7 +34,7 @@ public class odoteleop {
         hardware = new Hardware(hardwareMap);
     }
 
-    public String odoAimTurret(boolean isBlue) {
+    public String odoAimTurret(boolean isBlue, boolean aimLimelight) {
 
         follower.update();
 
@@ -44,6 +44,9 @@ public class odoteleop {
         Pose pose = follower.getPose();
 
         double angleOffset = pose.getHeading();
+        if(!isBlue) {
+            angleOffset -= 90;
+        }
 
 
         // -------- HEADING MATH --------
@@ -70,6 +73,9 @@ public class odoteleop {
         servoPos = Math.max(0, Math.min(1, servoPos));
 
         hardware.launcherTurn.setPosition(servoPos);
+        if(aimLimelight) {
+            hardware.limelightTurn.setPosition(1-(hardware.launcherTurn.getPosition()/2));
+        }
 
         return "heading: " + follower.getHeading()
                 + ", pose: " + follower.getPose();
