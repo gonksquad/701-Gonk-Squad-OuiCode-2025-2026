@@ -63,6 +63,9 @@ public class backendAutoBLUE extends LinearOpMode {
     private Timer pathTimer, actionTimer, opModeTimer;
     //private ElapsedTime runtime = new ElapsedTime();
 
+    public double gg = 1250;
+    public double pp = 1300;
+
     pathState pathState;
     public enum pathState {
         APRILTAGLOOKSIES,
@@ -85,18 +88,21 @@ public class backendAutoBLUE extends LinearOpMode {
 
     //poses initialized
     private final Pose startPose = new Pose(56, 9, Math.toRadians(90));
-    private final Pose beforeFirstSpike = new Pose(56,25, Math.toRadians(180));
+    private final Pose beforeFirstSpike = new Pose(56,34, Math.toRadians(135));
 
-    private final Pose firstSpike1 = new Pose(48,34, Math.toRadians(180)); //5.5 in artifact
-    private final Pose firstSpike2 = new Pose(46,34, Math.toRadians(180));
-    private final Pose firstSpike3 = new Pose(44,34, Math.toRadians(180));
+
+    private final Pose firstSpike1 = new Pose(47.75,34, Math.toRadians(180)); //5.5 in artifact
+    private final Pose firstSpike2 = new Pose(43,34, Math.toRadians(180));
+    private final Pose firstSpike3 = new Pose(38.25,34, Math.toRadians(180));
+    private final Pose startPose2 = new Pose(56, 9, Math.toRadians(90));
+
     private final Pose forward = new Pose(56, 21, Math.toRadians(90));
 
     //path initializing
     public void buildPaths() {
         start_driveToFirstSpike = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, beforeFirstSpike))
-                .setLinearHeadingInterpolation(startPose.getHeading(), beforeFirstSpike.getHeading())
+            .setLinearHeadingInterpolation(startPose.getHeading(), beforeFirstSpike.getHeading())
                 .build();
         firstSpike_firstArtifactCollect = follower.pathBuilder()
                 .addPath(new BezierCurve(beforeFirstSpike, firstSpike1))
@@ -111,11 +117,11 @@ public class backendAutoBLUE extends LinearOpMode {
                 .setLinearHeadingInterpolation(firstSpike2.getHeading(), firstSpike3.getHeading())
                 .build();
         firstSpike_shoot = follower.pathBuilder()
-                .addPath(new BezierLine(firstSpike3, startPose))
+                .addPath(new BezierLine(firstSpike3, startPose2))
                 .setLinearHeadingInterpolation(firstSpike3.getHeading(), startPose.getHeading()) //.setReversed() //hopefully backwards drive
                 .build();
         shoot_forward = follower.pathBuilder()
-                .addPath(new BezierLine(startPose, forward))
+                .addPath(new BezierLine(startPose2, forward))
                 .setLinearHeadingInterpolation(startPose.getHeading(), forward.getHeading())
                 .build();
     }
@@ -243,27 +249,28 @@ public class backendAutoBLUE extends LinearOpMode {
         rrHardware.sorterContents[1] = 1; //purple
         rrHardware.sorterContents[2] = 2; //green
 
-        odoTeleop.odoAimTurret(true);
         if (motif == "gpp") { //gpp (1150 close, 1350 far)
-            rrHardware.tryLaunch(true, 2, 1350);
-            rrHardware.tryLaunch(true, 1, 1350);
-            rrHardware.tryLaunch(true, 1, 1350);
+            rrHardware.tryLaunch(true, 2, (int)gg);
+            rrHardware.tryLaunch(true, 1, (int)pp);
+            rrHardware.tryLaunch(true, 1, (int)pp);
         }
-        if (motif == "pgp") { //pgp
-            rrHardware.tryLaunch(true, 1, 1350);
-            rrHardware.tryLaunch(true, 2, 1350);
-            rrHardware.tryLaunch(true, 1, 1350);
+
+        else if (motif == "pgp") { //pgp
+            rrHardware.tryLaunch(true, 1, (int)pp);
+            rrHardware.tryLaunch(true, 2, (int)gg);
+            rrHardware.tryLaunch(true, 1, (int)pp);
         }
-        if (motif == "ppg") { //ppg
-            rrHardware.tryLaunch(true, 1, 1350);
-            rrHardware.tryLaunch(true, 1, 1350);
-            rrHardware.tryLaunch(true, 2, 1350);
+        else if (motif == "ppg") { //ppg
+            rrHardware.tryLaunch(true, 1, (int)pp);
+            rrHardware.tryLaunch(true, 1, (int)pp);
+            rrHardware.tryLaunch(true, 2, (int)gg);
         } else { //gpp
-            telemetry.addData("tag found", id);
-            telemetry.addData("motif", motif);
-            rrHardware.tryLaunch(true, 2, 1350);
-            rrHardware.tryLaunch(true, 1, 1350);
-            rrHardware.tryLaunch(true, 1, 1350);
+            telemetry.addData("yeah", motif);
+            telemetry.addData("uh", sorterContents);
+            rrHardware.tryLaunch(true, 2, (int)gg);
+            rrHardware.tryLaunch(true, 1, (int)pp);
+            rrHardware.tryLaunch(true, 1, (int)pp);
+
         }
     }
 
@@ -336,16 +343,20 @@ public class backendAutoBLUE extends LinearOpMode {
         if (getRuntime() < 30) {
             follower.update();
             statePathUpdate();
+            telemetry.addData("path state", pathState.toString());
+            telemetry.addData("x", follower.getPose().getX());
+            telemetry.addData("y", follower.getPose().getY());
+            telemetry.addData("heading", follower.getPose().getHeading());
+            telemetry.addData("path time", pathTimer.getElapsedTimeSeconds());
+
+            telemetry.update();
+            odoTeleop.odoAimTurret(true);
 
             if (pathState == pathState.END) {
                 return;
             }
 
-            telemetry.addData("path state", pathState.toString());
-            telemetry.addData("x", follower.getPose().getX());
-            telemetry.addData("y", follower.getPose().getY());
-            telemetry.addData("heading", follower.getPose().getHeading());
-            telemetry.addData("path time", pathTimer.getElapsedTimeSeconds()); }}}}
+         }}}}
 
 /* process:
     1. Start pose

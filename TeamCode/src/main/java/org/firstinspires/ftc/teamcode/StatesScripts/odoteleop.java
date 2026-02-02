@@ -22,7 +22,7 @@ public class odoteleop {
 
     // ===== 100 DEGREE SERVO TUNING =====
 
-    private static final double TURRET_CENTER = 0.50; // adjust until forward is perfect
+    private static final double TURRET_CENTER = 0.47; // adjust until forward is perfect
     private static final double SERVO_TOTAL_DEGREES = 100.0;
     private static final double TURRET_MAX_DEGREES = 45.0; // safe turret swing each side
 
