@@ -15,19 +15,22 @@ public class SpeedTest extends LinearOpMode {
        // hardware.launcherTurn.setPower(0d); SHOULDNT BE  COMMENTED
 
         while (opModeIsActive()) {
-            if (gamepad2.xWasPressed()) {
+            if (gamepad2.aWasPressed()) {
                 testTps -= 100;
             }
+            if(gamepad2.yWasPressed()) {
+                testTps += 100;
+            }
 
-            if (gamepad2.y && hardware.outtakeTransferLeft.getPosition() != 0.2) {
+            /*if (gamepad2.y && hardware.outtakeTransferLeft.getPosition() != 0.2) {
                 hardware.outtakeTransferLeft.setPosition(0.2);
                 hardware.outtakeTransferRight.setPosition(0.2);
             } else if (hardware.outtakeTransferLeft.getPosition() != 0.9) {
                 hardware.outtakeTransferLeft.setPosition(0.9);
                 hardware.outtakeTransferRight.setPosition(0.9);
-            }
+            }*/
 
-            hardware.tryLaunch(gamepad2.right_bumper, 1, testTps);
+            hardware.tryLaunch(gamepad2.x, 1, testTps);
             if (gamepad2.b && !gamepad2.right_bumper) {
                 hardware.stopLaunch();
             }

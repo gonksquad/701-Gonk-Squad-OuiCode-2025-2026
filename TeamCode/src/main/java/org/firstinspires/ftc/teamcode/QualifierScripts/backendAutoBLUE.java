@@ -172,6 +172,9 @@ public class backendAutoBLUE extends LinearOpMode {
                 telemetry.addLine(" done to pickup");
                 break;
             case PICKUP1:
+                while(follower.isBusy()) {
+                    continue;
+                }
                 if (!follower.isBusy()) {
                     follower.followPath(firstSpike_firstArtifactCollect, true);
                     rrHardware.doIntakeGreen();

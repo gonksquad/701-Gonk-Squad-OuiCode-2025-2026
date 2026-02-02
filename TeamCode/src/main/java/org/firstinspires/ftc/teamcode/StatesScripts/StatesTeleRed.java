@@ -119,7 +119,7 @@ public class StatesTeleRed extends LinearOpMode {
 
                 //odo auto aiming
                 telemetry.addData("limelightpos", hardware.limelightTurn.getPosition());
-                hardware.launchTimer.reset();
+                //hardware.launchTimer.reset();
                 hardware.launcherTurn.setPosition(hardware.launcherTurn.getPosition()+gamepad2.left_stick_x/100f);
                 telemetry.addData("YURRRRR:    ", odoteleop.odoAimTurret(false));
                 telemetry.addData("robotX", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.X));

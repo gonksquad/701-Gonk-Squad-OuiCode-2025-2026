@@ -126,6 +126,7 @@ public class Hardware {
     public void stopLaunch() {
         outtakeTransferLeft.setPosition(liftPos[0]);
         outtakeTransferRight.setPosition(1-liftPos[0]);
+        intake.setPower(0);
         launcherLeft.setVelocity(0);
         launcherRight.setVelocity(0);
         launchingPurple = false;
@@ -150,7 +151,7 @@ public class Hardware {
                     launcherRight.setVelocity(tps + 20);
 
                     targetTps = tps;
-
+                    intake.setPower(0.75);
                     currentPos = i % 3;
                     sorter.setPosition(outtakePos[currentPos]);
                     launchTimer.reset();

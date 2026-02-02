@@ -49,10 +49,6 @@ public class StatesTeleBlue extends LinearOpMode {
                 }
             }
 
-            if (gamepad1.leftBumperWasPressed()) {
-
-            }
-
             if (gamepad2.y && !(gamepad2.a || gamepad2.b)) {
                 hardware.intaking = false;
                 hardware.intake.setPower(-1);
@@ -107,11 +103,11 @@ public class StatesTeleBlue extends LinearOpMode {
                     hardware.stopLaunch();
                 }
                 // 1 = purple, 2 = green. did this so that 0 can be either to help drivers
-                hardware.tryLaunch(gamepad2.right_bumper,          1, 1150);
+                hardware.tryLaunch(gamepad2.right_bumper, 1, 1150);
                 hardware.tryLaunch(gamepad2.right_trigger > 0.125, 1, 1350);
-                hardware.tryLaunch(gamepad2.left_bumper,           2, 1150);
-                hardware.tryLaunch(gamepad2.left_trigger > 0.125,  2, 1350);
-                hardware.tryLaunch(gamepad2.x,                     0, 1150);
+                hardware.tryLaunch(gamepad2.left_bumper, 2, 1150);
+                hardware.tryLaunch(gamepad2.left_trigger > 0.125, 2, 1350);
+                hardware.tryLaunch(gamepad2.x, 0, 1150);
 //                hardware.tryLaunchGreen(gamepad2.dpad_down);
 //                if (gamepad2.dpad_right && !(gamepad2.dpad_up || gamepad2.dpad_down)) {
 //                    hardware.stopLaunch();
@@ -119,7 +115,7 @@ public class StatesTeleBlue extends LinearOpMode {
 
                 //odo auto aiming
                 telemetry.addData("limelightpos", hardware.limelightTurn.getPosition());
-                hardware.launchTimer.reset();
+                //hardware.launchTimer.reset(); ///// THIS SINGLE LINE WAS WHY LAUNCHING DIDNT WORK :sob: :cool:
                 hardware.launcherTurn.setPosition(hardware.launcherTurn.getPosition()+gamepad2.left_stick_x/100f);
                 telemetry.addData("YURRRRR:    ", odoteleop.odoAimTurret(true));
                 telemetry.addData("robotX", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.X));
@@ -132,8 +128,8 @@ public class StatesTeleBlue extends LinearOpMode {
                 telemetry.addData("Launch Speed: ", hardware.launcherLeft.getVelocity());
 
                 /// touch sensor stuff is temp, just for testing
-                telemetry.addData("limit left", limitLeft.isPressed());
-                telemetry.addData("limit right", limitRight.isPressed());
+                //telemetry.addData("limit left", limitLeft.isPressed());
+                //telemetry.addData("limit right", limitRight.isPressed());
 
                 telemetry.addData("lift pos left", hardware.outtakeTransferLeft.getPosition());
                 telemetry.addData("launch timer", hardware.launchTimer.milliseconds());
