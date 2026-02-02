@@ -6,6 +6,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.TelemetryManager;
 import com.bylazar.telemetry.PanelsTelemetry;
+
+import org.firstinspires.ftc.teamcode.Hardware;
+import org.firstinspires.ftc.teamcode.QualifierScripts.RRHardware;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
@@ -21,10 +24,17 @@ public class AutoGoalBlue extends LinearOpMode {
     public Follower follower; // Pedro Pathing follower instance
     private int pathState; // Current autonomous path state (state machine)
     private Paths paths; // Paths defined in the Paths class
-    public ElapsedTime pathTimer;
+    private ElapsedTime pathTimer;
+    private Hardware hardware;
+    private byte sorterPos;
+
 
     @Override
     public void runOpMode() throws InterruptedException {
+        hardware = new Hardware(hardwareMap);
+
+        sorterPos = 2;
+
         pathTimer = new ElapsedTime();
 
         panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
@@ -36,7 +46,14 @@ public class AutoGoalBlue extends LinearOpMode {
 
         panelsTelemetry.debug("Status", "Initialized");
         panelsTelemetry.update(telemetry);
+
+
         waitForStart();
+
+
+        hardware.launcherTurn.setPosition(0.5);
+
+
         while (opModeIsActive()) {
             follower.update(); // Update Pedro Pathing
             autonomousPathUpdate(); // Update autonomous state machine
@@ -248,104 +265,148 @@ public class AutoGoalBlue extends LinearOpMode {
         switch (pathState) {
             case 0:
                 follower.followPath(paths.Shoot0);
+                hardware.launcherLeft.setVelocity(1170);
+                hardware.launcherRight.setVelocity(1170);
+                hardware.sorter.setPosition(hardware.outtakePos[2]);
                 setPathState(1);
                 break;
             case 1:
-                if(!follower.isBusy()) {
-                    follower.followPath(paths.Align1,true);
-                    setPathState(2);
-                }
+                launchAndSetState(2);
                 break;
             case 2:
                 if(!follower.isBusy()) {
-                    follower.followPath(paths.Intake11,true);
+                    follower.followPath(paths.Align1,true);
+                    hardware.intake.setPower(1);
                     setPathState(3);
                 }
                 break;
             case 3:
                 if(!follower.isBusy()) {
-                    follower.followPath(paths.Intake12,true);
+                    hardware.sorter.setPosition(hardware.intakePos[0]);
+                    sleep(1000);
+                    follower.followPath(paths.Intake11,true);
                     setPathState(4);
                 }
                 break;
             case 4:
-                if(!follower.isBusy()) {
-                    follower.followPath(paths.Intake13,true);
+                if(!follower.isBusy() && pathTimer.milliseconds() > 1000) {
+                    hardware.sorter.setPosition(hardware.intakePos[1]);
+                    sleep(1000);
+                    follower.followPath(paths.Intake12,true);
                     setPathState(5);
                 }
                 break;
             case 5:
-                if(!follower.isBusy()) {
-                    follower.followPath(paths.Shoot1,true);
+                if(!follower.isBusy() && pathTimer.milliseconds() > 1000) {
+                    hardware.sorter.setPosition(hardware.outtakePos[2]);
+                    sleep(1000);
+                    follower.followPath(paths.Intake13,true);
                     setPathState(6);
                 }
                 break;
             case 6:
-                if(!follower.isBusy()) {
-                    follower.followPath(paths.Align2,true);
+                if(!follower.isBusy() && pathTimer.milliseconds() > 1000) {
+                    follower.followPath(paths.Shoot1,true);
                     setPathState(7);
                 }
                 break;
             case 7:
-                if(!follower.isBusy()) {
-                    follower.followPath(paths.Intake21,true);
-                    setPathState(8);
+                if (!follower.isBusy()) {
+                    launchAndSetState(-1);
                 }
                 break;
             case 8:
                 if(!follower.isBusy()) {
-                    follower.followPath(paths.Intake22,true);
+                    follower.followPath(paths.Align2,true);
                     setPathState(9);
                 }
                 break;
             case 9:
                 if(!follower.isBusy()) {
-                    follower.followPath(paths.Intake23,true);
+                    follower.followPath(paths.Intake21,true);
                     setPathState(10);
                 }
                 break;
             case 10:
                 if(!follower.isBusy()) {
-                    follower.followPath(paths.Shoot2,true);
+                    follower.followPath(paths.Intake22,true);
                     setPathState(11);
                 }
                 break;
             case 11:
                 if(!follower.isBusy()) {
-                    follower.followPath(paths.Align3,true);
+                    follower.followPath(paths.Intake23,true);
                     setPathState(12);
                 }
                 break;
             case 12:
                 if(!follower.isBusy()) {
-                    follower.followPath(paths.Intake31,true);
+                    follower.followPath(paths.Shoot2,true);
                     setPathState(13);
-                }
-                break;
-            case 13:
-                if(!follower.isBusy()) {
-                    follower.followPath(paths.Intake32,true);
-                    setPathState(14);
                 }
                 break;
             case 14:
                 if(!follower.isBusy()) {
-                    follower.followPath(paths.Intake33,true);
+                    follower.followPath(paths.Align3,true);
                     setPathState(15);
                 }
                 break;
             case 15:
                 if(!follower.isBusy()) {
-                    follower.followPath(paths.Shoot3,true);
+                    follower.followPath(paths.Intake31,true);
                     setPathState(16);
                 }
                 break;
             case 16:
+                if(!follower.isBusy()) {
+                    follower.followPath(paths.Intake32,true);
+                    setPathState(17);
+                }
+                break;
+            case 17:
+                if(!follower.isBusy()) {
+                    follower.followPath(paths.Intake33,true);
+                    setPathState(18);
+                }
+                break;
+            case 18:
+                if(!follower.isBusy()) {
+                    follower.followPath(paths.Shoot3,true);
+                    setPathState(19);
+                }
+                break;
+            case 19:
                 if (!follower.isBusy()) {
                     follower.followPath(paths.Exit,true);
                     setPathState(-1);
                 }
                 break;
+        }
+    }
+
+    public void launchAndSetState(int state) {
+        if (follower.isBusy() || hardware.launcherLeft.getVelocity() < 1150) return;
+        if (sorterPos == 2) {
+            hardware.outtakeTransferLeft.setPosition(hardware.liftPos[1]);
+            sleep(1000);
+            hardware.outtakeTransferLeft.setPosition(hardware.liftPos[0]);
+            sleep(400);
+            sorterPos = 1;
+        } else if (sorterPos == 1){
+            hardware.sorter.setPosition(hardware.outtakePos[1]);
+            sleep(600);
+            hardware.outtakeTransferLeft.setPosition(hardware.liftPos[1]);
+            sleep(1000);
+            hardware.outtakeTransferLeft.setPosition(hardware.liftPos[0]);
+            sleep(400);
+            sorterPos = 0;
+        } else {
+            hardware.sorter.setPosition(hardware.outtakePos[0]);
+            sleep(600);
+            hardware.outtakeTransferLeft.setPosition(hardware.liftPos[1]);
+            sleep(1000);
+            hardware.outtakeTransferLeft.setPosition(hardware.liftPos[0]);
+            setPathState(state);
         }
     }
 
