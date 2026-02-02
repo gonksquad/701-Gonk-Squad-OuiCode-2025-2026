@@ -24,14 +24,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Hardware;
 import org.firstinspires.ftc.teamcode.StatesScripts.odoteleop;
+import org.firstinspires.ftc.teamcode.colorSequence;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
 
 @Autonomous
 public class backendAutoBLUE extends LinearOpMode {
-    int id = -1;
-    String motif = "null";
 
     public DcMotor frontLeft, frontRight, backLeft, backRight, intake;
     public DcMotorEx launcherLeft, launcherRight;
@@ -63,38 +62,46 @@ public class backendAutoBLUE extends LinearOpMode {
     private Timer pathTimer, actionTimer, opModeTimer;
     //private ElapsedTime runtime = new ElapsedTime();
 
-    public double gg = 1250;
-    public double pp = 1300;
-
     pathState pathState;
     public enum pathState {
         APRILTAGLOOKSIES,
+        a,
         SHOOT,
+        b,
         STARTTOBEFOREPICKUP,
+        c,
         PICKUP1,
+        d,
         PICKUP2,
+        e,
         PICKUP3,
+        f,
         PICKUPTOSHOOT,
+        g,
         SHOOT2,
+        h,
         SHOOTFORWARD,
+        i,
         END
 
     }
     float bounds_X = 4f;
     String lastPos = "None";
 
+    String motif = "null";
+    int id = 0;
+
     private PathChain start_driveToFirstSpike, firstSpike_firstArtifactCollect, firstSpike_secondArtifactCollect,
             firstSpike_thirdArtifactCollect, firstSpike_shoot, shoot_forward;
 
     //poses initialized
     private final Pose startPose = new Pose(56, 9, Math.toRadians(90));
-    private final Pose beforeFirstSpike = new Pose(56,34, Math.toRadians(135));
+    private final Pose beforeFirstSpike = new Pose(60,34, Math.toRadians(180));
 
-
-    private final Pose firstSpike1 = new Pose(47.75,34, Math.toRadians(180)); //5.5 in artifact
-    private final Pose firstSpike2 = new Pose(43,34, Math.toRadians(180));
-    private final Pose firstSpike3 = new Pose(38.25,34, Math.toRadians(180));
-    private final Pose startPose2 = new Pose(56, 9, Math.toRadians(90));
+    private final Pose firstSpike1 = new Pose(55,34, Math.toRadians(180)); //5.5 in artifact
+    private final Pose firstSpike2 = new Pose(49,34, Math.toRadians(180));
+    private final Pose firstSpike3 = new Pose(43,34, Math.toRadians(180));
+    private final Pose startPose2 = new Pose(56, 10, Math.toRadians(90));
 
     private final Pose forward = new Pose(56, 21, Math.toRadians(90));
 
@@ -102,7 +109,7 @@ public class backendAutoBLUE extends LinearOpMode {
     public void buildPaths() {
         start_driveToFirstSpike = follower.pathBuilder()
                 .addPath(new BezierLine(startPose, beforeFirstSpike))
-            .setLinearHeadingInterpolation(startPose.getHeading(), beforeFirstSpike.getHeading())
+                .setLinearHeadingInterpolation(startPose.getHeading(), beforeFirstSpike.getHeading())
                 .build();
         firstSpike_firstArtifactCollect = follower.pathBuilder()
                 .addPath(new BezierCurve(beforeFirstSpike, firstSpike1))
@@ -118,14 +125,15 @@ public class backendAutoBLUE extends LinearOpMode {
                 .build();
         firstSpike_shoot = follower.pathBuilder()
                 .addPath(new BezierLine(firstSpike3, startPose2))
-                .setLinearHeadingInterpolation(firstSpike3.getHeading(), startPose.getHeading()) //.setReversed() //hopefully backwards drive
+                .setLinearHeadingInterpolation(firstSpike3.getHeading(), startPose2.getHeading()) //.setReversed() //hopefully backwards drive
                 .build();
         shoot_forward = follower.pathBuilder()
                 .addPath(new BezierLine(startPose2, forward))
-                .setLinearHeadingInterpolation(startPose.getHeading(), forward.getHeading())
+                .setLinearHeadingInterpolation(startPose2.getHeading(), forward.getHeading())
                 .build();
     }
 
+    public boolean running = false;
     public void statePathUpdate() {
         switch(pathState) {
             case APRILTAGLOOKSIES:
@@ -134,8 +142,6 @@ public class backendAutoBLUE extends LinearOpMode {
                 LLResult result = limelight.getLatestResult();
 
                 if (result != null && result.isValid()) { //add time elapsed too?
-                    String motif = "null";
-                    int id = 0;
                     List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
 
                     for (LLResultTypes.FiducialResult fiducial : fiducials) {
@@ -162,77 +168,107 @@ public class backendAutoBLUE extends LinearOpMode {
 
                 telemetry.addData("tag mighta been found", id);
                 telemetry.addData("motif", motif);
-                setPathState(pathState.SHOOT); //reset timer and make new state
+                setPathState(pathState.a); //reset timer and make new state
+                break;
+            case a:
+                if (!follower.isBusy()) {
+                    setPathState(pathState.SHOOT);
+                }
                 break;
             case SHOOT:
+                aprilTagOuttake();
+                setPathState(pathState.b);
+
+                break;
+            case b:
                 if (!follower.isBusy()) {
-                    aprilTagOuttake();
                     setPathState(pathState.STARTTOBEFOREPICKUP);
                 }
                 break;
             case STARTTOBEFOREPICKUP:
-                if (!follower.isBusy()) { //note: after shoot and change time to something for whole auto
-                    follower.followPath(start_driveToFirstSpike, true);
-                    setPathState(pathState.PICKUP1);
-                }
+                follower.followPath(start_driveToFirstSpike, true);
+                setPathState(pathState.c);
                 telemetry.addLine(" done to pickup");
                 break;
-            case PICKUP1:
-                while(follower.isBusy()) {
-                    continue;
-                }
+            case c:
                 if (!follower.isBusy()) {
-                    follower.followPath(firstSpike_firstArtifactCollect, true);
-                    rrHardware.doIntakeGreen();
-                    setPathState(pathState.PICKUP2);
+                    setPathState(pathState.PICKUP1);
                 }
+                break;
+            case PICKUP1:
+                follower.followPath(firstSpike_firstArtifactCollect, true);
+                if (pathTimer.getElapsedTimeSeconds() > 2) {
+                    rrHardware.doIntakeGreen();
+                }
+                setPathState(pathState.d);
                 telemetry.addLine(" done pickup 1");
                 break;
-            case PICKUP2:
+            case d:
                 if (!follower.isBusy()) {
-                    rrHardware.stopIntake();
-                    follower.followPath(firstSpike_secondArtifactCollect, true);
-                    rrHardware.doIntakePurple1();
-                    setPathState(pathState.PICKUP3);
+                    setPathState(pathState.PICKUP2);
                 }
+                break;
+            case PICKUP2:
+                follower.followPath(firstSpike_secondArtifactCollect, true);
+                if (pathTimer.getElapsedTimeSeconds() > 2) {
+                    rrHardware.doIntakePurple1();
+                }
+                setPathState(pathState.e);
                 telemetry.addLine(" done pickup 2");
                 break;
-            case PICKUP3:
+            case e:
                 if (!follower.isBusy()) {
-                    rrHardware.stopIntake();
-                    follower.followPath(firstSpike_thirdArtifactCollect, true);
+                    setPathState(pathState.PICKUP3);
+                }
+                break;
+            case PICKUP3:
+                follower.followPath(firstSpike_thirdArtifactCollect, true);
+                if (pathTimer.getElapsedTimeSeconds() > 2) {
                     rrHardware.doIntakePurple2();
                     rrHardware.dontFallOut();
-                    setPathState(pathState.PICKUPTOSHOOT);
                 }
+                setPathState(pathState.f);
                 telemetry.addLine(" done pickup 3");
                 break;
-            case PICKUPTOSHOOT:
+            case f:
                 if (!follower.isBusy()) {
-                    follower.followPath(firstSpike_shoot, true);
-                    setPathState(pathState.SHOOT2);
+                    setPathState(pathState.PICKUPTOSHOOT);
                 }
+                break;
+            case PICKUPTOSHOOT:
+                follower.followPath(firstSpike_shoot, true);
+                setPathState(pathState.g);
                 telemetry.addLine(" done shooting");
                 break;
-            case SHOOT2:
+            case g:
                 if (!follower.isBusy()) {
-                    aprilTagOuttake();
-                    follower.followPath(shoot_forward, true);
+                    setPathState(pathState.SHOOT2);
+                }
+                break;
+            case SHOOT2:
+                odoTeleop.odoAimTurret(true);
+                aprilTagOuttake();
+                follower.followPath(shoot_forward, true);
+                setPathState(pathState.h);
+                break;
+            case h:
+                if (!follower.isBusy()) {
+                    setPathState(pathState.SHOOTFORWARD);
+                }
+                break;
+            case SHOOTFORWARD:
+                follower.followPath(shoot_forward, true);
+                setPathState(pathState.i);
+                telemetry.addLine(" done! :)");
+                break;
+            case i:
+                if (!follower.isBusy()) {
                     setPathState(pathState.END);
                 }
                 break;
-//            case SHOOTFORWARD:
-//                if (!follower.isBusy()) {
-//                    follower.followPath(shoot_forward, true);
-//                    setPathState(pathState.END);
-//                }
-//                telemetry.addLine(" done! :)");
-//                break;
-
             case END:
                 telemetry.addLine("Nothing running");
                 break;
-
             default:
                 telemetry.addLine("death");
                 break;
@@ -244,6 +280,10 @@ public class backendAutoBLUE extends LinearOpMode {
         pathTimer.resetTimer();
     }
 
+
+    public double gg = 1300;
+    public double pp = 1300;
+
     public void aprilTagOuttake() {
         rrHardware.sorterContents[0] = 1;
         rrHardware.sorterContents[1] = 1; //purple
@@ -253,24 +293,25 @@ public class backendAutoBLUE extends LinearOpMode {
             rrHardware.tryLaunch(true, 2, (int)gg);
             rrHardware.tryLaunch(true, 1, (int)pp);
             rrHardware.tryLaunch(true, 1, (int)pp);
-        }
 
+        }
         else if (motif == "pgp") { //pgp
             rrHardware.tryLaunch(true, 1, (int)pp);
             rrHardware.tryLaunch(true, 2, (int)gg);
             rrHardware.tryLaunch(true, 1, (int)pp);
+
         }
         else if (motif == "ppg") { //ppg
             rrHardware.tryLaunch(true, 1, (int)pp);
             rrHardware.tryLaunch(true, 1, (int)pp);
             rrHardware.tryLaunch(true, 2, (int)gg);
+
         } else { //gpp
             telemetry.addData("yeah", motif);
             telemetry.addData("uh", sorterContents);
             rrHardware.tryLaunch(true, 2, (int)gg);
             rrHardware.tryLaunch(true, 1, (int)pp);
             rrHardware.tryLaunch(true, 1, (int)pp);
-
         }
     }
 
@@ -319,8 +360,7 @@ public class backendAutoBLUE extends LinearOpMode {
 
         //turretAxon = hardwareMap.get(CRServo.class, "axon");
         limelight.setPollRateHz(90);
-       // limelight.pipelineSwitch(1); // motif pipeline (ID=21,22,23)
-        //limelight.pipelineSwitch(1); // this is for left goal (ID=20)
+        // limelight.pipelineSwitch(0); // motif pipeline (ID=21,22,23)
 
         limelight.start();
 
@@ -343,6 +383,7 @@ public class backendAutoBLUE extends LinearOpMode {
         if (getRuntime() < 30) {
             follower.update();
             statePathUpdate();
+            odoTeleop.odoAimTurret(true);
             telemetry.addData("path state", pathState.toString());
             telemetry.addData("x", follower.getPose().getX());
             telemetry.addData("y", follower.getPose().getY());
@@ -350,7 +391,6 @@ public class backendAutoBLUE extends LinearOpMode {
             telemetry.addData("path time", pathTimer.getElapsedTimeSeconds());
 
             telemetry.update();
-            odoTeleop.odoAimTurret(true);
 
             if (pathState == pathState.END) {
                 return;
