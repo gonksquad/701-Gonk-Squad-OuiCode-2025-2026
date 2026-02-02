@@ -2,6 +2,7 @@ package org.firstinspires.ftc. teamcode. QualifierScripts;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.linearOpMode;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
 import android.annotation.SuppressLint;
 
@@ -128,91 +129,33 @@ public class RRHardware{
         backRight.setPower(brPwr / denominator);
     }
 
-    public void doIntakeGreen() {
-        sorterContents[0] = 2;
-       // sleep(1000);
+    public void doIntake(byte sorterPos) {
+        sorter.setPosition(intakePos[sorterPos]);
+        stopIntake();
+        sleep(1000);
+        intake.setPower(1);
+        intakeTimer.reset();
+        while(intakeTimer.milliseconds() < 2000 && detectFilled() == 0) {
+            telemetry.addLine("Looking for ball");
+        }
+        sorterContents[sorterPos] = detectFilled();
 
-        sorter.setPosition(intakePos[0]);
-       // stopIntake();
-       // sleep(1000);
-       // intake.setPower(1);
-       // sleep(1000);
+        if (!intaking) {
+            sorter.setPosition(intakePos[sorterPos]);
+            stopLaunch();
 
-//        if (!intaking) {
-//            sorterContents[0] = 2;
-//            sorter.setPosition(intakePos[0]);
-//            stopLaunch();
-//
-//            sleep(1000);
-//            intake.setPower(1);
-//
-//            sleep(1000);
-//
-//           // sorter.setPosition(outtakePos[2]);
-//            intakeTimer.reset();
-//        }
-//        if (intaking && intakeTimer.milliseconds() > 500) {
-//            intaking = false;
-//            intake.setPower(0);
-//        }
-    }
+            sleep(1000);
+            intake.setPower(1);
 
-    public void doIntakePurple1() {
-        sorterContents[1] = 1;
-      //  sleep(1000);
-        sorter.setPosition(intakePos[1]);
-//        stopIntake();
-//        sleep(1000);
-//        intake.setPower(1);
-//        sleep(1000);
+            sleep(1000);
 
-//        if (!intaking) {
-//            sorter.setPosition(intakePos[1]);
-//            stopLaunch();
-//            intaking = true;
-//
-//            sleep(1000);
-//            intake.setPower(1);
-//
-//            sorterContents[1] = 1;
-//            sleep(1000);
-//
-//           // sorter.setPosition(outtakePos[0]);
-//            intakeTimer.reset();
-//        }
-//        if (intaking && intakeTimer.milliseconds() > 500) {
-//            intaking = false;
-//            intake.setPower(0);
-//        }
-    }
-
-    public void doIntakePurple2() {
-        sorterContents[2] = 1;
-        //sleep(1000);
-        sorter.setPosition(intakePos[2]);
-//        stopIntake();
-//        sleep(1000);
-//        intake.setPower(1);
-//        sleep(1000);
-
-//        if (!intaking) {
-//            sorter.setPosition(intakePos[2]);
-//            stopLaunch();
-//            intaking = true;
-//
-//            sleep(1000);
-//            intake.setPower(1);
-//
-//            sorterContents[2] = 1;
-//            sleep(1000);
-//
-//         //   sorter.setPosition(outtakePos[1]);
-//            intakeTimer.reset();
-//        }
-//        if (intaking && intakeTimer.milliseconds() > 500) {
-//            intaking = false;
-//            intake.setPower(0);
-//        }
+           // sorter.setPosition(outtakePos[2]);
+            intakeTimer.reset();
+        }
+        if (intaking && intakeTimer.milliseconds() > 500) {
+            intaking = false;
+            intake.setPower(0);
+        }
     }
 
     public void dontFallOut() {
