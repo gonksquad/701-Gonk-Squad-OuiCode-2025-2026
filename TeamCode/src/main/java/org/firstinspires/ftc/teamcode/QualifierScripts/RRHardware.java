@@ -131,7 +131,6 @@ public class RRHardware{
     public void doIntakeGreen() {
         sorterContents[0] = 2;
         sorter.setPosition(intakePos[0]);
-        sleep(1000);
         intake.setPower(1);
 
 //        if (!intaking) {
@@ -156,7 +155,6 @@ public class RRHardware{
     public void doIntakePurple1() {
         sorterContents[1] = 1;
         sorter.setPosition(intakePos[1]);
-        sleep(2000);
         intake.setPower(1);
 
 //        if (!intaking) {
@@ -182,7 +180,6 @@ public class RRHardware{
     public void doIntakePurple2() {
         sorterContents[2] = 1;
         sorter.setPosition(intakePos[2]);
-        sleep(2000);
         intake.setPower(1);
 
 //        if (!intaking) {
@@ -207,7 +204,6 @@ public class RRHardware{
 
     public void dontFallOut() {
         sorter.setPosition(outtakePos[0]);
-        sleep(2000);
         intake.setPower(0);
         //intaking = false;
     }
@@ -215,6 +211,44 @@ public class RRHardware{
     public void stopIntake() {
         intake.setPower(0);
     }
+
+    public void tryIntake(boolean button) {
+        // check if intake button is being pressed and not currently intaking
+        if (button && !intaking) {
+            // set sorter position
+            for (int i = 0; i < 3; i++) {
+                //if spot is empty, set to that pos
+                if (sorterContents[i] == 0) {
+                    stopLaunch();
+
+                    intaking = true;
+                    intake.setPower(1);
+
+                    sorter.setPosition(intakePos[i]);
+                    currentPos = i;
+                    intakeTimer.reset();
+
+                    break;
+                }
+            }
+        }
+        if (intaking && intakeTimer.milliseconds() > 1000) {
+            byte guess = detectFilled();
+            if (guess == 0) return;
+            //set current sorter pos to color-sensor-detected color
+            sorterContents[currentPos] = guess;
+            currentPos = (currentPos + 2) % 3;
+            //change to outtake
+            sorter.setPosition(outtakePos[currentPos]);
+
+
+            // treat this as a loop
+            // try to go to the artifact (maybe split int tryIntakePurple and tryIntakeGreen)
+            // check if intaking was completed -> store color at position
+        }
+
+    }
+
     public void stopLaunch() {
         outtakeTransferLeft.setPosition(liftPos[0]);
         outtakeTransferRight.setPosition(1-liftPos[0]);
@@ -270,4 +304,193 @@ public class RRHardware{
 
 //        }
     }
+
+    public byte detectFilled() {
+        float red = colorSensor.red();
+        float green = colorSensor.green();
+        float blue = colorSensor.blue();
+
+        float multiplier = 255f / Math.max(Math.max(red, green), Math.max(blue, 255f));
+        green *= multiplier;
+        blue *= multiplier;
+
+        byte guess = 0;
+        if (blue > 200 && blue > green) {
+            //likely purple artifact
+            guess = 1;
+        } else if (green > 200 && green > blue) {
+            //likely green artifact
+            guess = 2;
+        }
+
+        return guess;
+    }
+    public void intake1() {
+        sorter.setPosition(.2);
+        intake.setPower(1);
+        sleep(1000);
+        intake.setPower(0);
+
+    }
+
+    public void intake2() {
+        sorter.setPosition(.6);
+        intake.setPower(1);
+        sleep(1000);
+        intake.setPower(0);
+    }
+
+    public void intake3() {
+        sorter.setPosition(1);
+        intake.setPower(1);
+        sleep(1000);
+        intake.setPower(0);
+    }
+
+    public void launchOnFar() {
+        launcherLeft.setVelocity(2600);
+        launcherRight.setVelocity(2600);
+    }
+
+    public void launchOnClose() {
+        launcherLeft.setVelocity(1250);
+        launcherRight.setVelocity(1250);
+    }
+
+    public void launchOff() {
+        launcherLeft.setVelocity(0);
+        launcherRight.setVelocity(0);
+    }
+
+//    public void shootgppfar() {
+//        launchOnFar();
+//        sorter.setPosition(.4);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(.8);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer. setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        launchOff();
+//    }
+//
+//    public void shootpgpfar() {
+//        launchOnFar();
+//        sorter.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(.4);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(.8);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        launchOff();
+//    }
+//
+//    public void shootppgfar() {
+//        launchOnFar();
+//        sorter.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(.8);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(.4);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        launchOff();
+//    }
+//    public void shootgppclose() {
+//        launchOnClose();
+//        sorter.setPosition(.4);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(.8);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer. setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        launchOff();
+//    }
+//
+//    public void shootpgpclose() {
+//        launchOnClose();
+//        sleep(3000);
+//        sorter.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(.4);
+//        sleep(5000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(.8);
+//        sleep(3500);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        launchOff();
+//    }
+//
+//    public void shootppgclose() {
+//        launchOnClose();
+//        sorter.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(.8);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        sleep(1000);
+//        sorter.setPosition(.4);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(0);
+//        sleep(1000);
+//        outtakeTransfer.setPosition(.9);
+//        launchOff();
+//    }
 }

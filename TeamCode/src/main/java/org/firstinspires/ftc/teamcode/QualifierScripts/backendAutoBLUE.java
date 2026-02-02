@@ -24,13 +24,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Hardware;
 import org.firstinspires.ftc.teamcode.StatesScripts.odoteleop;
-import org.firstinspires.ftc.teamcode.colorSequence;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.List;
 
 @Autonomous
 public class backendAutoBLUE extends LinearOpMode {
+    int id = -1;
+    String motif = "null";
 
     public DcMotor frontLeft, frontRight, backLeft, backRight, intake;
     public DcMotorEx launcherLeft, launcherRight;
@@ -65,31 +66,19 @@ public class backendAutoBLUE extends LinearOpMode {
     pathState pathState;
     public enum pathState {
         APRILTAGLOOKSIES,
-        a,
         SHOOT,
-        b,
         STARTTOBEFOREPICKUP,
-        c,
         PICKUP1,
-        d,
         PICKUP2,
-        e,
         PICKUP3,
-        f,
         PICKUPTOSHOOT,
-        g,
         SHOOT2,
-        h,
         SHOOTFORWARD,
-        i,
         END
 
     }
     float bounds_X = 4f;
     String lastPos = "None";
-
-    String motif = "null";
-    int id = 0;
 
     private PathChain start_driveToFirstSpike, firstSpike_firstArtifactCollect, firstSpike_secondArtifactCollect,
             firstSpike_thirdArtifactCollect, firstSpike_shoot, shoot_forward;
@@ -98,9 +87,9 @@ public class backendAutoBLUE extends LinearOpMode {
     private final Pose startPose = new Pose(56, 9, Math.toRadians(90));
     private final Pose beforeFirstSpike = new Pose(56,25, Math.toRadians(180));
 
-    private final Pose firstSpike1 = new Pose(47.75,34, Math.toRadians(180)); //5.5 in artifact
-    private final Pose firstSpike2 = new Pose(42.75,34, Math.toRadians(180));
-    private final Pose firstSpike3 = new Pose(37.75,34, Math.toRadians(180));
+    private final Pose firstSpike1 = new Pose(48,34, Math.toRadians(180)); //5.5 in artifact
+    private final Pose firstSpike2 = new Pose(46,34, Math.toRadians(180));
+    private final Pose firstSpike3 = new Pose(44,34, Math.toRadians(180));
     private final Pose forward = new Pose(56, 21, Math.toRadians(90));
 
     //path initializing
@@ -139,6 +128,8 @@ public class backendAutoBLUE extends LinearOpMode {
                 LLResult result = limelight.getLatestResult();
 
                 if (result != null && result.isValid()) { //add time elapsed too?
+                    String motif = "null";
+                    int id = 0;
                     List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
 
                     for (LLResultTypes.FiducialResult fiducial : fiducials) {
@@ -165,103 +156,77 @@ public class backendAutoBLUE extends LinearOpMode {
 
                 telemetry.addData("tag mighta been found", id);
                 telemetry.addData("motif", motif);
-                setPathState(pathState.a); //reset timer and make new state
-                break;
-            case a:
-                if (!follower.isBusy()) {
-                    setPathState(pathState.SHOOT);
-                }
+                setPathState(pathState.SHOOT); //reset timer and make new state
                 break;
             case SHOOT:
-                aprilTagOuttake();
-                setPathState(pathState.b);
-                break;
-            case b:
                 if (!follower.isBusy()) {
+                    aprilTagOuttake();
                     setPathState(pathState.STARTTOBEFOREPICKUP);
                 }
                 break;
             case STARTTOBEFOREPICKUP:
-                follower.followPath(start_driveToFirstSpike, true);
-                setPathState(pathState.c);
+                if (!follower.isBusy()) { //note: after shoot and change time to something for whole auto
+                    follower.followPath(start_driveToFirstSpike, true);
+                    setPathState(pathState.PICKUP1);
+                }
                 telemetry.addLine(" done to pickup");
                 break;
             case PICKUP1:
-            while(follower.isBusy()) {
+                while(follower.isBusy()) {
                     continue;
                 }
-            case c:
                 if (!follower.isBusy()) {
-                    setPathState(pathState.PICKUP1);
-                }
-                break;
-            case PICKUP1:
-                follower.followPath(firstSpike_firstArtifactCollect, true);
-                rrHardware.doIntakeGreen();
-                setPathState(pathState.d);
-                telemetry.addLine(" done pickup 1");
-                break;
-            case d:
-                if (!follower.isBusy()) {
+                    follower.followPath(firstSpike_firstArtifactCollect, true);
+                    rrHardware.doIntakeGreen();
                     setPathState(pathState.PICKUP2);
                 }
+                telemetry.addLine(" done pickup 1");
                 break;
             case PICKUP2:
-                follower.followPath(firstSpike_secondArtifactCollect, true);
-                rrHardware.doIntakePurple1();
-                setPathState(pathState.e);
-                telemetry.addLine(" done pickup 2");
-                break;
-            case e:
                 if (!follower.isBusy()) {
+                    rrHardware.stopIntake();
+                    follower.followPath(firstSpike_secondArtifactCollect, true);
+                    rrHardware.doIntakePurple1();
                     setPathState(pathState.PICKUP3);
                 }
+                telemetry.addLine(" done pickup 2");
                 break;
             case PICKUP3:
-                follower.followPath(firstSpike_thirdArtifactCollect, true);
-                rrHardware.doIntakePurple2();
-                rrHardware.dontFallOut();
-                setPathState(pathState.f);
-                telemetry.addLine(" done pickup 3");
-                break;
-            case f:
                 if (!follower.isBusy()) {
+                    rrHardware.stopIntake();
+                    follower.followPath(firstSpike_thirdArtifactCollect, true);
+                    rrHardware.doIntakePurple2();
+                    rrHardware.dontFallOut();
                     setPathState(pathState.PICKUPTOSHOOT);
                 }
+                telemetry.addLine(" done pickup 3");
                 break;
             case PICKUPTOSHOOT:
-                follower.followPath(firstSpike_shoot, true);
-                setPathState(pathState.g);
-                telemetry.addLine(" done shooting");
-                break;
-            case g:
                 if (!follower.isBusy()) {
+                    follower.followPath(firstSpike_shoot, true);
                     setPathState(pathState.SHOOT2);
                 }
+                telemetry.addLine(" done shooting");
                 break;
             case SHOOT2:
-                aprilTagOuttake();
-                follower.followPath(shoot_forward, true);
-                setPathState(pathState.h);
-                break;
-            case h:
                 if (!follower.isBusy()) {
-                    setPathState(pathState.SHOOTFORWARD);
-                }
-                break;
-            case SHOOTFORWARD:
-                follower.followPath(shoot_forward, true);
-                setPathState(pathState.i);
-                telemetry.addLine(" done! :)");
-                break;
-            case i:
-                if (!follower.isBusy()) {
+                    aprilTagOuttake();
+                    follower.followPath(shoot_forward, true);
                     setPathState(pathState.END);
                 }
                 break;
+//            case SHOOTFORWARD:
+//                if (!follower.isBusy()) {
+//                    follower.followPath(shoot_forward, true);
+//                    setPathState(pathState.END);
+//                }
+//                telemetry.addLine(" done! :)");
+//                break;
+
             case END:
                 telemetry.addLine("Nothing running");
                 break;
+
             default:
                 telemetry.addLine("death");
                 break;
@@ -284,18 +249,18 @@ public class backendAutoBLUE extends LinearOpMode {
             rrHardware.tryLaunch(true, 1, 1350);
             rrHardware.tryLaunch(true, 1, 1350);
         }
-        else if (motif == "pgp") { //pgp
+        if (motif == "pgp") { //pgp
             rrHardware.tryLaunch(true, 1, 1350);
             rrHardware.tryLaunch(true, 2, 1350);
             rrHardware.tryLaunch(true, 1, 1350);
         }
-        else if (motif == "ppg") { //ppg
+        if (motif == "ppg") { //ppg
             rrHardware.tryLaunch(true, 1, 1350);
             rrHardware.tryLaunch(true, 1, 1350);
             rrHardware.tryLaunch(true, 2, 1350);
         } else { //gpp
-            telemetry.addData("yeah", motif);
-            telemetry.addData("uh", sorterContents);
+            telemetry.addData("tag found", id);
+            telemetry.addData("motif", motif);
             rrHardware.tryLaunch(true, 2, 1350);
             rrHardware.tryLaunch(true, 1, 1350);
             rrHardware.tryLaunch(true, 1, 1350);
@@ -365,22 +330,22 @@ public class backendAutoBLUE extends LinearOpMode {
 
         waitForStart();
 
-        telemetry.addData("path state", pathState.toString());
-        telemetry.addData("x", follower.getPose().getX());
-        telemetry.addData("y", follower.getPose().getY());
-        telemetry.addData("heading", follower.getPose().getHeading());
-        telemetry.addData("path time", pathTimer.getElapsedTimeSeconds());
-
         opModeTimer.resetTimer();
         setPathState(pathState);
         while (opModeIsActive()) {
+        if (getRuntime() < 30) {
             follower.update();
             statePathUpdate();
-            telemetry.update();
 
             if (pathState == pathState.END) {
                 return;
-            }}}}
+            }
+
+            telemetry.addData("path state", pathState.toString());
+            telemetry.addData("x", follower.getPose().getX());
+            telemetry.addData("y", follower.getPose().getY());
+            telemetry.addData("heading", follower.getPose().getHeading());
+            telemetry.addData("path time", pathTimer.getElapsedTimeSeconds()); }}}}
 
 /* process:
     1. Start pose
