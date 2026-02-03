@@ -1,5 +1,6 @@
 
 package org.firstinspires.ftc.teamcode.StatesScripts;
+import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -29,6 +30,7 @@ public class AutoGoalBlue extends LinearOpMode {
     private Hardware hardware;
     private byte sorterPos;
     private byte launchProgress;
+    private LLResult obeliskId;
 
 
     @Override
@@ -57,7 +59,10 @@ public class AutoGoalBlue extends LinearOpMode {
 
         hardware.launcherTurn.setPosition(0.5);
         hardware.sorter.setPosition(hardware.outtakePos[2]);
+        hardware.limelightTurn.setPosition(0.75);
 
+        hardware.limelight.pipelineSwitch(0);
+        obeliskId = hardware.limelight.getLatestResult();
 
         while (opModeIsActive()) {
             follower.update(); // Update Pedro Pathing
@@ -68,6 +73,7 @@ public class AutoGoalBlue extends LinearOpMode {
             panelsTelemetry.debug("X", follower.getPose().getX());
             panelsTelemetry.debug("Y", follower.getPose().getY());
             panelsTelemetry.debug("Heading", follower.getPose().getHeading());
+            panelsTelemetry.debug("Obelisk Id", obeliskId);
             panelsTelemetry.update(telemetry);
         }
     }
@@ -118,7 +124,7 @@ public class AutoGoalBlue extends LinearOpMode {
                             new BezierLine(
                                     new Pose(48.000, 84.000),
 
-                                    new Pose(36.000, 84.000)
+                                    new Pose(38.000, 84.000)
                             )
                     ).setTangentHeadingInterpolation()
 
@@ -126,9 +132,9 @@ public class AutoGoalBlue extends LinearOpMode {
 
             Intake12 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(36.000, 84.000),
+                                    new Pose(38.000, 84.000),
 
-                                    new Pose(31.000, 84.000)
+                                    new Pose(32.000, 84.000)
                             )
                     ).setTangentHeadingInterpolation()
 
@@ -136,7 +142,7 @@ public class AutoGoalBlue extends LinearOpMode {
 
             Intake13 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(31.000, 84.000),
+                                    new Pose(32.000, 84.000),
 
                                     new Pose(20.000, 84.000)
                             )
@@ -271,137 +277,85 @@ public class AutoGoalBlue extends LinearOpMode {
         switch (pathState) {
             case 0: // Start Launcher and Go to Launch
                 follower.followPath(paths.Shoot0);
-                hardware.launcherLeft.setVelocity(1170);
-                hardware.launcherRight.setVelocity(1170);
+                hardware.launcherLeft.setVelocity(1200);
+                hardware.launcherRight.setVelocity(1200);
                 hardware.sorter.setPosition(hardware.outtakePos[2]);
                 sorterPos = 2;
                 launchProgress = 0;
                 setPathState(1);
                 break;
-            case 1: // Launch Artifacts
+            case 1:
+                obeliskId = hardware.limelight.getLatestResult();
+                setPathState(2);
+                break;
+            case 2: // Launch Artifacts
                 if (sorterPos > 0) {
                     launch();
                 } else {
-                    launchAndSetPathState(2);
+                    launchAndSetPathState(3);
                 }
                 break;
-            case 2: // Align to Intake
+            case 3: // Align to Intake
                 hardware.launcherLeft.setVelocity(0);
                 hardware.launcherRight.setVelocity(0);
                 follower.followPath(paths.Align1,true);
                 hardware.intake.setPower(1);
-                setPathState(3);
+                setPathState(4);
                 break;
-            case 3: // Intake First Artifact
+            case 4: // Intake First Artifact
                 if (hardware.sorter.getPosition() != hardware.intakePos[0]) {
                     hardware.sorter.setPosition(hardware.intakePos[0]);
-                } else if (pathTimer.milliseconds() > 1000) {
+                } else if (pathTimer.milliseconds() > 1250) {
                     follower.followPath(paths.Intake11, true);
-                    setPathState(4);
-                }
-                break;
-            case 4: // Intake Second Artifact
-                if (hardware.sorter.getPosition() != hardware.intakePos[1] && pathTimer.milliseconds() > 1000) {
-                    hardware.sorter.setPosition(hardware.intakePos[1]);
-                } else if (pathTimer.milliseconds() > 2000) {
-                    follower.followPath(paths.Intake12, true);
                     setPathState(5);
                 }
                 break;
-            case 5: // Intake Third Artifact
-                if(hardware.sorter.getPosition() != hardware.intakePos[2] && pathTimer.milliseconds() > 1000) {
-                    hardware.sorter.setPosition(hardware.intakePos[2]);
-                } else if (pathTimer.milliseconds() > 2000) {
-                    follower.followPath(paths.Intake13,true);
+            case 5: // Intake Second Artifact
+                if (hardware.sorter.getPosition() != hardware.intakePos[1] && pathTimer.milliseconds() > 1250) {
+                    hardware.sorter.setPosition(hardware.intakePos[1]);
+                } else if (pathTimer.milliseconds() > 2500) {
+                    follower.followPath(paths.Intake12, true);
                     setPathState(6);
                 }
                 break;
-            case 6: // Move to Launch
-                if(pathTimer.milliseconds() > 1000) {
-                    hardware.launcherLeft.setVelocity(1170);
-                    hardware.launcherRight.setVelocity(1170);
-                    follower.followPath(paths.Shoot1,true);
+            case 6: // Intake Third Artifact
+                if(hardware.sorter.getPosition() != hardware.intakePos[2] && pathTimer.milliseconds() > 1250) {
+                    hardware.sorter.setPosition(hardware.intakePos[2]);
+                } else if (pathTimer.milliseconds() > 2500) {
+                    follower.followPath(paths.Intake13,true);
                     setPathState(7);
                 }
                 break;
-            case 7: // Launch Artifacts
+            case 7: // Move to Launch
+                if(pathTimer.milliseconds() > 1250) {
+                    hardware.sorter.setPosition(hardware.outtakePos[2]);
+                    hardware.launcherLeft.setVelocity(1200);
+                    hardware.launcherRight.setVelocity(1200);
+                    follower.followPath(paths.Shoot1,true);
+                    setPathState(8);
+                }
+                break;
+            case 8: // Launch Artifacts
                 if (sorterPos > 0) {
                     launch();
                 } else {
-                    launchAndSetPathState(8);
+                    launchAndSetPathState(9);
                 }
                 break;
-            case 8: // Cleanup and End
+            case 9: // Cleanup and End
                 hardware.launcherLeft.setVelocity(0);
                 hardware.launcherRight.setVelocity(0);
-                follower.followPath(paths.Align2,true);
+                follower.followPath(paths.Exit,true);
                 setPathState(-1);
                 break;
-            case 9:
-                if(!follower.isBusy()) {
-                    follower.followPath(paths.Intake21,true);
-                    setPathState(10);
-                }
-                break;
-            case 10:
-                if(!follower.isBusy()) {
-                    follower.followPath(paths.Intake22,true);
-                    setPathState(11);
-                }
-                break;
-            case 11:
-                if(!follower.isBusy()) {
-                    follower.followPath(paths.Intake23,true);
-                    setPathState(12);
-                }
-                break;
-            case 12:
-                if(!follower.isBusy()) {
-                    follower.followPath(paths.Shoot2,true);
-                    setPathState(13);
-                }
-                break;
-            case 14:
-                if(!follower.isBusy()) {
-                    follower.followPath(paths.Align3,true);
-                    setPathState(15);
-                }
-                break;
-            case 15:
-                if(!follower.isBusy()) {
-                    follower.followPath(paths.Intake31,true);
-                    setPathState(16);
-                }
-                break;
-            case 16:
-                if(!follower.isBusy()) {
-                    follower.followPath(paths.Intake32,true);
-                    setPathState(17);
-                }
-                break;
-            case 17:
-                if(!follower.isBusy()) {
-                    follower.followPath(paths.Intake33,true);
-                    setPathState(18);
-                }
-                break;
-            case 18:
-                if(!follower.isBusy()) {
-                    follower.followPath(paths.Shoot3,true);
-                    setPathState(19);
-                }
-                break;
-            case 19:
-                if (!follower.isBusy()) {
-                    follower.followPath(paths.Exit,true);
-                    setPathState(-1);
-                }
+            default:
+                requestOpModeStop();
                 break;
         }
     }
 
     public void launch() {
-        if (hardware.launcherLeft.getVelocity() < 1150) return;
+        if (hardware.launcherLeft.getVelocity() < 1180) return;
         switch (launchProgress) {
             case 0:
                 hardware.intake.setPower(0.5);
@@ -410,7 +364,7 @@ public class AutoGoalBlue extends LinearOpMode {
                 launchProgress = 1;
                 break;
             case 1:
-                if (launchTimer.milliseconds() > 1000) {
+                if (launchTimer.milliseconds() > 1250) {
                     hardware.intake.setPower(0);
                     hardware.outtakeTransferLeft.setPosition(hardware.liftPos[1]);
                     hardware.outtakeTransferRight.setPosition(1 - hardware.liftPos[1]);
@@ -419,7 +373,7 @@ public class AutoGoalBlue extends LinearOpMode {
                 }
                 break;
             case 2:
-                if (launchTimer.milliseconds() > 1000) {
+                if (launchTimer.milliseconds() > 750) {
                     hardware.outtakeTransferLeft.setPosition(hardware.liftPos[0]);
                     hardware.outtakeTransferRight.setPosition(1 - hardware.liftPos[0]);
                     launchTimer.reset();
@@ -437,7 +391,7 @@ public class AutoGoalBlue extends LinearOpMode {
     }
 
     public void launchAndSetPathState(int state) {
-        if (hardware.launcherLeft.getVelocity() < 1150) return;
+        if (hardware.launcherLeft.getVelocity() < 1180) return;
         switch (launchProgress) {
             case 0:
                 hardware.intake.setPower(0.5);
@@ -446,7 +400,7 @@ public class AutoGoalBlue extends LinearOpMode {
                 launchProgress = 1;
                 break;
             case 1:
-                if (launchTimer.milliseconds() > 1000) {
+                if (launchTimer.milliseconds() > 1500) {
                     hardware.intake.setPower(0);
                     hardware.outtakeTransferLeft.setPosition(hardware.liftPos[1]);
                     hardware.outtakeTransferRight.setPosition(1 - hardware.liftPos[1]);
