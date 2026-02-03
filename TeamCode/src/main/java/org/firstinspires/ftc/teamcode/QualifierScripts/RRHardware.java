@@ -136,7 +136,7 @@ public class RRHardware{
         intake.setPower(1);
         intakeTimer.reset();
         while(intakeTimer.milliseconds() < 2000 && detectFilled() == 0) {
-            telemetry.addLine("Looking for ball");
+            //telemetry.addLine("Looking for ball");
         }
         sorterContents[sorterPos] = detectFilled();
 
@@ -172,71 +172,29 @@ public class RRHardware{
         intake.setPower(1);
     }
 
-    public void tryIntake(boolean button) {
-        // check if intake button is being pressed and not currently intaking
-        if (button && !intaking) {
-            // set sorter position
-            for (int i = 0; i < 3; i++) {
-                //if spot is empty, set to that pos
-                if (sorterContents[i] == 0) {
-                    stopLaunch();
-
-                    intaking = true;
-                    intake.setPower(1);
-
-                    sorter.setPosition(intakePos[i]);
-                    currentPos = i;
-                    intakeTimer.reset();
-
-                    break;
-                }
-            }
-        }
-        if (intaking && intakeTimer.milliseconds() > 1000) {
-            byte guess = detectFilled();
-            if (guess == 0) return;
-            //set current sorter pos to color-sensor-detected color
-            sorterContents[currentPos] = guess;
-            currentPos = (currentPos + 2) % 3;
-            //change to outtake
-            sorter.setPosition(outtakePos[currentPos]);
-
-
-            // treat this as a loop
-            // try to go to the artifact (maybe split int tryIntakePurple and tryIntakeGreen)
-            // check if intaking was completed -> store color at position
-        }
-
-    }
 
     public void stopLaunch() {
         outtakeTransferLeft.setPosition(liftPos[0]);
         outtakeTransferRight.setPosition(1-liftPos[0]);
         launcherLeft.setVelocity(0);
         launcherRight.setVelocity(0);
-        launchingPurple = false;
-        launchingGreen = false;
     }
 
     // NOTE: if the color is not in the
     @SuppressLint("SuspiciousIndentation")
     public void tryLaunch(boolean button, int color, int tps) { // 1=purple, 2=green, other=any color
-        sleep(1000); //prev 200
-        if (button && !(launchingPurple || launchingGreen)) { // on first button press
             // check if sorter has purple
             for (int i = currentPos; i < currentPos + 3; i++) { // for every sorter position starting at the current one
                 //if position has purple
                 if (sorterContents[i % 3] != 0 && (sorterContents[i % 3] == color || color == 0)) {
-                   stopLaunch();
+                   //stopLaunch();
                    intake.setPower(1);
 //                   stopIntake();
 
-                    launchingPurple = sorterContents[i % 3] == 1;
-                    launchingGreen = sorterContents[i % 3] == 2;
 
                     // TODO: set velocity based on apriltag distance
-                    launcherLeft.setVelocity(tps + 20);
-                    launcherRight.setVelocity(tps + 20);
+                    //launcherLeft.setVelocity(tps + 20);
+                    //launcherRight.setVelocity(tps + 20);
 
                     targetTps = tps;
 
@@ -247,20 +205,20 @@ public class RRHardware{
                     break;
                 }
             }
-        }
 
-        sleep(1500); //prev 600
+        sleep(500); //prev 600
         intake.setPower(0);
        // while (launcherLeft.getVelocity() < targetTps);
 //        while ((launchingPurple || launchingGreen) && launcherLeft.getVelocity() > targetTps && outtakeTransferLeft.getPosition() != liftPos[1]) {
-            outtakeTransferLeft.setPosition(liftPos[1]); //launch here
-            outtakeTransferRight.setPosition(1-liftPos[1]);
-            sorterContents[currentPos] = 0;
+        outtakeTransferLeft.setPosition(liftPos[1]); //launch here
+        outtakeTransferRight.setPosition(1-liftPos[1]);
+        sleep(1000);
+        outtakeTransferLeft.setPosition(liftPos[0]); //launch here
+        outtakeTransferRight.setPosition(1-liftPos[0]);
+        sorterContents[currentPos] = 0;
     //}
 
-        sleep(1000);
 //        while (outtakeTransferLeft.getPosition() == liftPos[1]) {
-            stopLaunch();
 
 //        }
     }

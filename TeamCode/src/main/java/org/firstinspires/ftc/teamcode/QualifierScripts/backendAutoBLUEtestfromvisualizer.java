@@ -293,7 +293,7 @@ public class backendAutoBLUEtestfromvisualizer extends OpMode {
                 if (!follower.isBusy()) {
                     follower.followPath(startForward, true);
                     follower.followPath(fFirstPickup1, true);
-                    rrHardware.doIntakeGreen();
+                    rrHardware.doIntake((byte)0);
                     sleep(4000);
                     // rrHardware.intake1(); //make sure this doesn't stop other functions
                     setPathState(pathState.PICKUP2);
@@ -303,7 +303,7 @@ public class backendAutoBLUEtestfromvisualizer extends OpMode {
             case PICKUP2:
                 if (!follower.isBusy()) {
                     follower.followPath(fp1SecondPickup1);
-                    rrHardware.doIntakePurple1();
+                    rrHardware.doIntake((byte)1);
                     sleep(4000);
                     setPathState(pathState.PICKUP3);
                 }
@@ -312,7 +312,7 @@ public class backendAutoBLUEtestfromvisualizer extends OpMode {
             case PICKUP3:
                 if (!follower.isBusy()) {
                     follower.followPath(sp1ThirdPickup1);
-                    rrHardware.doIntakePurple2();
+                    rrHardware.doIntake((byte)2);
                     sleep(4000);
                     rrHardware.dontFallOut();
                     setPathState(pathState.PICKUPTOSHOOT);

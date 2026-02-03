@@ -150,14 +150,14 @@ public class backendAutoBLUE extends LinearOpMode {
                         motif = "ppg";
                     }
 
-                    telemetry.addData("tag found", id);
-                    telemetry.addData("motif", motif);
-
-                    telemetry.update();
+//                    telemetry.addData("tag found", id);
+//                    telemetry.addData("motif", motif);
+//
+//                    telemetry.update();
 
                 } else {
-                    telemetry.addLine("No apriltag found");
-                    telemetry.update();
+//                    telemetry.addLine("No apriltag found");
+//                    telemetry.update();
                 }
 
                 telemetry.addData("tag mighta been found", id);
@@ -280,7 +280,11 @@ public class backendAutoBLUE extends LinearOpMode {
         rrHardware.sorterContents[0] = 1;
         rrHardware.sorterContents[1] = 1; //purple
         rrHardware.sorterContents[2] = 2; //green
-
+        launcherLeft.setVelocity(pp + 20);
+        launcherRight.setVelocity(pp + 20);
+        while(launcherLeft.getVelocity() < pp) {
+            //waitin until
+        }
         if (motif == "gpp") { //gpp (1150 close, 1350 far)
             rrHardware.tryLaunch(true, 2, (int)gg);
             rrHardware.tryLaunch(true, 1, (int)pp);
@@ -305,6 +309,7 @@ public class backendAutoBLUE extends LinearOpMode {
             rrHardware.tryLaunch(true, 1, (int)pp);
             rrHardware.tryLaunch(true, 1, (int)pp);
         }
+        rrHardware.stopIntake();
     }
 
     @Override
@@ -387,8 +392,17 @@ public class backendAutoBLUE extends LinearOpMode {
             if (pathState == pathState.END) {
                 return;
             }
-
-         }}}}
+        }
+            telemetry.addData("path state", pathState.toString());
+            telemetry.addData("x", follower.getPose().getX());
+            telemetry.addData("y", follower.getPose().getY());
+            telemetry.addData("heading", follower.getPose().getHeading());
+            telemetry.addData("path time", pathTimer.getElapsedTimeSeconds());
+            telemetry.addData("SOrter pso", rrHardware.sorter.getPosition());
+            telemetry.update();
+        }
+    }
+}
 
 /* process:
     1. Start pose
