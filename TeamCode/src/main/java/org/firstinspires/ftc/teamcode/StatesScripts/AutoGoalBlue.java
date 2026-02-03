@@ -25,8 +25,10 @@ public class AutoGoalBlue extends LinearOpMode {
     private int pathState; // Current autonomous path state (state machine)
     private Paths paths; // Paths defined in the Paths class
     private ElapsedTime pathTimer;
+    private ElapsedTime launchTimer;
     private Hardware hardware;
     private byte sorterPos;
+    private byte launchProgress;
 
 
     @Override
@@ -34,8 +36,10 @@ public class AutoGoalBlue extends LinearOpMode {
         hardware = new Hardware(hardwareMap);
 
         sorterPos = 2;
+        launchProgress = 0;
 
         pathTimer = new ElapsedTime();
+        launchTimer = new ElapsedTime();
 
         panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
@@ -52,6 +56,7 @@ public class AutoGoalBlue extends LinearOpMode {
 
 
         hardware.launcherTurn.setPosition(0.5);
+        hardware.sorter.setPosition(hardware.outtakePos[2]);
 
 
         while (opModeIsActive()) {
@@ -262,62 +267,75 @@ public class AutoGoalBlue extends LinearOpMode {
     }
 
     public void autonomousPathUpdate() {
+        if (follower.isBusy()) return;
         switch (pathState) {
-            case 0:
+            case 0: // Start Launcher and Go to Launch
                 follower.followPath(paths.Shoot0);
                 hardware.launcherLeft.setVelocity(1170);
                 hardware.launcherRight.setVelocity(1170);
                 hardware.sorter.setPosition(hardware.outtakePos[2]);
+                sorterPos = 2;
+                launchProgress = 0;
                 setPathState(1);
                 break;
-            case 1:
-                launchAndSetState(2);
-                break;
-            case 2:
-                if(!follower.isBusy()) {
-                    follower.followPath(paths.Align1,true);
-                    hardware.intake.setPower(1);
-                    setPathState(3);
+            case 1: // Launch Artifacts
+                if (sorterPos > 0) {
+                    launch();
+                } else {
+                    launchAndSetPathState(2);
                 }
                 break;
-            case 3:
-                if(!follower.isBusy()) {
+            case 2: // Align to Intake
+                hardware.launcherLeft.setVelocity(0);
+                hardware.launcherRight.setVelocity(0);
+                follower.followPath(paths.Align1,true);
+                hardware.intake.setPower(1);
+                setPathState(3);
+                break;
+            case 3: // Intake First Artifact
+                if (hardware.sorter.getPosition() != hardware.intakePos[0]) {
                     hardware.sorter.setPosition(hardware.intakePos[0]);
-                    sleep(1000);
-                    follower.followPath(paths.Intake11,true);
+                } else if (pathTimer.milliseconds() > 1000) {
+                    follower.followPath(paths.Intake11, true);
                     setPathState(4);
                 }
                 break;
-            case 4:
-                if(!follower.isBusy() && pathTimer.milliseconds() > 1000) {
+            case 4: // Intake Second Artifact
+                if (hardware.sorter.getPosition() != hardware.intakePos[1] && pathTimer.milliseconds() > 1000) {
                     hardware.sorter.setPosition(hardware.intakePos[1]);
-                    sleep(1000);
-                    follower.followPath(paths.Intake12,true);
+                } else if (pathTimer.milliseconds() > 2000) {
+                    follower.followPath(paths.Intake12, true);
                     setPathState(5);
                 }
                 break;
-            case 5:
-                if(!follower.isBusy() && pathTimer.milliseconds() > 1000) {
+            case 5: // Intake Third Artifact
+                if(hardware.sorter.getPosition() != hardware.intakePos[2] && pathTimer.milliseconds() > 1000) {
                     hardware.sorter.setPosition(hardware.intakePos[2]);
-                    sleep(1000);
+                } else if (pathTimer.milliseconds() > 2000) {
                     follower.followPath(paths.Intake13,true);
                     setPathState(6);
                 }
                 break;
-            case 6:
-                if(!follower.isBusy() && pathTimer.milliseconds() > 1000) {
+            case 6: // Move to Launch
+                if(pathTimer.milliseconds() > 1000) {
+                    hardware.launcherLeft.setVelocity(1170);
+                    hardware.launcherRight.setVelocity(1170);
                     follower.followPath(paths.Shoot1,true);
                     setPathState(7);
                 }
                 break;
-            case 7:
-                launchAndSetState(-1);
-                break;
-            case 8:
-                if(!follower.isBusy()) {
-                    follower.followPath(paths.Align2,true);
-                    setPathState(9);
+            case 7: // Launch Artifacts
+                if (sorterPos > 0) {
+                    launch();
+                } else {
+                    launchAndSetPathState(8);
                 }
+                break;
+            case 8: // Cleanup and End
+                hardware.launcherLeft.setVelocity(0);
+                hardware.launcherRight.setVelocity(0);
+                follower.followPath(paths.Align2,true);
+                setPathState(-1);
                 break;
             case 9:
                 if(!follower.isBusy()) {
@@ -382,29 +400,76 @@ public class AutoGoalBlue extends LinearOpMode {
         }
     }
 
-    public void launchAndSetState(int state) {
-        if (follower.isBusy() || hardware.launcherLeft.getVelocity() < 1150) return;
-        hardware.intake.setPower(0.5);
-        hardware.sorter.setPosition(hardware.outtakePos[sorterPos]);
-        sleep(1000);
-        hardware.intake.setPower(0);
-        if (sorterPos > 0) {
-            hardware.outtakeTransferLeft.setPosition(hardware.liftPos[1]);
-            hardware.outtakeTransferRight.setPosition(1 - hardware.liftPos[1]);
-            sleep(1000);
-            hardware.outtakeTransferLeft.setPosition(hardware.liftPos[0]);
-            hardware.outtakeTransferRight.setPosition(1 - hardware.liftPos[0]);
-            sleep(400);
-            sorterPos--;
-        } else {
-            hardware.outtakeTransferLeft.setPosition(hardware.liftPos[1]);
-            hardware.outtakeTransferRight.setPosition(1 - hardware.liftPos[1]);
-            sleep(1000);
-            hardware.outtakeTransferLeft.setPosition(hardware.liftPos[0]);
-            hardware.outtakeTransferRight.setPosition(1 - hardware.liftPos[0]);
-            sorterPos = 2;
-            sleep(400);
-            setPathState(state);
+    public void launch() {
+        if (hardware.launcherLeft.getVelocity() < 1150) return;
+        switch (launchProgress) {
+            case 0:
+                hardware.intake.setPower(0.5);
+                hardware.sorter.setPosition(hardware.outtakePos[sorterPos]);
+                launchTimer.reset();
+                launchProgress = 1;
+                break;
+            case 1:
+                if (launchTimer.milliseconds() > 1000) {
+                    hardware.intake.setPower(0);
+                    hardware.outtakeTransferLeft.setPosition(hardware.liftPos[1]);
+                    hardware.outtakeTransferRight.setPosition(1 - hardware.liftPos[1]);
+                    launchTimer.reset();
+                    launchProgress = 2;
+                }
+                break;
+            case 2:
+                if (launchTimer.milliseconds() > 1000) {
+                    hardware.outtakeTransferLeft.setPosition(hardware.liftPos[0]);
+                    hardware.outtakeTransferRight.setPosition(1 - hardware.liftPos[0]);
+                    launchTimer.reset();
+                    launchProgress = 3;
+                }
+                break;
+            case 3:
+                if (launchTimer.milliseconds() > 400) {
+                    sorterPos += 2;
+                    sorterPos %= 3;
+                    launchProgress = 0;
+                }
+                break;
+        }
+    }
+
+    public void launchAndSetPathState(int state) {
+        if (hardware.launcherLeft.getVelocity() < 1150) return;
+        switch (launchProgress) {
+            case 0:
+                hardware.intake.setPower(0.5);
+                hardware.sorter.setPosition(hardware.outtakePos[sorterPos]);
+                launchTimer.reset();
+                launchProgress = 1;
+                break;
+            case 1:
+                if (launchTimer.milliseconds() > 1000) {
+                    hardware.intake.setPower(0);
+                    hardware.outtakeTransferLeft.setPosition(hardware.liftPos[1]);
+                    hardware.outtakeTransferRight.setPosition(1 - hardware.liftPos[1]);
+                    launchTimer.reset();
+                    launchProgress = 2;
+                }
+                break;
+            case 2:
+                if (launchTimer.milliseconds() > 1000) {
+                    hardware.outtakeTransferLeft.setPosition(hardware.liftPos[0]);
+                    hardware.outtakeTransferRight.setPosition(1 - hardware.liftPos[0]);
+                    launchTimer.reset();
+                    launchProgress = 3;
+                }
+                break;
+            case 3:
+                if (launchTimer.milliseconds() > 400) {
+                    sorterPos += 2;
+                    sorterPos %= 3;
+                    launchProgress = 0;
+                    setPathState(state);
+                }
+                break;
         }
     }
 
