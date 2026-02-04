@@ -30,7 +30,7 @@ public class odoteleop {
 
     public odoteleop(HardwareMap hardwareMap) {
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(56, 9, 90)); // remove later
+        follower.setStartingPose(new Pose(36, 84, Math.toRadians(135))); // remove later
         hardware = new Hardware(hardwareMap);
     }
 
@@ -38,8 +38,8 @@ public class odoteleop {
 
         follower.update();
 
-        int goalX = (isBlue) ? 12 : 132;
-        int goalY = 132;
+        int goalX = (isBlue) ? 0 : 144;
+        int goalY = 144;
 
         Pose pose = follower.getPose();
 

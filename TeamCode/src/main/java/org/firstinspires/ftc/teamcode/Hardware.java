@@ -31,7 +31,8 @@ public class Hardware {
 
     public int currentPos = 0; // 0-2
     int targetTps = 0; // protect launcher tps from override
-    ElapsedTime intakeTimer, intakeWait = new ElapsedTime();
+    ElapsedTime intakeTimer = new ElapsedTime();
+    ElapsedTime intakeWait = new ElapsedTime();
     public ElapsedTime launchTimer = new ElapsedTime();
 
     // initialize flags
@@ -98,7 +99,6 @@ public class Hardware {
                     sorter.setPosition(intakePos[i]);
                     currentPos = i;
                     intakeTimer.reset();
-
                     break;
                 }
             }
@@ -106,18 +106,19 @@ public class Hardware {
         if (intaking && intakeTimer.milliseconds() > 1000) {
             byte guess = detectFilled();
             if (guess == 0) return;
-            if(guess != 0) {
-                foundBall = true;
-                intakeWait.reset();
-            }
+//            if(!foundBall) {
+//                intakeWait.reset();
+//                foundBall = true;
+//            }
+
             //set current sorter pos to color-sensor-detected color
             sorterContents[currentPos] = guess;
             currentPos = (currentPos + 2) % 3;
             //change to outtake
             sorter.setPosition(outtakePos[currentPos]);
-            if(intakeWait.milliseconds()>350) {
+//            if(intakeWait.milliseconds()>350) {
                 stopIntake();
-            }
+//            }
             // treat this as a loop
             // try to go to the artifact (maybe split int tryIntakePurple and tryIntakeGreen)
             // check if intaking was completed -> store color at position
