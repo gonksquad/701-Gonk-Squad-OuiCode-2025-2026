@@ -36,7 +36,13 @@ public class AutoGoalBlue extends LinearOpMode {
     private byte launchProgress;
     private LLResult result;
     private int obeliskId;
-    private int limelightAttempts = 0;
+    /*  ID|ORDER|
+        21  GPP
+        22  PGP
+        23  PPG
+    */
+    private int sorterInitial;
+    private int limelightAttempts;
     private ArrayList<String> log;
 
     @Override
@@ -49,6 +55,8 @@ public class AutoGoalBlue extends LinearOpMode {
 
         sorterPos = 2;
         launchProgress = 0;
+        limelightAttempts = 0;
+        sorterInitial = 0;
 
         pathTimer = new ElapsedTime();
         launchTimer = new ElapsedTime();
@@ -71,6 +79,7 @@ public class AutoGoalBlue extends LinearOpMode {
         hardware.sorter.setPosition(hardware.outtakePos[2]);
         hardware.limelightTurn.setPosition(0.6);
 
+        hardware.limelight.setPollRateHz(64);
         hardware.limelight.pipelineSwitch(0);
         obeliskId = -1;
 
@@ -183,13 +192,16 @@ public class AutoGoalBlue extends LinearOpMode {
                 hardware.launcherLeft.setVelocity(1200);
                 hardware.launcherRight.setVelocity(1200);
                 hardware.sorter.setPosition(hardware.outtakePos[2]);
-                sorterPos = 2;
+                sorterPos = 0;
                 launchProgress = 0;
                 setPathState(1);
                 break;
             case 1:
                 if (pathTimer.milliseconds() < 500) break;
-                if (limelightAttempts == 0) log.add("Attempting to Fetch Result...");
+                if (limelightAttempts == 0) {
+                    log.add("Attempting to Fetch Result...");
+                    hardware.limelight.start();
+                }
                 result = hardware.limelight.getLatestResult();
                 if (result != null && result.isValid()) { //add time elapsed too?
                     log.add("Found April Tags");
@@ -208,13 +220,17 @@ public class AutoGoalBlue extends LinearOpMode {
                     log.add("Failed to Find April Tags. Result is " + (result == null ? "null" : "invalid"));
                 }
                 limelightAttempts++;
-                if (limelightAttempts > 16) setPathState(2);
+                if (limelightAttempts > 16) {
+                    hardware.limelight.stop();
+                    sorterPos = (byte)((obeliskId + 2) % 3);
+                    setPathState(2);
+                }
                 break;
             case 2: // Launch Artifacts
-                if (sorterPos > 0) {
-                    launch();
-                } else {
+                if (sorterPos == obeliskId % 3) {
                     launchAndSetPathState(3);
+                } else {
+                    launch();
                 }
                 break;
             case 3: // Align to Intake
@@ -258,10 +274,10 @@ public class AutoGoalBlue extends LinearOpMode {
                 }
                 break;
             case 8: // Launch Artifacts
-                if (sorterPos > 0) {
-                    launch();
-                } else {
+                if (sorterPos == obeliskId % 3) {
                     launchAndSetPathState(9);
+                } else {
+                    launch();
                 }
                 break;
             case 9: // Cleanup and End
@@ -340,7 +356,7 @@ public class AutoGoalBlue extends LinearOpMode {
                 break;
             case 3:
                 if (launchTimer.milliseconds() > 400) {
-                    sorterPos += 2;
+                    sorterPos++;
                     sorterPos %= 3;
                     launchProgress = 0;
                     setPathState(state);
