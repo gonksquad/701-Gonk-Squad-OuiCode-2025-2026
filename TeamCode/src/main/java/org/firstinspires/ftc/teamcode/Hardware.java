@@ -158,7 +158,7 @@ public class Hardware {
                     launcherRight.setVelocity(tps + 20);
 
                     targetTps = tps;
-                    intake.setPower(0.75);
+                    intake.setPower(0.9);
                     currentPos = i % 3;
                     sorter.setPosition(outtakePos[currentPos]);
                     launchTimer.reset();

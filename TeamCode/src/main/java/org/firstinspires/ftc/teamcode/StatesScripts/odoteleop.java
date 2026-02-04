@@ -38,8 +38,8 @@ public class odoteleop {
 
         follower.update();
 
-        int goalX = (isBlue) ? 0 : 144;
-        int goalY = 144;
+        int goalX = (isBlue) ? 12 : 132;
+        int goalY = 132;
 
         Pose pose = follower.getPose();
 
