@@ -266,7 +266,7 @@ public class AutoGoalBlue extends LinearOpMode {
                 break;
             case 7: // Move to Launch
                 if(pathTimer.milliseconds() > 1250) {
-                    hardware.sorter.setPosition(hardware.outtakePos[2]);
+                    hardware.sorter.setPosition(hardware.outtakePos[sorterPos]);
                     hardware.launcherLeft.setVelocity(1200);
                     hardware.launcherRight.setVelocity(1200);
                     follower.followPath(paths.Shoot1,true);
@@ -274,6 +274,7 @@ public class AutoGoalBlue extends LinearOpMode {
                 }
                 break;
             case 8: // Launch Artifacts
+                if (pathTimer.milliseconds() < 1500) break;
                 if (sorterPos == obeliskId % 3) {
                     launchAndSetPathState(9);
                 } else {
@@ -302,7 +303,7 @@ public class AutoGoalBlue extends LinearOpMode {
                 launchProgress = 1;
                 break;
             case 1:
-                if (launchTimer.milliseconds() > 1250) {
+                if (launchTimer.milliseconds() > 1500) {
                     hardware.intake.setPower(0);
                     hardware.outtakeTransferLeft.setPosition(hardware.liftPos[1]);
                     hardware.outtakeTransferRight.setPosition(1 - hardware.liftPos[1]);
@@ -347,7 +348,7 @@ public class AutoGoalBlue extends LinearOpMode {
                 }
                 break;
             case 2:
-                if (launchTimer.milliseconds() > 1000) {
+                if (launchTimer.milliseconds() > 750) {
                     hardware.outtakeTransferLeft.setPosition(hardware.liftPos[0]);
                     hardware.outtakeTransferRight.setPosition(1 - hardware.liftPos[0]);
                     launchTimer.reset();
@@ -356,7 +357,7 @@ public class AutoGoalBlue extends LinearOpMode {
                 break;
             case 3:
                 if (launchTimer.milliseconds() > 400) {
-                    sorterPos++;
+                    sorterPos += 2;
                     sorterPos %= 3;
                     launchProgress = 0;
                     setPathState(state);
