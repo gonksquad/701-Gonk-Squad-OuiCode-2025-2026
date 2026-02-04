@@ -1,6 +1,7 @@
 
 package org.firstinspires.ftc.teamcode.StatesScripts;
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -18,6 +19,9 @@ import com.pedropathing.paths.PathChain;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Autonomous(name="Goal Blue")
 @Configurable // Panels
 public class AutoGoalBlue extends LinearOpMode {
@@ -30,15 +34,29 @@ public class AutoGoalBlue extends LinearOpMode {
     private Hardware hardware;
     private byte sorterPos;
     private byte launchProgress;
-    private LLResult obeliskId;
-
+    private LLResult result;
+    private int obeliskId;
+    /*  ID|ORDER|
+        21  GPP
+        22  PGP
+        23  PPG
+    */
+    private int sorterInitial;
+    private int limelightAttempts;
+    private ArrayList<String> log;
 
     @Override
     public void runOpMode() throws InterruptedException {
         hardware = new Hardware(hardwareMap);
 
+        log = new ArrayList<String>();
+
+        log.add("Log:");
+
         sorterPos = 2;
         launchProgress = 0;
+        limelightAttempts = 0;
+        sorterInitial = 0;
 
         pathTimer = new ElapsedTime();
         launchTimer = new ElapsedTime();
@@ -59,10 +77,11 @@ public class AutoGoalBlue extends LinearOpMode {
 
         hardware.launcherTurn.setPosition(0.5);
         hardware.sorter.setPosition(hardware.outtakePos[2]);
-        hardware.limelightTurn.setPosition(0.75);
+        hardware.limelightTurn.setPosition(0.6);
 
+        hardware.limelight.setPollRateHz(64);
         hardware.limelight.pipelineSwitch(0);
-        obeliskId = hardware.limelight.getLatestResult();
+        obeliskId = -1;
 
         while (opModeIsActive()) {
             follower.update(); // Update Pedro Pathing
@@ -74,6 +93,9 @@ public class AutoGoalBlue extends LinearOpMode {
             panelsTelemetry.debug("Y", follower.getPose().getY());
             panelsTelemetry.debug("Heading", follower.getPose().getHeading());
             panelsTelemetry.debug("Obelisk Id", obeliskId);
+            for (String str : log) {
+                panelsTelemetry.addLine(str);
+            }
             panelsTelemetry.update(telemetry);
         }
     }
@@ -87,16 +109,6 @@ public class AutoGoalBlue extends LinearOpMode {
         public PathChain Intake12;
         public PathChain Intake13;
         public PathChain Shoot1;
-        public PathChain Align2;
-        public PathChain Intake21;
-        public PathChain Intake22;
-        public PathChain Intake23;
-        public PathChain Shoot2;
-        public PathChain Align3;
-        public PathChain Intake31;
-        public PathChain Intake32;
-        public PathChain Intake33;
-        public PathChain Shoot3;
         public PathChain Exit;
 
         public Paths(Follower follower) {
@@ -104,19 +116,19 @@ public class AutoGoalBlue extends LinearOpMode {
                             new BezierLine(
                                     new Pose(20.000, 122.000),
 
-                                    new Pose(60.000, 84.000)
+                                    new Pose(54.000, 90.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(144), Math.toRadians(135))
 
                     .build();
 
             Align1 = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    new Pose(60.000, 84.000),
-
+                            new BezierCurve(
+                                    new Pose(54.000, 90.000),
+                                    new Pose(54.000, 84.000),
                                     new Pose(48.000, 84.000)
                             )
-                    ).setTangentHeadingInterpolation()
+                    ).setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
 
                     .build();
 
@@ -124,7 +136,7 @@ public class AutoGoalBlue extends LinearOpMode {
                             new BezierLine(
                                     new Pose(48.000, 84.000),
 
-                                    new Pose(38.000, 84.000)
+                                    new Pose(40.000, 84.000)
                             )
                     ).setTangentHeadingInterpolation()
 
@@ -132,9 +144,9 @@ public class AutoGoalBlue extends LinearOpMode {
 
             Intake12 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(38.000, 84.000),
+                                    new Pose(40.000, 84.000),
 
-                                    new Pose(32.000, 84.000)
+                                    new Pose(30.000, 84.000)
                             )
                     ).setTangentHeadingInterpolation()
 
@@ -142,7 +154,7 @@ public class AutoGoalBlue extends LinearOpMode {
 
             Intake13 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(32.000, 84.000),
+                                    new Pose(29.000, 84.000),
 
                                     new Pose(20.000, 84.000)
                             )
@@ -154,107 +166,7 @@ public class AutoGoalBlue extends LinearOpMode {
                             new BezierLine(
                                     new Pose(20.000, 84.000),
 
-                                    new Pose(60.000, 84.000)
-                            )
-                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
-
-                    .build();
-
-            Align2 = follower.pathBuilder().addPath(
-                            new BezierCurve(
-                                    new Pose(60.000, 84.000),
-                                    new Pose(60.000, 60.000),
-                                    new Pose(48.000, 60.000)
-                            )
-                    ).setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
-
-                    .build();
-
-            Intake21 = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    new Pose(48.000, 60.000),
-
-                                    new Pose(36.000, 60.000)
-                            )
-                    ).setTangentHeadingInterpolation()
-
-                    .build();
-
-            Intake22 = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    new Pose(36.000, 60.000),
-
-                                    new Pose(31.000, 60.000)
-                            )
-                    ).setTangentHeadingInterpolation()
-
-                    .build();
-
-            Intake23 = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    new Pose(31.000, 60.000),
-
-                                    new Pose(20.000, 60.000)
-                            )
-                    ).setTangentHeadingInterpolation()
-
-                    .build();
-
-            Shoot2 = follower.pathBuilder().addPath(
-                            new BezierCurve(
-                                    new Pose(20.000, 60.000),
-                                    new Pose(60.000, 60.000),
-                                    new Pose(60.000, 84.000)
-                            )
-                    ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
-
-                    .build();
-
-            Align3 = follower.pathBuilder().addPath(
-                            new BezierCurve(
-                                    new Pose(60.000, 84.000),
-                                    new Pose(60.000, 36.000),
-                                    new Pose(48.000, 36.000)
-                            )
-                    ).setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
-
-                    .build();
-
-            Intake31 = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    new Pose(48.000, 36.000),
-
-                                    new Pose(36.000, 36.000)
-                            )
-                    ).setTangentHeadingInterpolation()
-
-                    .build();
-
-            Intake32 = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    new Pose(36.000, 36.000),
-
-                                    new Pose(31.000, 36.000)
-                            )
-                    ).setTangentHeadingInterpolation()
-
-                    .build();
-
-            Intake33 = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    new Pose(31.000, 36.000),
-
-                                    new Pose(20.000, 36.000)
-                            )
-                    ).setTangentHeadingInterpolation()
-
-                    .build();
-
-            Shoot3 = follower.pathBuilder().addPath(
-                            new BezierCurve(
-                                    new Pose(20.000, 36.000),
-                                    new Pose(60.000, 36.000),
-                                    new Pose(60.000, 84.000)
+                                    new Pose(54.000, 90.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
 
@@ -262,7 +174,7 @@ public class AutoGoalBlue extends LinearOpMode {
 
             Exit = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(60.000, 84.000),
+                                    new Pose(54.000, 90.000),
 
                                     new Pose(36.000, 84.000)
                             )
@@ -280,19 +192,45 @@ public class AutoGoalBlue extends LinearOpMode {
                 hardware.launcherLeft.setVelocity(1200);
                 hardware.launcherRight.setVelocity(1200);
                 hardware.sorter.setPosition(hardware.outtakePos[2]);
-                sorterPos = 2;
+                sorterPos = 0;
                 launchProgress = 0;
                 setPathState(1);
                 break;
             case 1:
-                obeliskId = hardware.limelight.getLatestResult();
-                setPathState(2);
+                if (pathTimer.milliseconds() < 500) break;
+                if (limelightAttempts == 0) {
+                    log.add("Attempting to Fetch Result...");
+                    hardware.limelight.start();
+                }
+                result = hardware.limelight.getLatestResult();
+                if (result != null && result.isValid()) { //add time elapsed too?
+                    log.add("Found April Tags");
+                    List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
+
+                    for (LLResultTypes.FiducialResult fiducial : fiducials) {
+                        int id = fiducial.getFiducialId();
+                        log.add("AprilTag Detected: " + id);
+                        if (id >= 21 && id <= 23) {
+                            obeliskId = id;
+                            limelightAttempts = 99;
+                            break;
+                        }
+                    }
+                } else {
+                    log.add("Failed to Find April Tags. Result is " + (result == null ? "null" : "invalid"));
+                }
+                limelightAttempts++;
+                if (limelightAttempts > 16) {
+                    hardware.limelight.stop();
+                    sorterPos = (byte)((obeliskId + 2) % 3);
+                    setPathState(2);
+                }
                 break;
             case 2: // Launch Artifacts
-                if (sorterPos > 0) {
-                    launch();
-                } else {
+                if (sorterPos == obeliskId % 3) {
                     launchAndSetPathState(3);
+                } else {
+                    launch();
                 }
                 break;
             case 3: // Align to Intake
@@ -336,10 +274,10 @@ public class AutoGoalBlue extends LinearOpMode {
                 }
                 break;
             case 8: // Launch Artifacts
-                if (sorterPos > 0) {
-                    launch();
-                } else {
+                if (sorterPos == obeliskId % 3) {
                     launchAndSetPathState(9);
+                } else {
+                    launch();
                 }
                 break;
             case 9: // Cleanup and End
@@ -418,7 +356,7 @@ public class AutoGoalBlue extends LinearOpMode {
                 break;
             case 3:
                 if (launchTimer.milliseconds() > 400) {
-                    sorterPos += 2;
+                    sorterPos++;
                     sorterPos %= 3;
                     launchProgress = 0;
                     setPathState(state);
