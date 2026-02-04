@@ -34,51 +34,55 @@ public class odoteleop {
         hardware = new Hardware(hardwareMap);
     }
 
-    public String odoAimTurret(boolean isBlue, boolean aimLimelight) {
+    public String odoAimTurret(boolean autoAim, boolean isBlue, boolean aimLimelight) {
+        if(autoAim){
+            follower.update();
 
-        follower.update();
+            int goalX = (isBlue) ? 0 : 144;
+            int goalY = 144;
 
-        int goalX = (isBlue) ? 0 : 144;
-        int goalY = 144;
+            Pose pose = follower.getPose();
 
-        Pose pose = follower.getPose();
+            double angleOffset = pose.getHeading();
+            if(!isBlue) {
+                angleOffset -= 90;
+            }
 
-        double angleOffset = pose.getHeading();
-        if(!isBlue) {
-            angleOffset -= 90;
+
+            // -------- HEADING MATH --------
+
+            double targetAngle = Math.atan2(goalY - pose.getY(), goalX - pose.getX());
+
+            double theta = targetAngle - angleOffset;
+
+            theta = Math.toDegrees(theta);
+
+            while (theta > 180) theta -= 360;
+            while (theta < -180) theta += 360;
+
+            // Limit to what turret is allowed to rotate
+            theta = Math.max(-TURRET_MAX_DEGREES, Math.min(TURRET_MAX_DEGREES, theta));
+
+            // ------------------------------
+
+            // Convert turret angle to servo position
+            double servoScale = TURRET_MAX_DEGREES / SERVO_TOTAL_DEGREES;
+
+            double servoPos = TURRET_CENTER - (theta * servoScale / TURRET_MAX_DEGREES);
+
+            servoPos = Math.max(0, Math.min(1, servoPos));
+
+            hardware.launcherTurn.setPosition(servoPos);
+            if(aimLimelight) {
+                hardware.limelightTurn.setPosition(1-(hardware.launcherTurn.getPosition()/2));
+            }
+
+            return "heading: " + follower.getHeading()
+                    + ", pose: " + follower.getPose();
+        } else {
+            hardware.launcherTurn.setPosition(0.5f);
+            return "im lazy";
         }
-
-
-        // -------- HEADING MATH --------
-
-        double targetAngle = Math.atan2(goalY - pose.getY(), goalX - pose.getX());
-
-        double theta = targetAngle - angleOffset;
-
-        theta = Math.toDegrees(theta);
-
-        while (theta > 180) theta -= 360;
-        while (theta < -180) theta += 360;
-
-        // Limit to what turret is allowed to rotate
-        theta = Math.max(-TURRET_MAX_DEGREES, Math.min(TURRET_MAX_DEGREES, theta));
-
-        // ------------------------------
-
-        // Convert turret angle to servo position
-        double servoScale = TURRET_MAX_DEGREES / SERVO_TOTAL_DEGREES;
-
-        double servoPos = TURRET_CENTER - (theta * servoScale / TURRET_MAX_DEGREES);
-
-        servoPos = Math.max(0, Math.min(1, servoPos));
-
-        hardware.launcherTurn.setPosition(servoPos);
-        if(aimLimelight) {
-            hardware.limelightTurn.setPosition(1-(hardware.launcherTurn.getPosition()/2));
-        }
-
-        return "heading: " + follower.getHeading()
-                + ", pose: " + follower.getPose();
     }
 
     public double getOdoData(odoDataTypes odt) {
@@ -99,4 +103,11 @@ public class odoteleop {
         return 0;
     }
 
+    public void resetOdoPos(boolean isBlue){
+        if(isBlue) {
+            follower.setStartingPose(new Pose(16, 122, Math.toRadians(144)));
+        } else {
+            follower.setStartingPose(new Pose(144-16, 122, Math.toRadians(54)));
+        }
+    }
 }

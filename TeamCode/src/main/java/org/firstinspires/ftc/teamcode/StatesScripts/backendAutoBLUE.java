@@ -575,7 +575,7 @@ public class backendAutoBLUE extends LinearOpMode {
             if (getRuntime() < 30) {
                 follower.update();
                 statePathUpdate();
-                odoTeleop.odoAimTurret(true, false);
+                odoTeleop.odoAimTurret(true, true, false);
                 telemetry.addData("path state", pathState.toString());
                 telemetry.addData("x", follower.getPose().getX());
                 telemetry.addData("y", follower.getPose().getY());

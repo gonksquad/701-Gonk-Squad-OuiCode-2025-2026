@@ -18,6 +18,8 @@ public class StatesTeleBlue extends LinearOpMode {
     boolean prevA = false;
     boolean prevB = false;
     boolean slowMode = false;
+    boolean autoAim = true;
+
     /// touch sensor stuff is temp, just for testing
     TouchSensor limitLeft, limitRight;
 
@@ -102,6 +104,12 @@ public class StatesTeleBlue extends LinearOpMode {
                     hardware.stopIntake();
                     hardware.stopLaunch();
                 }
+                if(gamepad1.yWasPressed()){
+                    autoAim=!autoAim;
+                }
+                if(gamepad1.aWasPressed()){
+                    odoteleop.resetOdoPos(true);
+                }
                 // 1 = purple, 2 = green. did this so that 0 can be either to help drivers
                 hardware.tryLaunch(gamepad2.right_bumper, 1, 1150);
                 hardware.tryLaunch(gamepad2.right_trigger > 0.125, 1, 1350);
@@ -117,7 +125,7 @@ public class StatesTeleBlue extends LinearOpMode {
                 telemetry.addData("limelightpos", hardware.limelightTurn.getPosition());
                 //hardware.launchTimer.reset(); ///// THIS SINGLE LINE WAS WHY LAUNCHING DIDNT WORK :sob: :cool:
                 hardware.launcherTurn.setPosition(hardware.launcherTurn.getPosition()+gamepad2.left_stick_x/100f);
-                telemetry.addData("YURRRRR:    ", odoteleop.odoAimTurret(true, true));
+                telemetry.addData("YURRRRR:    ", odoteleop.odoAimTurret(autoAim, true, true));
                 telemetry.addData("robotX", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.X));
                 telemetry.addData("robotY", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.Y));
                 telemetry.addData("robotRot", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.HEADING));

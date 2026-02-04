@@ -18,6 +18,9 @@ public class StatesTeleRed extends LinearOpMode {
     boolean prevA = false;
     boolean prevB = false;
     boolean slowMode = false;
+    boolean autoAim = true;
+
+
     /// touch sensor stuff is temp, just for testing
     TouchSensor limitLeft, limitRight;
 
@@ -101,6 +104,12 @@ public class StatesTeleRed extends LinearOpMode {
                     hardware.sorter.setPosition(hardware.sorterOffset);
                 }
             } else {
+                if(gamepad1.yWasPressed()){
+                    autoAim=!autoAim;
+                }
+                if(gamepad1.aWasPressed()){
+                    odoteleop.resetOdoPos(true);
+                }
                 hardware.tryIntake(gamepad2.a);
                 if (gamepad2.b && !gamepad2.a && !gamepad2.right_bumper) {
                     hardware.stopIntake();
@@ -121,7 +130,7 @@ public class StatesTeleRed extends LinearOpMode {
                 telemetry.addData("limelightpos", hardware.limelightTurn.getPosition());
                 //hardware.launchTimer.reset();
                 hardware.launcherTurn.setPosition(hardware.launcherTurn.getPosition()+gamepad2.left_stick_x/100f);
-                telemetry.addData("YURRRRR:    ", odoteleop.odoAimTurret(false, true));
+                telemetry.addData("YURRRRR:    ", odoteleop.odoAimTurret(true, false, true));
                 telemetry.addData("robotX", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.X));
                 telemetry.addData("robotY", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.Y));
                 telemetry.addData("robotRot", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.HEADING));

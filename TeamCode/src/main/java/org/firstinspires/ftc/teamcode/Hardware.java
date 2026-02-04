@@ -40,6 +40,7 @@ public class Hardware {
     private boolean launchingPurple = false;
     private boolean launchingGreen = false;
 
+
     // CONSTRUCTOR
     // assign hardware
     public Hardware(HardwareMap hardwareMap) {
