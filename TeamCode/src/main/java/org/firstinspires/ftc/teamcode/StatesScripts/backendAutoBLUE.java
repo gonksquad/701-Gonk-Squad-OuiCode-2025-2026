@@ -37,16 +37,13 @@ public class backendAutoBLUE extends LinearOpMode {
     public Limelight3A limelight;
     public ColorSensor colorSensor;
     public AnalogInput floodgate;
-
     private int pathState;
-
     public final double[] intakePos = {1.0, 0.6, 0.2};//*/{0.4, 0.0, 0.8};// sorter servo positions for outtaking
     public final double[] outtakePos = {0.4, 0.0, 0.8};//*/{1.0, 0.6, 0.2}; // sorter servo positions for intaking
     public byte[] sorterContents = {0, 0, 0}; // what is stored in each sorter slot 0 = empty, 1 = purple, 2 = green
-
     private boolean launchingPurple = false;
     private boolean launchingGreen = false;
-    RRHardware hardware;
+    Hardware hardware;
     odoteleop odoTeleop;
     private Follower follower;
     private byte launchProgress;
@@ -60,6 +57,7 @@ public class backendAutoBLUE extends LinearOpMode {
     private LLResult result;
     private int sorterInitial;
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
+    public int b = 1400; //outtake velocity base value
 
 
 
@@ -112,7 +110,7 @@ public class backendAutoBLUE extends LinearOpMode {
 
         limelight.start();
 
-        hardware = new RRHardware(hardwareMap);
+        hardware = new Hardware(hardwareMap);
         odoTeleop = new odoteleop(hardwareMap);
 
         pathState = 0;
@@ -168,12 +166,12 @@ public class backendAutoBLUE extends LinearOpMode {
 
     //poses initialized
     private final Pose startPose = new Pose(56, 9, Math.toRadians(90));
-    private final Pose mid = new Pose(58, 36);
+    private final Pose mid = new Pose(56, 36);
     private final Pose beforeFirstSpike = new Pose(60,36, Math.toRadians(180));
 
     private final Pose firstSpike1 = new Pose(50,36, Math.toRadians(180)); //5.5 in artifact
     private final Pose firstSpike2 = new Pose(45,36, Math.toRadians(180));
-    private final Pose firstSpike3 = new Pose(35,36, Math.toRadians(180));
+    private final Pose firstSpike3 = new Pose(28,36, Math.toRadians(180));
     private final Pose startPose2 = new Pose(56, 10, Math.toRadians(90));
 
     private final Pose forward = new Pose(56, 36, Math.toRadians(90));
@@ -205,8 +203,7 @@ public class backendAutoBLUE extends LinearOpMode {
                 .setLinearHeadingInterpolation(startPose2.getHeading(), forward.getHeading())
                 .build();
     }
-    //public boolean running = false;
-    public int b = 1400;
+
     public void statePathUpdate() {
         switch(pathState) {
             case 0:
@@ -244,8 +241,8 @@ public class backendAutoBLUE extends LinearOpMode {
                 }
                 break;
             case 1: //ready to launch
-                hardware.launcherLeft.setVelocity(b);
-                hardware.launcherRight.setVelocity(b);
+                hardware.launcherLeft.setVelocity(b + 50);
+                hardware.launcherRight.setVelocity(b + 50);
                 hardware.sorter.setPosition(hardware.outtakePos[sorterPos]);
                 launchProgress = 0;
                 setPathState(2);
