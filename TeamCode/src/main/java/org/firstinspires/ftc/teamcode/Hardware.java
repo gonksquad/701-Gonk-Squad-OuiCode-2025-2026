@@ -36,7 +36,8 @@ public class Hardware {
     public ElapsedTime launchTimer = new ElapsedTime();
 
     // initialize flags
-    public boolean intaking,foundBall = false;
+    public boolean intaking = false;
+    public boolean foundBall = false;
     private boolean launchingPurple = false;
     private boolean launchingGreen = false;
 
@@ -95,6 +96,7 @@ public class Hardware {
                     stopLaunch();
 
                     intaking = true;
+                    foundBall = false;
                     intake.setPower(1);
 
                     sorter.setPosition(intakePos[i]);
@@ -104,7 +106,7 @@ public class Hardware {
                 }
             }
         }
-        if (intaking && intakeTimer.milliseconds() > 1000) {
+        if (intaking && intakeTimer.milliseconds() > 1000 && !foundBall) {
             byte guess = detectFilled();
             if (guess == 0) return;
 //            if(!foundBall) {
@@ -113,7 +115,11 @@ public class Hardware {
 //            }
 
             //set current sorter pos to color-sensor-detected color
+            foundBall = true;
             sorterContents[currentPos] = guess;
+            launchTimer.reset();
+        }
+        if (intaking && intakeTimer.milliseconds() > 500 && foundBall) {
             currentPos = (currentPos + 2) % 3;
             //change to outtake
             sorter.setPosition(outtakePos[currentPos]);
