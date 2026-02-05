@@ -105,9 +105,9 @@ public class odoteleop {
 
     public void resetOdoPos(boolean isBlue){
         if(isBlue) {
-            follower.setStartingPose(new Pose(16, 122, Math.toRadians(144)));
+            follower.setPose(new Pose(16, 122, Math.toRadians(144)));
         } else {
-            follower.setStartingPose(new Pose(144-16, 122, Math.toRadians(54)));
+            follower.setPose(new Pose(144-16, 122, Math.toRadians(54)));
         }
     }
 }
