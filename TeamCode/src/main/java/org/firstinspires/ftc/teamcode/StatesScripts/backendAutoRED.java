@@ -167,15 +167,14 @@ public class backendAutoRED extends LinearOpMode {
 
     //poses initialized
     private final Pose startPose = new Pose(144-56, 9, Math.toRadians(90));
-    private final Pose mid = new Pose(144-58, 44);
-    private final Pose beforeFirstSpike = new Pose(144-60,48, Math.toRadians(0));
-
-    private final Pose firstSpike1 = new Pose(144-45,44, Math.toRadians(0)); //5.5 in artifact
-    private final Pose firstSpike2 = new Pose(144-40,44, Math.toRadians(0));
-    private final Pose firstSpike3 = new Pose(144-30,44, Math.toRadians(0));
-    private final Pose startPose2 = new Pose(144-56, 10, Math.toRadians(90));
-
-    private final Pose forward = new Pose(144-56, 36, Math.toRadians(90));
+    private final Pose mid = new Pose(144-56, 44);
+    private final Pose beforeFirstSpike = new Pose(144-56,45, Math.toRadians(0));
+    private final Pose firstSpike1 = new Pose(144-39.5,45, Math.toRadians(0)); //5.5 in artifact
+    private final Pose firstSpike2 = new Pose(144-34.5,45, Math.toRadians(0));
+    private final Pose firstSpike3 = new Pose(144-15,45, Math.toRadians(0));
+    private final Pose mid2 = new Pose(144-52, 45, Math.toRadians(180));
+    private final Pose startPose2 = new Pose(144-54, 12, Math.toRadians(90));
+    private final Pose forward = new Pose(144-54, 30, Math.toRadians(90));
 
     //path initializing
     public void buildPaths() {
@@ -196,7 +195,7 @@ public class backendAutoRED extends LinearOpMode {
                 .setLinearHeadingInterpolation(firstSpike2.getHeading(), firstSpike3.getHeading())
                 .build();
         firstSpike_shoot = follower.pathBuilder()
-                .addPath(new BezierLine(firstSpike3, startPose2))
+                .addPath(new BezierCurve(firstSpike3, mid2, startPose2))
                 .setLinearHeadingInterpolation(firstSpike3.getHeading(), startPose2.getHeading()) //.setReversed() //hopefully backwards drive
                 .build();
         shoot_forward = follower.pathBuilder()
@@ -210,8 +209,8 @@ public class backendAutoRED extends LinearOpMode {
         switch(pathState) {
             case 0:
                 limelight.pipelineSwitch(0);
-                limelightTurn.setPosition(.7);
-                launcherTurn.setPosition(1-0.28);
+                limelightTurn.setPosition(.4);
+                launcherTurn.setPosition(.75);
                 intake.setPower(1);
                 if (pathTimer.milliseconds() < 500) break;
                 if (limelightAttempts == 0) {
@@ -243,8 +242,8 @@ public class backendAutoRED extends LinearOpMode {
                 }
                 break;
             case 1: //ready to launch
-                hardware.launcherLeft.setVelocity(b);
-                hardware.launcherRight.setVelocity(b);
+                hardware.launcherLeft.setVelocity(b + 50);
+                hardware.launcherRight.setVelocity(b + 50);
                 hardware.sorter.setPosition(hardware.outtakePos[sorterPos]);
                 launchProgress = 0;
                 setPathState(2);
@@ -293,9 +292,9 @@ public class backendAutoRED extends LinearOpMode {
             case 7: //move to launch
                 if(pathTimer.milliseconds() > 1250) {
                     hardware.sorter.setPosition(hardware.outtakePos[sorterPos]);
-                    launcherTurn.setPosition(0.7);
-                    hardware.launcherLeft.setVelocity(b + 20);
-                    hardware.launcherRight.setVelocity(b + 20);
+                    launcherTurn.setPosition(0.74);
+                    hardware.launcherLeft.setVelocity(b + 30);
+                    hardware.launcherRight.setVelocity(b + 30);
                     follower.followPath(firstSpike_shoot);
                     setPathState(8);
                 }
