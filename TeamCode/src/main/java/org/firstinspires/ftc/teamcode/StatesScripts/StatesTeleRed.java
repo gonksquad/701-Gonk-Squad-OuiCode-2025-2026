@@ -108,7 +108,7 @@ public class StatesTeleRed extends LinearOpMode {
                     autoAim=!autoAim;
                 }
                 if(gamepad1.aWasPressed()){
-                    odoteleop.resetOdoPos(true);
+                    odoteleop.resetOdoPos(false);
                 }
                 hardware.tryIntake(gamepad2.a);
                 if (gamepad2.b && !gamepad2.a && !gamepad2.right_bumper) {
