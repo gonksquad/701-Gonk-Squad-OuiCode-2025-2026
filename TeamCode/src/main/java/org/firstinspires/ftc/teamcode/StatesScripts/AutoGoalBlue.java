@@ -76,7 +76,6 @@ public class AutoGoalBlue extends LinearOpMode {
 
 
         hardware.launcherTurn.setPosition(0.5);
-        hardware.sorter.setPosition(hardware.outtakePos[2]);
         hardware.limelightTurn.setPosition(0.6);
 
         hardware.limelight.setPollRateHz(64);
@@ -154,7 +153,7 @@ public class AutoGoalBlue extends LinearOpMode {
 
             Intake13 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(29.000, 84.000),
+                                    new Pose(30.000, 84.000),
 
                                     new Pose(20.000, 84.000)
                             )
@@ -191,7 +190,7 @@ public class AutoGoalBlue extends LinearOpMode {
                 follower.followPath(paths.Shoot0);
                 hardware.launcherLeft.setVelocity(1200);
                 hardware.launcherRight.setVelocity(1200);
-                hardware.sorter.setPosition(hardware.outtakePos[sorterPos]);
+                hardware.intake.setPower(1);
                 sorterPos = 0;
                 launchProgress = 0;
                 setPathState(1);
@@ -213,7 +212,6 @@ public class AutoGoalBlue extends LinearOpMode {
                         if (id >= 21 && id <= 23) {
                             obeliskId = id;
                             limelightAttempts = 99;
-                            break;
                         }
                     }
                 } else {
@@ -223,10 +221,12 @@ public class AutoGoalBlue extends LinearOpMode {
                 if (limelightAttempts > 16) {
                     hardware.limelight.stop();
                     sorterPos = (byte)((obeliskId + 2) % 3);
+                    hardware.sorter.setPosition(hardware.outtakePos[sorterPos]);
                     setPathState(2);
                 }
                 break;
             case 2: // Launch Artifacts
+                if (pathTimer.milliseconds() < 1000) break;
                 if (sorterPos == obeliskId % 3) {
                     launchAndSetPathState(3);
                 } else {
@@ -236,14 +236,13 @@ public class AutoGoalBlue extends LinearOpMode {
             case 3: // Align to Intake
                 hardware.launcherLeft.setVelocity(0);
                 hardware.launcherRight.setVelocity(0);
-                follower.followPath(paths.Align1,true);
+                hardware.sorter.setPosition(hardware.intakePos[0]);
                 hardware.intake.setPower(1);
+                follower.followPath(paths.Align1,true);
                 setPathState(4);
                 break;
             case 4: // Intake First Artifact
-                if (hardware.sorter.getPosition() != hardware.intakePos[0]) {
-                    hardware.sorter.setPosition(hardware.intakePos[0]);
-                } else if (pathTimer.milliseconds() > 1250) {
+                if (pathTimer.milliseconds() > 1250) {
                     follower.followPath(paths.Intake11, true);
                     setPathState(5);
                 }
@@ -263,6 +262,7 @@ public class AutoGoalBlue extends LinearOpMode {
                     follower.followPath(paths.Intake13,true);
                     setPathState(7);
                 }
+                hardware.intake.setPower(1);
                 break;
             case 7: // Move to Launch
                 if(pathTimer.milliseconds() > 1250) {
@@ -274,7 +274,7 @@ public class AutoGoalBlue extends LinearOpMode {
                 }
                 break;
             case 8: // Launch Artifacts
-                if (pathTimer.milliseconds() < 1500) break;
+                if (pathTimer.milliseconds() < 1000) break;
                 if (sorterPos == obeliskId % 3) {
                     launchAndSetPathState(9);
                 } else {
@@ -297,7 +297,7 @@ public class AutoGoalBlue extends LinearOpMode {
         if (hardware.launcherLeft.getVelocity() < 1180) return;
         switch (launchProgress) {
             case 0:
-                hardware.intake.setPower(0.5);
+                hardware.intake.setPower(1);
                 hardware.sorter.setPosition(hardware.outtakePos[sorterPos]);
                 launchTimer.reset();
                 launchProgress = 1;
@@ -333,7 +333,7 @@ public class AutoGoalBlue extends LinearOpMode {
         if (hardware.launcherLeft.getVelocity() < 1180) return;
         switch (launchProgress) {
             case 0:
-                hardware.intake.setPower(0.5);
+                hardware.intake.setPower(1);
                 hardware.sorter.setPosition(hardware.outtakePos[sorterPos]);
                 launchTimer.reset();
                 launchProgress = 1;
