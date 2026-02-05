@@ -2,14 +2,15 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import org.firstinspires.ftc.teamcode.StatesScripts.odoteleop;
 
 @TeleOp
 public class SpeedTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Hardware hardware = new Hardware(hardwareMap);
+        odoteleop odoteleop = new odoteleop(hardwareMap);
         int testTps = 1700;
-
         waitForStart();
 
        // hardware.launcherTurn.setPower(0d); SHOULDNT BE  COMMENTED
@@ -37,6 +38,7 @@ public class SpeedTest extends LinearOpMode {
             }
 
             telemetry.addData("Launcher TPS: ", testTps);
+            telemetry.addData("", odoteleop.getMotorPower(testTps/100, true));
             telemetry.update();
         }
     }

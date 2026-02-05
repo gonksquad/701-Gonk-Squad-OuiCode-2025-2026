@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class odoteleop {
 
+
     Hardware hardware;
     private Follower follower;
     double lastTheta;
@@ -28,6 +29,29 @@ public class odoteleop {
 
     // ==================================
 
+
+    // random odoaim vars
+    private static int goalX = 0;
+    private static final int goalY = 144;
+    private Pose pose;
+    private double angleOffset;
+    private double theta;
+
+
+    void setOdoVariables(boolean isBlue) {
+        goalX = (isBlue) ? 0 : 144;
+        pose = follower.getPose();
+        angleOffset = pose.getHeading();
+        if(!isBlue) {
+            angleOffset -= 90;
+        }
+
+        theta = Math.atan2(goalY - pose.getY(), goalX - pose.getX()) - angleOffset;
+        theta = Math.toDegrees(theta);
+        if(theta > 180) theta -= 360;
+        if(theta < -180) theta += 360;
+    }
+
     public odoteleop(HardwareMap hardwareMap) {
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(36, 84, Math.toRadians(135))); // remove later
@@ -38,28 +62,9 @@ public class odoteleop {
         if(autoAim){
             follower.update();
 
-            int goalX = (isBlue) ? 0 : 144;
-            int goalY = 144;
-
-            Pose pose = follower.getPose();
-
-            double angleOffset = pose.getHeading();
-            if(!isBlue) {
-                angleOffset -= 90;
-            }
-
+            setOdoVariables(isBlue);
 
             // -------- HEADING MATH --------
-
-            double targetAngle = Math.atan2(goalY - pose.getY(), goalX - pose.getX());
-
-            double theta = targetAngle - angleOffset;
-
-            theta = Math.toDegrees(theta);
-
-            while (theta > 180) theta -= 360;
-            while (theta < -180) theta += 360;
-
             // Limit to what turret is allowed to rotate
             theta = Math.max(-TURRET_MAX_DEGREES, Math.min(TURRET_MAX_DEGREES, theta));
 
@@ -109,5 +114,15 @@ public class odoteleop {
         } else {
             follower.setPose(new Pose(128, 122, Math.toRadians(36)));
         }
+    }
+
+    public String getMotorPower(float powerOffset, Boolean isBlue) {
+        setOdoVariables(isBlue);
+        double xDist = goalX - getOdoData(odoDataTypes.X);
+        double yDist = goalY - getOdoData(odoDataTypes.Y);
+        double dist = yDist/Math.sin(theta);
+        double power = dist * powerOffset;
+
+        return "calculated pwr: " + power + ", dist: (" + xDist + ", " + yDist + "), total dist: " + dist + ", ";
     }
 }
