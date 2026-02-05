@@ -81,7 +81,7 @@ public class AutoGoalBlue extends LinearOpMode {
 
         hardware.limelight.setPollRateHz(64);
         hardware.limelight.pipelineSwitch(0);
-        obeliskId = -1;
+        obeliskId = 0;
 
         while (opModeIsActive()) {
             follower.update(); // Update Pedro Pathing
@@ -114,7 +114,7 @@ public class AutoGoalBlue extends LinearOpMode {
         public Paths(Follower follower) {
             Shoot0 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(20.000, 122.000),
+                                    new Pose(16.000, 122.000),
 
                                     new Pose(54.000, 90.000)
                             )
@@ -191,7 +191,7 @@ public class AutoGoalBlue extends LinearOpMode {
                 follower.followPath(paths.Shoot0);
                 hardware.launcherLeft.setVelocity(1200);
                 hardware.launcherRight.setVelocity(1200);
-                hardware.sorter.setPosition(hardware.outtakePos[2]);
+                hardware.sorter.setPosition(hardware.outtakePos[sorterPos]);
                 sorterPos = 0;
                 launchProgress = 0;
                 setPathState(1);
