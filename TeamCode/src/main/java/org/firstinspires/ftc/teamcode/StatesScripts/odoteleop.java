@@ -43,7 +43,7 @@ public class odoteleop {
         pose = follower.getPose();
         angleOffset = pose.getHeading();
         if(isBlue) {
-            angleOffset += Math.toRadians(0);
+            angleOffset += Math.toRadians(188);
             theta = Math.atan2(-Math.abs(goalY - pose.getY()), Math.abs(goalX - pose.getX())) - angleOffset; //make sure atan isnt negative for blue
         } else {
             angleOffset += Math.toRadians(15);

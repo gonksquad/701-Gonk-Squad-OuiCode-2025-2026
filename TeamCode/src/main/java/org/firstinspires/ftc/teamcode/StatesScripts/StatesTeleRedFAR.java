@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.Hardware;
 
-@TeleOp (name="REDFARStatesTele", group = "_Main_")
+@TeleOp (name="AAA-REDFAR-StatesTele")
 public class StatesTeleRedFAR extends LinearOpMode {
 
     boolean manual = false;

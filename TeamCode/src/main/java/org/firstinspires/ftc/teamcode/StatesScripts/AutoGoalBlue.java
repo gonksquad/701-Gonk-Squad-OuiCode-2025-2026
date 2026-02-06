@@ -22,7 +22,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name="Goal Blue", group="_Main")
+@Autonomous(name="AAA-BLUECLOSE-StatesAuto")
 @Configurable // Panels
 public class AutoGoalBlue extends LinearOpMode {
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance

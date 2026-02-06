@@ -27,7 +27,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous (name = "REDFAR-StatesAuto", group = "_Main_")
+@Autonomous (name = "AAA-REDFAR-StatesAuto")
 public class backendAutoRED extends LinearOpMode {
 
     public DcMotor frontLeft, frontRight, backLeft, backRight, intake;

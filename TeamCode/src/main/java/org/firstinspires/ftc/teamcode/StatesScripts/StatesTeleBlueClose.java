@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.teamcode.Hardware;
 
-@TeleOp (name="BLUECLOSE-StatesTele", group = "_Main_")
+@TeleOp (name="AAA-BLUECLOSE-StatesTele")
 public class StatesTeleBlueClose extends LinearOpMode {
 
     boolean manual = false;
