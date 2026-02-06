@@ -75,10 +75,10 @@ public class Hardware {
 
         launcherRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         launcherRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        launcherRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         launcherLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         launcherLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        launcherLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
         frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
         backRight.setDirection(DcMotorSimple.Direction.REVERSE);

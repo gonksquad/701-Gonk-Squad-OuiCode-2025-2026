@@ -52,7 +52,7 @@ public class odoteleop {
             //angleOffset += Math.toRadians(188);
             theta = Math.atan2(goalY - pose.getY(), goalX - pose.getX()) - angleOffset; //make sure atan isnt negative for blue
         } else {
-            angleOffset += Math.toRadians(15);
+            angleOffset += Math.toRadians(12.5);
             theta = Math.atan2(Math.abs(goalY - pose.getY()), Math.abs(goalX - pose.getX())) - angleOffset; //make sure atan isnt negative for blue
         }
 
@@ -64,24 +64,25 @@ public class odoteleop {
 
     public odoteleop(HardwareMap hardwareMap, boolean onBlue, boolean startingFar) {
         isBlue = onBlue;
-        byte x = 0;
-        byte y = 0;
+        int x = 0;
+        int y = 0;
         int rot = 0;
         if(isBlue && startingFar) {
             x = 56;
             y = 35;
             rot = 90;
         } else if(isBlue && !startingFar) {
-            x = 36;
-            y = 84;
-            rot = 135;
+            x = 32;
+            y = 85;
+            rot = 144;
         } else if(!isBlue && startingFar) {
-            x = 90;
-            y = 30;
+            x = 108;
+            y = 27;
             rot = 90;
         } else if(!isBlue && !startingFar) {
-
-            rot = 45;
+            x = 132;
+            y = 83;
+            rot = 36;
         }
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(x, y, Math.toRadians(rot))); // used to be 36, 84, 135
