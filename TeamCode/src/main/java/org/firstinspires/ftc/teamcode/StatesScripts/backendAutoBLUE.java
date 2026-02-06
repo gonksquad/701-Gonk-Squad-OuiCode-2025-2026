@@ -28,7 +28,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous
+@Autonomous (name = "BLUEFAR-StatesAuto", group = "_Main_")
 public class backendAutoBLUE extends LinearOpMode {
 
     public DcMotor frontLeft, frontRight, backLeft, backRight, intake;
