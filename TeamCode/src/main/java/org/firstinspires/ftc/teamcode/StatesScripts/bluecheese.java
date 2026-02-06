@@ -22,14 +22,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Hardware;
-import org.firstinspires.ftc.teamcode.QualifierScripts.RRHardware;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous (name = "AAA-BLUEFAR-StatesAuto")
-public class backendAutoBLUE extends LinearOpMode {
+@Autonomous (name = "bluecheese", group = "_Main_")
+public class bluecheese extends LinearOpMode {
 
     public DcMotor frontLeft, frontRight, backLeft, backRight, intake;
     public DcMotorEx launcherLeft, launcherRight;
@@ -43,7 +42,7 @@ public class backendAutoBLUE extends LinearOpMode {
     public byte[] sorterContents = {0, 0, 0}; // what is stored in each sorter slot 0 = empty, 1 = purple, 2 = green
     private boolean launchingPurple = false;
     private boolean launchingGreen = false;
-    RRHardware hardware;
+    Hardware hardware;
     private Follower follower;
     private byte launchProgress;
     private byte sorterPos;
@@ -91,7 +90,7 @@ public class backendAutoBLUE extends LinearOpMode {
 
         launcherRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         launcherRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        launcherLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        launcherRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
         launcherLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         launcherLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -109,7 +108,7 @@ public class backendAutoBLUE extends LinearOpMode {
 
         limelight.start();
 
-        hardware = new RRHardware(hardwareMap);
+        hardware = new Hardware(hardwareMap);
 
         pathState = 0;
         pathTimer = new ElapsedTime();
@@ -159,42 +158,47 @@ public class backendAutoBLUE extends LinearOpMode {
             panelsTelemetry.update(telemetry);
         }
     }
-    private PathChain start_driveToFirstSpike, firstSpike_firstArtifactCollect, firstSpike_secondArtifactCollect,
-            firstSpike_thirdArtifactCollect, firstSpike_shoot, shoot_forward;
+    private PathChain start_one, one_two, two_shimmy, shimmy_three, three_back,
+            three_shoot , shoot_forward;
 
     //poses initialized
     private final Pose startPose = new Pose(56, 9, Math.toRadians(90));
-    private final Pose mid = new Pose(56, 36);
-    private final Pose beforeFirstSpike = new Pose(60,36, Math.toRadians(180));
-
-    private final Pose firstSpike1 = new Pose(50,36, Math.toRadians(180)); //5.5 in artifact
-    private final Pose firstSpike2 = new Pose(45,36, Math.toRadians(180));
-    private final Pose firstSpike3 = new Pose(28,36, Math.toRadians(180));
+    private final Pose mid = new Pose(56, 12);
+    private final Pose one = new Pose(18, 18, 150);
+    private final Pose two = new Pose(18,13, Math.toRadians(150));
+    private final Pose shimmy = new Pose(13,9, Math.toRadians(90)); //5.5 in artifact
+    private final Pose three = new Pose(12,20, Math.toRadians(90));
+    private final Pose back = new Pose(15, 20, Math.toRadians(90));
     private final Pose startPose2 = new Pose(56, 10, Math.toRadians(90));
 
     private final Pose forward = new Pose(56, 36, Math.toRadians(90));
 
     //path initializing
     public void buildPaths() {
-        start_driveToFirstSpike = follower.pathBuilder()
-                .addPath(new BezierLine(startPose, beforeFirstSpike))
-                .setLinearHeadingInterpolation(startPose.getHeading(), beforeFirstSpike.getHeading())
+        start_one = follower.pathBuilder()
+                .addPath(new BezierCurve(startPose, mid, one))
+                .setLinearHeadingInterpolation(startPose.getHeading(), one.getHeading())
                 .build();
-        firstSpike_firstArtifactCollect = follower.pathBuilder()
-                .addPath(new BezierCurve(beforeFirstSpike, mid, firstSpike1))
-                .setLinearHeadingInterpolation(beforeFirstSpike.getHeading(), firstSpike1.getHeading())
+        one_two = follower.pathBuilder()
+                .addPath(new BezierCurve(one, two))
+                .setLinearHeadingInterpolation(one.getHeading(), two.getHeading())
                 .build();
-        firstSpike_secondArtifactCollect = follower.pathBuilder()
-                .addPath(new BezierLine(firstSpike1, firstSpike2))
-                .setLinearHeadingInterpolation(firstSpike1.getHeading(), firstSpike2.getHeading())
+        two_shimmy = follower.pathBuilder()
+                .addPath(new BezierLine(two, shimmy))
+                .setLinearHeadingInterpolation(two.getHeading(), shimmy.getHeading())
                 .build();
-        firstSpike_thirdArtifactCollect = follower.pathBuilder()
-                .addPath(new BezierLine(firstSpike2, firstSpike3))
-                .setLinearHeadingInterpolation(firstSpike2.getHeading(), firstSpike3.getHeading())
+        shimmy_three = follower.pathBuilder()
+                .addPath(new BezierLine(shimmy, three))
+                .setLinearHeadingInterpolation(shimmy.getHeading(), three.getHeading())
                 .build();
-        firstSpike_shoot = follower.pathBuilder()
-                .addPath(new BezierLine(firstSpike3, startPose2))
-                .setLinearHeadingInterpolation(firstSpike3.getHeading(), startPose2.getHeading()) //.setReversed() //hopefully backwards drive
+        three_back = follower.pathBuilder()
+                .addPath(new BezierLine(three, back))
+                .addPath(new BezierLine(back, three))
+                .setLinearHeadingInterpolation(three.getHeading(), back.getHeading())
+                .build();
+        three_shoot = follower.pathBuilder()
+                .addPath(new BezierLine(three, startPose2))
+                .setLinearHeadingInterpolation(three.getHeading(), startPose2.getHeading())
                 .build();
         shoot_forward = follower.pathBuilder()
                 .addPath(new BezierLine(startPose2, forward))
@@ -247,33 +251,30 @@ public class backendAutoBLUE extends LinearOpMode {
                 break;
             case 2: //launch
                 if (sorterPos == obeliskId % 3) {
-                    launchAndSetPathState(3);
+                    launchAndSetPathState(4);
                 } else {
                     launch();
                 }
                 break;
-            case 3: //align to intake
+            case 4: //intake first
                 launcherLeft.setVelocity(0);
                 launcherRight.setVelocity(0);
-                follower.followPath(start_driveToFirstSpike, true);
                 hardware.intake.setPower(1);
-                setPathState(4);
-                break;
-            case 4: //intake first
                 if (hardware.sorter.getPosition() != hardware.intakePos[2]) {
                     hardware.sorter.setPosition(hardware.intakePos[2]);
-                    hardware.sorterContents[2] = 2;
+                    hardware.sorterContents[2] = 1;
                 } else if (pathTimer.milliseconds() > 1250) {
-                    follower.followPath(firstSpike_firstArtifactCollect, true);
+                    follower.followPath(start_one, true);
                     setPathState(5);
                 }
                 break;
             case 5: //intake second
                 if (hardware.sorter.getPosition() != hardware.intakePos[1]  && pathTimer.milliseconds() > 1250) {
                     hardware.sorter.setPosition(hardware.intakePos[1]);
-                    hardware.sorterContents[1] = 1;
+                    hardware.sorterContents[1] = 2;
                 } else if (pathTimer.milliseconds() > 2500) {
-                    follower.followPath(firstSpike_secondArtifactCollect, true);
+                    follower.followPath(one_two, true);
+                    follower.followPath(two_shimmy, true);
                     setPathState(6);
                 }
                 break;
@@ -282,7 +283,8 @@ public class backendAutoBLUE extends LinearOpMode {
                     hardware.sorter.setPosition(hardware.intakePos[0]);
                     hardware.sorterContents[0] = 1;
                 } else if (pathTimer.milliseconds() > 2500) {
-                    follower.followPath(firstSpike_thirdArtifactCollect);
+                    follower.followPath(shimmy_three);
+                    follower.followPath(three_back);
                     setPathState(7);
                 }
                 break;
@@ -292,7 +294,7 @@ public class backendAutoBLUE extends LinearOpMode {
                     launcherTurn.setPosition(.2);
                     hardware.launcherLeft.setVelocity(b + 20);
                     hardware.launcherRight.setVelocity(b + 20);
-                    follower.followPath(firstSpike_shoot);
+                    follower.followPath(three_shoot);
                     setPathState(8);
                 }
                 break;

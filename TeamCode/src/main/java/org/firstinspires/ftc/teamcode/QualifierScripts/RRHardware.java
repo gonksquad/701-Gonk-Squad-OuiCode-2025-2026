@@ -58,7 +58,8 @@ public class RRHardware{
 
         launcherRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         launcherRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        launcherRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        launcherLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
         launcherLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         launcherLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
