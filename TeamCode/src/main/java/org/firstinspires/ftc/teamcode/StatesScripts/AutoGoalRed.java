@@ -22,7 +22,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name="Goal Red")
+@Autonomous(name="Goal Red", group="_Main")
 @Configurable // Panels
 public class AutoGoalRed extends LinearOpMode {
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
@@ -41,6 +41,7 @@ public class AutoGoalRed extends LinearOpMode {
         22  PGP
         23  PPG
     */
+    private byte[] obeliskFrequency;
     private int sorterInitial;
     private int limelightAttempts;
     private ArrayList<String> log;
@@ -64,19 +65,21 @@ public class AutoGoalRed extends LinearOpMode {
         panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(128, 122, Math.toRadians(36)));
+        follower.setStartingPose(new Pose(124, 122, Math.toRadians(36)));
 
         paths = new Paths(follower); // Build paths
 
         panelsTelemetry.debug("Status", "Initialized");
         panelsTelemetry.update(telemetry);
 
+        obeliskFrequency = new byte[3];
+
 
         waitForStart();
 
 
         hardware.launcherTurn.setPosition(0.5);
-        hardware.limelightTurn.setPosition(0.3);
+        hardware.limelightTurn.setPosition(0.2);
 
         hardware.limelight.setPollRateHz(64);
         hardware.limelight.pipelineSwitch(0);
@@ -113,7 +116,7 @@ public class AutoGoalRed extends LinearOpMode {
         public Paths(Follower follower) {
             Shoot0 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(128.000, 122.000),
+                                    new Pose(124.000, 122.000),
 
                                     new Pose(90.000, 90.000)
                             )
@@ -124,8 +127,8 @@ public class AutoGoalRed extends LinearOpMode {
             Align1 = follower.pathBuilder().addPath(
                             new BezierCurve(
                                     new Pose(90.000, 90.000),
-                                    new Pose(90.000, 84.000),
-                                    new Pose(96.000, 84.000)
+                                    new Pose(90.000, 88.000),
+                                    new Pose(96.000, 88.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(0))
 
@@ -133,9 +136,9 @@ public class AutoGoalRed extends LinearOpMode {
 
             Intake11 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(96.000, 84.000),
+                                    new Pose(96.000, 88.000),
 
-                                    new Pose(104.000, 84.000)
+                                    new Pose(102.000, 88.000)
                             )
                     ).setTangentHeadingInterpolation()
 
@@ -143,9 +146,9 @@ public class AutoGoalRed extends LinearOpMode {
 
             Intake12 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(104.000, 84.000),
+                                    new Pose(102.000, 88.000),
 
-                                    new Pose(114.000, 84.000)
+                                    new Pose(108.000, 88.000)
                             )
                     ).setTangentHeadingInterpolation()
 
@@ -153,9 +156,9 @@ public class AutoGoalRed extends LinearOpMode {
 
             Intake13 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(114.000, 84.000),
+                                    new Pose(108.000, 88.000),
 
-                                    new Pose(124.000, 84.000)
+                                    new Pose(124.000, 88.000)
                             )
                     ).setTangentHeadingInterpolation()
 
@@ -163,7 +166,7 @@ public class AutoGoalRed extends LinearOpMode {
 
             Shoot1 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(124.000, 84.000),
+                                    new Pose(124.000, 88.000),
 
                                     new Pose(90.000, 90.000)
                             )
@@ -187,12 +190,12 @@ public class AutoGoalRed extends LinearOpMode {
         if (follower.isBusy()) return;
         switch (pathState) {
             case 0: // Start Launcher and Go to Launch
-                follower.followPath(paths.Shoot0);
                 hardware.launcherLeft.setVelocity(1200);
                 hardware.launcherRight.setVelocity(1200);
                 hardware.intake.setPower(1);
                 sorterPos = 0;
                 launchProgress = 0;
+                follower.followPath(paths.Shoot0);
                 setPathState(1);
                 break;
             case 1:
@@ -210,8 +213,7 @@ public class AutoGoalRed extends LinearOpMode {
                         int id = fiducial.getFiducialId();
                         log.add("AprilTag Detected: " + id);
                         if (id >= 21 && id <= 23) {
-                            obeliskId = id;
-                            limelightAttempts = 99;
+                            obeliskFrequency[id - 21]++;
                         }
                     }
                 } else {
@@ -220,6 +222,12 @@ public class AutoGoalRed extends LinearOpMode {
                 limelightAttempts++;
                 if (limelightAttempts > 16) {
                     hardware.limelight.stop();
+                    for (int i = 0; i < 3; i++) {
+                        if (obeliskFrequency[i] >= obeliskFrequency[(i + 1) % 3] && obeliskFrequency[i] >= obeliskFrequency[(i + 2) % 3]) {
+                            obeliskId = i + 21;
+                            break;
+                        }
+                    }
                     sorterPos = (byte)((obeliskId + 2) % 3);
                     hardware.sorter.setPosition(hardware.outtakePos[sorterPos]);
                     setPathState(2);

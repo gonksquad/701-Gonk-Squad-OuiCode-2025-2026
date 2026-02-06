@@ -22,7 +22,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name="Goal Blue")
+@Autonomous(name="Goal Blue", group="_Main")
 @Configurable // Panels
 public class AutoGoalBlue extends LinearOpMode {
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
@@ -41,6 +41,7 @@ public class AutoGoalBlue extends LinearOpMode {
         22  PGP
         23  PPG
     */
+    private byte[] obeliskFrequency;
     private int sorterInitial;
     private int limelightAttempts;
     private ArrayList<String> log;
@@ -70,6 +71,8 @@ public class AutoGoalBlue extends LinearOpMode {
 
         panelsTelemetry.debug("Status", "Initialized");
         panelsTelemetry.update(telemetry);
+
+        obeliskFrequency = new byte[3];
 
 
         waitForStart();
@@ -135,7 +138,7 @@ public class AutoGoalBlue extends LinearOpMode {
                             new BezierLine(
                                     new Pose(48.000, 84.000),
 
-                                    new Pose(40.000, 84.000)
+                                    new Pose(42.000, 84.000)
                             )
                     ).setTangentHeadingInterpolation()
 
@@ -143,9 +146,9 @@ public class AutoGoalBlue extends LinearOpMode {
 
             Intake12 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(40.000, 84.000),
+                                    new Pose(42.000, 84.000),
 
-                                    new Pose(30.000, 84.000)
+                                    new Pose(36.000, 84.000)
                             )
                     ).setTangentHeadingInterpolation()
 
@@ -153,7 +156,7 @@ public class AutoGoalBlue extends LinearOpMode {
 
             Intake13 = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(30.000, 84.000),
+                                    new Pose(36.000, 84.000),
 
                                     new Pose(20.000, 84.000)
                             )
@@ -187,12 +190,12 @@ public class AutoGoalBlue extends LinearOpMode {
         if (follower.isBusy()) return;
         switch (pathState) {
             case 0: // Start Launcher and Go to Launch
-                follower.followPath(paths.Shoot0);
                 hardware.launcherLeft.setVelocity(1200);
                 hardware.launcherRight.setVelocity(1200);
                 hardware.intake.setPower(1);
                 sorterPos = 0;
                 launchProgress = 0;
+                follower.followPath(paths.Shoot0);
                 setPathState(1);
                 break;
             case 1:
@@ -210,8 +213,7 @@ public class AutoGoalBlue extends LinearOpMode {
                         int id = fiducial.getFiducialId();
                         log.add("AprilTag Detected: " + id);
                         if (id >= 21 && id <= 23) {
-                            obeliskId = id;
-                            limelightAttempts = 99;
+                            obeliskFrequency[id - 21]++;
                         }
                     }
                 } else {
@@ -220,6 +222,12 @@ public class AutoGoalBlue extends LinearOpMode {
                 limelightAttempts++;
                 if (limelightAttempts > 16) {
                     hardware.limelight.stop();
+                    for (int i = 0; i < 3; i++) {
+                        if (obeliskFrequency[i] >= obeliskFrequency[(i + 1) % 3] && obeliskFrequency[i] >= obeliskFrequency[(i + 2) % 3]) {
+                            obeliskId = i + 21;
+                            break;
+                        }
+                    }
                     sorterPos = (byte)((obeliskId + 2) % 3);
                     hardware.sorter.setPosition(hardware.outtakePos[sorterPos]);
                     setPathState(2);
