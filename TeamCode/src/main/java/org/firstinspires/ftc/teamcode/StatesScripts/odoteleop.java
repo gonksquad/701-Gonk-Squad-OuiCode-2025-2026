@@ -23,9 +23,9 @@ public class odoteleop {
 
     // ===== 100 DEGREE SERVO TUNING =====
 
-    private static final double TURRET_CENTER = 0.47; // adjust until forward is perfect
-    private static final double SERVO_TOTAL_DEGREES = 100.0;
-    private static final double TURRET_MAX_DEGREES = 45.0; // safe turret swing each side
+    private static double TURRET_CENTER = 0.47; // adjust until forward is perfect
+    private static double SERVO_TOTAL_DEGREES = 100.0;
+    private static double TURRET_MAX_DEGREES = 45.0; // safe turret swing each side
 
     // ==================================
 
@@ -40,11 +40,17 @@ public class odoteleop {
 
 
     String setOdoVariables(boolean isBlue) {
+        if(isBlue) {
+            TURRET_CENTER = 0.5;
+            goalX = 0;
+        } else {
+            goalX = 144;
+        }
         pose = follower.getPose();
         angleOffset = pose.getHeading();
         if(isBlue) {
-            angleOffset += Math.toRadians(188);
-            theta = Math.atan2(-Math.abs(goalY - pose.getY()), Math.abs(goalX - pose.getX())) - angleOffset; //make sure atan isnt negative for blue
+            //angleOffset += Math.toRadians(188);
+            theta = Math.atan2(goalY - pose.getY(), goalX - pose.getX()) - angleOffset; //make sure atan isnt negative for blue
         } else {
             angleOffset += Math.toRadians(15);
             theta = Math.atan2(Math.abs(goalY - pose.getY()), Math.abs(goalX - pose.getX())) - angleOffset; //make sure atan isnt negative for blue
@@ -86,6 +92,7 @@ public class odoteleop {
         if(autoAim){
             follower.update();
             String printStuff = setOdoVariables(isBlue) + ", ";
+            theta = Math.max(-TURRET_MAX_DEGREES, Math.min(TURRET_MAX_DEGREES, theta));
 
             // -------- HEADING MATH --------
             // Limit to what turret is allowed to rotate
@@ -96,7 +103,7 @@ public class odoteleop {
             // Convert turret angle to servo position
             double servoScale = TURRET_MAX_DEGREES / SERVO_TOTAL_DEGREES;
             if(!isBlue) {
-                servoScale *= 0.9;
+                //servoScale *= 0.9;
             }
 
             double servoPos = TURRET_CENTER - (theta * servoScale / TURRET_MAX_DEGREES);
