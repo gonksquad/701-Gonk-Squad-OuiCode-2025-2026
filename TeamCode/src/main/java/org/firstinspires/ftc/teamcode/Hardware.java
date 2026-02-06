@@ -117,14 +117,14 @@ public class Hardware {
             //set current sorter pos to color-sensor-detected color
             foundBall = true;
             sorterContents[currentPos] = guess;
-            launchTimer.reset();
+            intakeTimer.reset();
         }
         if (intaking && intakeTimer.milliseconds() > 500 && foundBall) {
             currentPos = (currentPos + 2) % 3;
             //change to outtake
             sorter.setPosition(outtakePos[currentPos]);
 //            if(intakeWait.milliseconds()>350) {
-                stopIntake();
+            stopIntake();
 //            }
             // treat this as a loop
             // try to go to the artifact (maybe split int tryIntakePurple and tryIntakeGreen)
