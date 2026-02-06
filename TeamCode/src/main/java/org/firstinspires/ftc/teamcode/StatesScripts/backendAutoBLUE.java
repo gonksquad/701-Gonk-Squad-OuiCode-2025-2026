@@ -44,7 +44,6 @@ public class backendAutoBLUE extends LinearOpMode {
     private boolean launchingPurple = false;
     private boolean launchingGreen = false;
     Hardware hardware;
-    odoteleop odoTeleop;
     private Follower follower;
     private byte launchProgress;
     private byte sorterPos;
@@ -111,7 +110,6 @@ public class backendAutoBLUE extends LinearOpMode {
         limelight.start();
 
         hardware = new Hardware(hardwareMap);
-        odoTeleop = new odoteleop(hardwareMap);
 
         pathState = 0;
         pathTimer = new ElapsedTime();

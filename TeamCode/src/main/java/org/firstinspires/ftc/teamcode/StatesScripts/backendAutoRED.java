@@ -112,7 +112,6 @@ public class backendAutoRED extends LinearOpMode {
         limelight.start();
 
         hardware = new RRHardware(hardwareMap);
-        odoTeleop = new odoteleop(hardwareMap);
 
         pathState = 0;
         pathTimer = new ElapsedTime();

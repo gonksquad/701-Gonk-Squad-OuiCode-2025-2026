@@ -31,33 +31,54 @@ public class odoteleop {
 
 
     // random odoaim vars
-    private static int goalX = 0;
+    private static int goalX = 144;
     private static int goalY = 144;
     private Pose pose;
     private double angleOffset;
     private double theta;
+    private boolean isBlue;
 
 
     String setOdoVariables(boolean isBlue) {
-        goalX = (isBlue) ? 0 : 144;
         pose = follower.getPose();
         angleOffset = pose.getHeading();
         if(isBlue) {
-            angleOffset += Math.toRadians(180);
+            angleOffset += Math.toRadians(0);
+            theta = Math.atan2(-Math.abs(goalY - pose.getY()), Math.abs(goalX - pose.getX())) - angleOffset; //make sure atan isnt negative for blue
         } else {
-            angleOffset += Math.toRadians(210);
+            angleOffset += Math.toRadians(15);
+            theta = Math.atan2(Math.abs(goalY - pose.getY()), Math.abs(goalX - pose.getX())) - angleOffset; //make sure atan isnt negative for blue
         }
 
-        theta = Math.atan2(-Math.abs(goalY - pose.getY()), Math.abs(goalX - pose.getX())) - angleOffset;
         theta = Math.toDegrees(theta);
         if(theta > 180) theta -= 360;
         if(theta < -180) theta += 360;
         return "theta: " + theta + ", angleoffset: " + Math.toDegrees(angleOffset);
     }
 
-    public odoteleop(HardwareMap hardwareMap) {
+    public odoteleop(HardwareMap hardwareMap, boolean onBlue, boolean startingFar) {
+        isBlue = onBlue;
+        byte x = 0;
+        byte y = 0;
+        int rot = 0;
+        if(isBlue && startingFar) {
+            x = 56;
+            y = 35;
+            rot = 90;
+        } else if(isBlue && !startingFar) {
+            x = 36;
+            y = 84;
+            rot = 135;
+        } else if(!isBlue && startingFar) {
+            x = 90;
+            y = 30;
+            rot = 90;
+        } else if(!isBlue && !startingFar) {
+
+            rot = 45;
+        }
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(36, 84, Math.toRadians(135))); // remove later
+        follower.setStartingPose(new Pose(x, y, Math.toRadians(rot))); // used to be 36, 84, 135
         hardware = new Hardware(hardwareMap);
     }
 
@@ -121,7 +142,7 @@ public class odoteleop {
             follower.setPose(new Pose(16, 122, Math.toRadians(144)));
         } else {
             //follower.setPose(new Pose(138, 112, Math.toRadians(36)));
-            follower.setPose(new Pose(16, 144, Math.toRadians(144)));
+            follower.setPose(new Pose(144, 122, Math.toRadians(36)));
 
         }
     }

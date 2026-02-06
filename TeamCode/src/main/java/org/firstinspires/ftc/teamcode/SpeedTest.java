@@ -9,7 +9,7 @@ public class SpeedTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Hardware hardware = new Hardware(hardwareMap);
-        odoteleop odoteleop = new odoteleop(hardwareMap);
+        odoteleop odoteleop = new odoteleop(hardwareMap, true, false);
         int testTps = 1700;
         waitForStart();
 
