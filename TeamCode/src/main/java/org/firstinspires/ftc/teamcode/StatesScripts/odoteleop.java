@@ -32,24 +32,25 @@ public class odoteleop {
 
     // random odoaim vars
     private static int goalX = 0;
-    private static final int goalY = 144;
+    private static int goalY = 144;
     private Pose pose;
     private double angleOffset;
     private double theta;
 
 
-    void setOdoVariables(boolean isBlue) {
+    String setOdoVariables(boolean isBlue) {
         goalX = (isBlue) ? 0 : 144;
         pose = follower.getPose();
         angleOffset = pose.getHeading();
         if(!isBlue) {
-            angleOffset -= 90;
+            angleOffset -= Math.toRadians(90);
         }
 
-        theta = Math.atan2(goalY - pose.getY(), goalX - pose.getX()) - angleOffset;
+        theta = Math.atan2(-Math.abs(goalY - pose.getY()), Math.abs(goalX - pose.getX())) - angleOffset;
         theta = Math.toDegrees(theta);
         if(theta > 180) theta -= 360;
         if(theta < -180) theta += 360;
+        return "Angle Offset: " + angleOffset;
     }
 
     public odoteleop(HardwareMap hardwareMap) {
@@ -61,29 +62,34 @@ public class odoteleop {
     public String odoAimTurret(boolean autoAim, boolean isBlue, boolean aimLimelight) {
         if(autoAim){
             follower.update();
-
-            setOdoVariables(isBlue);
+            String printStuff = setOdoVariables(isBlue) + ", ";
 
             // -------- HEADING MATH --------
             // Limit to what turret is allowed to rotate
-            theta = Math.max(-TURRET_MAX_DEGREES, Math.min(TURRET_MAX_DEGREES, theta));
+            //theta = Math.max(-TURRET_MAX_DEGREES, Math.min(TURRET_MAX_DEGREES, theta));
 
             // ------------------------------
 
             // Convert turret angle to servo position
             double servoScale = TURRET_MAX_DEGREES / SERVO_TOTAL_DEGREES;
+            if(!isBlue) {
+                servoScale *= 0.8;
+            }
 
             double servoPos = TURRET_CENTER - (theta * servoScale / TURRET_MAX_DEGREES);
 
             servoPos = Math.max(0, Math.min(1, servoPos));
-
+//            if(!isBlue) {
+//                servoPos = 1 - servoPos;
+//            }
             hardware.launcherTurn.setPosition(servoPos);
             if(aimLimelight) {
                 hardware.limelightTurn.setPosition(1-(hardware.launcherTurn.getPosition()/2));
             }
 
-            return "heading: " + follower.getHeading()
-                    + ", pose: " + follower.getPose();
+            printStuff += "SP: " + servoPos;
+            return printStuff;//"heading: " + follower.getHeading()
+                    //+ ", pose: " + follower.getPose();
         } else {
             hardware.launcherTurn.setPosition(0.5f);
             return "im lazy";
@@ -112,7 +118,7 @@ public class odoteleop {
         if(isBlue) {
             follower.setPose(new Pose(16, 122, Math.toRadians(144)));
         } else {
-            follower.setPose(new Pose(128, 122, Math.toRadians(36)));
+            follower.setPose(new Pose(138, 112, Math.toRadians(36)));
         }
     }
 
