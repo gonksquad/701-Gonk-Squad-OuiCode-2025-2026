@@ -42,15 +42,17 @@ public class odoteleop {
         goalX = (isBlue) ? 0 : 144;
         pose = follower.getPose();
         angleOffset = pose.getHeading();
-        if(!isBlue) {
-            angleOffset -= Math.toRadians(90);
+        if(isBlue) {
+            angleOffset += Math.toRadians(180);
+        } else {
+            angleOffset += Math.toRadians(210);
         }
 
         theta = Math.atan2(-Math.abs(goalY - pose.getY()), Math.abs(goalX - pose.getX())) - angleOffset;
         theta = Math.toDegrees(theta);
         if(theta > 180) theta -= 360;
         if(theta < -180) theta += 360;
-        return "Angle Offset: " + angleOffset;
+        return "theta: " + theta + ", angleoffset: " + Math.toDegrees(angleOffset);
     }
 
     public odoteleop(HardwareMap hardwareMap) {
@@ -73,7 +75,7 @@ public class odoteleop {
             // Convert turret angle to servo position
             double servoScale = TURRET_MAX_DEGREES / SERVO_TOTAL_DEGREES;
             if(!isBlue) {
-                servoScale *= 0.8;
+                servoScale *= 0.9;
             }
 
             double servoPos = TURRET_CENTER - (theta * servoScale / TURRET_MAX_DEGREES);
@@ -118,7 +120,9 @@ public class odoteleop {
         if(isBlue) {
             follower.setPose(new Pose(16, 122, Math.toRadians(144)));
         } else {
-            follower.setPose(new Pose(138, 112, Math.toRadians(36)));
+            //follower.setPose(new Pose(138, 112, Math.toRadians(36)));
+            follower.setPose(new Pose(16, 144, Math.toRadians(144)));
+
         }
     }
 
