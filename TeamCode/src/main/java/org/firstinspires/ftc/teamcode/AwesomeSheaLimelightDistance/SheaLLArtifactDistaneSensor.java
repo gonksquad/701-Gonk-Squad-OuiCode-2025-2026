@@ -40,15 +40,15 @@ public class SheaLLArtifactDistaneSensor extends LinearOpMode {
             }
             telemetry.update();
 
-//            double limelightMountAngleDegrees = 0.0; // Angle Limelight is mounted
-//            double limelightLensHeightInches = 0.0; // Height of Limelight lens
-//            double goalHeightInches = 60.0; // Height of the target
-//
-//            double angleToGoalDegrees = limelightMountAngleDegrees + result.getTx();
-//            //double angleToGoalDegrees = result.getTy();
-//            double angleToGoalRadians = Math.toRadians(angleToGoalDegrees);
-//            double distanceFromLimelightToGoalInches = (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);
-//            //double distanceFromLimelightToGoalInches = (goalHeightInches) / Math.tan(angleToGoalRadians);
+            double limelightMountAngleDegrees = 0.0; // Angle Limelight is mounted
+            double limelightLensHeightInches = 0.0; // Height of Limelight lens
+            double goalHeightInches = 60.0; // Height of the target
+
+            double angleToGoalDegrees = limelightMountAngleDegrees + result.getTx();
+            //double angleToGoalDegrees = result.getTy();
+            double angleToGoalRadians = Math.toRadians(angleToGoalDegrees);
+            double distanceFromLimelightToGoalInches = (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);
+            //double distanceFromLimelightToGoalInches = (goalHeightInches) / Math.tan(angleToGoalRadians);
 
             if (result != null && result.isValid()) {
                 double tx = result.getTx();
