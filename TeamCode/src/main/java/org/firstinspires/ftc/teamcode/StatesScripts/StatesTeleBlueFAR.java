@@ -115,7 +115,7 @@ public class StatesTeleBlueFAR extends LinearOpMode {
                 if(gamepad1.yWasPressed()){
                     autoAim=!autoAim;
                 }
-                if(gamepad1.aWasPressed()){
+                if(gamepad1.xWasPressed()){
                     odoteleop.resetOdoPos(true);
                 }
                 // 1 = purple, 2 = green. did this so that 0 can be either to help drivers

@@ -115,7 +115,7 @@ public class StatesTeleRedFAR extends LinearOpMode {
                 if(gamepad1.yWasPressed()){
                     autoAim=!autoAim;
                 }
-                if(gamepad1.aWasPressed()){
+                if(gamepad1.xWasPressed()){
                     odoteleop.resetOdoPos(false);
                 }
                 hardware.tryIntake(gamepad2.a);
