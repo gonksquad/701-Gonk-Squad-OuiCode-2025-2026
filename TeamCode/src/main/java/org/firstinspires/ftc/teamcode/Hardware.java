@@ -30,6 +30,8 @@ public class Hardware {
     public double[] liftPos = {0.6, 0.2};
 
     public int currentPos = 0; // 0-2
+    public int recentIntake = 0;
+    public int recentLaunch = 0;
     int targetTps = 0; // protect launcher tps from override
     ElapsedTime intakeTimer = new ElapsedTime();
     ElapsedTime intakeWait = new ElapsedTime();
@@ -117,6 +119,7 @@ public class Hardware {
             //set current sorter pos to color-sensor-detected color
             foundBall = true;
             sorterContents[currentPos] = guess;
+            recentIntake = currentPos;
             intakeTimer.reset();
         }
         if (intaking && intakeTimer.milliseconds() > 500 && foundBall) {
@@ -136,6 +139,10 @@ public class Hardware {
         intake.setPower(0);
         intaking = false;
         foundBall = false;
+    }
+
+    public void forgetIntake() {
+        sorterContents[recentIntake] = 0;
     }
 
     public void stopLaunch() {
@@ -178,12 +185,19 @@ public class Hardware {
         if ((launchingPurple || launchingGreen) && launcherLeft.getVelocity() > targetTps && outtakeTransferLeft.getPosition() != liftPos[1] && launchTimer.milliseconds() > 600) {
             outtakeTransferLeft.setPosition(liftPos[1]);
             outtakeTransferRight.setPosition(1-liftPos[1]);
+            recentLaunch = currentPos | ((sorterContents[currentPos] - 1) << 2);
             sorterContents[currentPos] = 0;
             launchTimer.reset();
         }
         if (outtakeTransferLeft.getPosition() == liftPos[1] && launchTimer.milliseconds() > 1000) {
             stopLaunch();
             launchTimer.reset();
+        }
+    }
+
+    public void forgetLaunch() {
+        if (sorterContents[recentLaunch & 0b11] == 0) {
+            sorterContents[recentLaunch & 0b11] = (byte)(((recentLaunch & 0b100) >> 2) + 1);
         }
     }
 

@@ -104,6 +104,14 @@ public class StatesTeleRedClose extends LinearOpMode {
                     hardware.sorter.setPosition(hardware.sorterOffset);
                 }
             } else {
+
+                if (gamepad2.dpadDownWasPressed()) {
+                    hardware.forgetIntake();
+                }
+                if (gamepad2.dpadUpWasPressed()) {
+                    hardware.forgetLaunch();
+                }
+
                 if(gamepad1.yWasPressed()){
                     autoAim=!autoAim;
                 }

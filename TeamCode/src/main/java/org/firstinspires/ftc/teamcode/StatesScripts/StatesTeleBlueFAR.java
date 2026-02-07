@@ -99,6 +99,14 @@ public class StatesTeleBlueFAR extends LinearOpMode {
                     hardware.sorter.setPosition(hardware.sorterOffset);
                 }
             } else {
+
+                if (gamepad2.dpadDownWasPressed()) {
+                    hardware.forgetIntake();
+                }
+                if (gamepad2.dpadUpWasPressed()) {
+                    hardware.forgetLaunch();
+                }
+
                 hardware.tryIntake(gamepad2.a);
                 if (gamepad2.b && !gamepad2.a && !gamepad2.right_bumper) {
                     hardware.stopIntake();
