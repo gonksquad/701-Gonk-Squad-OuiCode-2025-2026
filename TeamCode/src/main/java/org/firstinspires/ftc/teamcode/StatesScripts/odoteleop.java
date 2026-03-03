@@ -4,6 +4,7 @@ import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 
 import org.firstinspires.ftc.teamcode.Hardware;
+import org.firstinspires.ftc.teamcode.WorldsScripts.AutoToTeleData;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -85,7 +86,8 @@ public class odoteleop {
             rot = 36;
         }
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(x, y, Math.toRadians(rot))); // used to be 36, 84, 135
+        //follower.setStartingPose(new Pose(x, y, Math.toRadians(rot))); // used to be 36, 84, 135
+        follower.setStartingPose(new Pose(AutoToTeleData.AutoX, AutoToTeleData.AutoY, AutoToTeleData.AutoRot));
         hardware = new Hardware(hardwareMap);
     }
 

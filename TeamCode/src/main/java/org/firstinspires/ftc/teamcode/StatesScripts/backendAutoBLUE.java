@@ -12,6 +12,7 @@ import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -23,12 +24,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Hardware;
 import org.firstinspires.ftc.teamcode.QualifierScripts.RRHardware;
+import org.firstinspires.ftc.teamcode.WorldsScripts.AutoToTeleData;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous (name = "AAA-BLUEFAR-StatesAuto")
+@Disabled
+//@Autonomous (name = "AAA-BLUEFAR-StatesAuto")
 public class backendAutoBLUE extends LinearOpMode {
 
     public DcMotor frontLeft, frontRight, backLeft, backRight, intake;
@@ -153,6 +156,9 @@ public class backendAutoBLUE extends LinearOpMode {
             panelsTelemetry.debug("Y", follower.getPose().getY());
             panelsTelemetry.debug("Heading", follower.getPose().getHeading());
             panelsTelemetry.debug("Obelisk Id", obeliskId);
+            AutoToTeleData.AutoX = follower.getPose().getX();
+            AutoToTeleData.AutoY = follower.getPose().getY();
+            AutoToTeleData.AutoRot = follower.getPose().getHeading();
             for (String str : log) {
                 panelsTelemetry.addLine(str);
             }
