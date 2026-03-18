@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode.QualifierScripts;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.MiscScripts.Hardware;
+import org.firstinspires.ftc.teamcode.Hardware;
 
 @TeleOp(name="SorterTest")
 public class SorterTest extends LinearOpMode {

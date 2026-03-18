@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
-import org.firstinspires.ftc.teamcode.MiscScripts.Hardware;
+import org.firstinspires.ftc.teamcode.Hardware;
 
 @Disabled
 //@TeleOp (name="ONECONTROLLER-Worlds")

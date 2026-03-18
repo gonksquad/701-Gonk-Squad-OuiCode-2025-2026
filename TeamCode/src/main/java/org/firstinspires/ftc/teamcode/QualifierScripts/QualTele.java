@@ -1,11 +1,15 @@
 // used to be TeleopFromHardware
 package org.firstinspires.ftc.teamcode.QualifierScripts;
 
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
-import org.firstinspires.ftc.teamcode.MiscScripts.Hardware;
+import org.firstinspires.ftc.teamcode.Hardware;
+
+import java.util.List;
 
 @TeleOp //(name="QualTele")
 public class QualTele extends LinearOpMode {
