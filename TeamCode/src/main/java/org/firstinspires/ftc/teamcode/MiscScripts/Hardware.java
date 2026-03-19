@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.MiscScripts;
 
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -9,6 +10,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.MecanumDrive;
+import com.acmerobotics.roadrunner.Pose2d;
 
 public class Hardware {
     // declare hardware
@@ -41,12 +45,14 @@ public class Hardware {
     public boolean foundBall = false;
     private boolean launchingPurple = false;
     private boolean launchingGreen = false;
-
+    MecanumDrive drive;
 
     // CONSTRUCTOR
     // assign hardware
     public Hardware(HardwareMap hardwareMap) {
         // e0 = expansion hub 0, c2 = control hub 2
+        drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
+
         frontLeft = hardwareMap.get(DcMotor.class, "fl");
         frontRight = hardwareMap.get(DcMotor.class, "fr");
         backLeft = hardwareMap.get(DcMotor.class, "bl");
@@ -152,6 +158,10 @@ public class Hardware {
         launcherRight.setVelocity(0);
         launchingPurple = false;
         launchingGreen = false;
+    }
+
+    public Pose2d getOdoPose() {
+        return drive.localizer.getPose();
     }
 
     // NOTE: if the color is not in the

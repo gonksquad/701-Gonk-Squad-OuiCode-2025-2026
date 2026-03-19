@@ -6,6 +6,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import org.firstinspires.ftc.teamcode.MiscScripts.Hardware;
+import org.firstinspires.ftc.teamcode.StatesScripts.odoteleop;
+
 
 @TeleOp(name="WorldsWoodenTele")
 public class WoodenBotTele extends LinearOpMode {
@@ -20,6 +23,8 @@ public class WoodenBotTele extends LinearOpMode {
 
     public void runOpMode() {
 
+       Hardware hardware = new Hardware(hardwareMap);
+       odoteleop odoteleop = new odoteleop(hardwareMap, true, true);
         //fr =
         //
         //
@@ -49,8 +54,9 @@ public class WoodenBotTele extends LinearOpMode {
             intakeBtn = gamepad2.x || blockBtn;
             flushBtn = gamepad2.b;
             longRangeBtn = gamepad2.right_trigger>0.05;
-            SpinIntake(1); // x for intake, a for flush
-            ToggleOuttaking();
+            //SpinIntake(1); // x for intake, a for flush
+            //ToggleOuttaking();
+            odoteleop.odoAimTurret(true, true, false);
             SetMotorPowers(1);
             telemetry.update();
         }

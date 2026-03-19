@@ -140,10 +140,7 @@ public class StatesTeleRedFAR extends LinearOpMode {
                 //hardware.launchTimer.reset();
                 hardware.launcherTurn.setPosition(hardware.launcherTurn.getPosition()+gamepad2.left_stick_x/100f);
                 telemetry.addData("YURRRRR:    ", odoteleop.odoAimTurret(autoAim, false, false));
-                telemetry.addData("robotX", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.X));
-                telemetry.addData("robotY", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.Y));
-                telemetry.addData("robotRot", odoteleop.getOdoData(org.firstinspires.ftc.teamcode.StatesScripts.odoteleop.odoDataTypes.HEADING));
-//
+                //
 //
                 telemetry.addData("Sorter Position: ", hardware.sorter.getPosition());
                 telemetry.addData("Sorter Contents: ", "%d, %d, %d", hardware.sorterContents[0], hardware.sorterContents[1], hardware.sorterContents[2]);
