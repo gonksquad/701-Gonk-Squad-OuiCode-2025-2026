@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
-import org.firstinspires.ftc.teamcode.Hardware;
+import org.firstinspires.ftc.teamcode.MiscScripts.Hardware;
 
 @TeleOp (name="AAA-BLUEFAR-StatesTele")
 public class StatesTeleBlueFAR extends LinearOpMode {

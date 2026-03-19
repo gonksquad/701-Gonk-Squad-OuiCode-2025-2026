@@ -3,10 +3,9 @@ package org.firstinspires.ftc.teamcode.StatesScripts;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
-import org.firstinspires.ftc.teamcode.Hardware;
+import org.firstinspires.ftc.teamcode.MiscScripts.Hardware;
 
 @Disabled
 //@TeleOp (name="AAA-REDCLOSE-StatesTele")

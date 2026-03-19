@@ -41,6 +41,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.MiscScripts.Drawing;
 import org.firstinspires.ftc.teamcode.messages.DriveCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.MecanumCommandMessage;
 import org.firstinspires.ftc.teamcode.messages.MecanumLocalizerInputsMessage;
@@ -63,14 +64,14 @@ public final class MecanumDrive {
                 RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
 
         // drive model parameters
-        public double inPerTick = 1;
-        public double lateralInPerTick = -0.35213064245782766;
-        public double trackWidthTicks = 12488.544366421425;
+        public double inPerTick = 0.0019880304002982;
+        public double lateralInPerTick = 0.0013810447622712916;
+        public double trackWidthTicks = 5367.061120347124;
 
         // feedforward parameters (in tick units)
-        public double kS = 1.4240932806843323;
-        public double kV = 0.0002692077509647068;
-        public double kA = 0.0000001;
+        public double kS = 1.6394869754776482;
+        public double kV = 0.00026148236981827204;
+        public double kA = 0.00006;
 
         // path profile parameters (in inches)
         public double maxWheelVel = 50;
@@ -82,9 +83,9 @@ public final class MecanumDrive {
         public double maxAngAccel = Math.PI;
 
         // path controller gains
-        public double axialGain = 0.0;
-        public double lateralGain = 0.0;
-        public double headingGain = 0.0; // shared with turn
+        public double axialGain = 5.0;
+        public double lateralGain = 5.0;
+        public double headingGain = 2.0; // shared with turn
 
         public double axialVelGain = 0.0;
         public double lateralVelGain = 0.0;

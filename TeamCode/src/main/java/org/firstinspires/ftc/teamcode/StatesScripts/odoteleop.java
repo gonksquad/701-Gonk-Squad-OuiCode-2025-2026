@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.StatesScripts;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
 
-import org.firstinspires.ftc.teamcode.Hardware;
+import org.firstinspires.ftc.teamcode.MiscScripts.Hardware;
 import org.firstinspires.ftc.teamcode.WorldsScripts.AutoToTeleData;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
