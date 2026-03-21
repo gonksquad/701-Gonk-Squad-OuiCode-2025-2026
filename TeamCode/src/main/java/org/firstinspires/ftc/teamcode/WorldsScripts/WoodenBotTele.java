@@ -1,34 +1,44 @@
 package org.firstinspires.ftc.teamcode.WorldsScripts;
 
+import com.acmerobotics.roadrunner.Pose2d;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
-import org.firstinspires.ftc.teamcode.MiscScripts.Hardware;
+
+import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.StatesScripts.odoteleop;
+//import com.acmerobotics.dashboard.config.Config;
 
 
 @TeleOp(name="WorldsWoodenTele")
 public class WoodenBotTele extends LinearOpMode {
 
+   /* public static class Params {
+        public double servoPos = 0;
+    }
+
+    public static WoodenBotTele.Params PARAMS = new WoodenBotTele.Params();*/
+
     DcMotor driveFr, driveFl, driveBr, driveBl;
     DcMotor intakeMotorLeft, intakeMotorRight;
     DcMotorEx outtakeMotorR, outtakeMotorL;
-    Servo blocker;
+    Servo blocker, launcherTurn;
     //boolean isBlocking = false;
     boolean intakeBtn, flushBtn, blockBtn, longRangeBtn;
-
+    MecanumDrive drive;
 
     public void runOpMode() {
 
-       Hardware hardware = new Hardware(hardwareMap);
-       odoteleop odoteleop = new odoteleop(hardwareMap, true, true);
+       odoteleop odoteleop = new odoteleop( true, true);
         //fr =
         //
         //
         //
+        drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
         driveFr = hardwareMap.get(DcMotor.class, "fr");
             //driveFr.setDirection(DcMotorSimple.Direction.REVERSE);
         driveFl = hardwareMap.get(DcMotor.class, "fl");
@@ -47,6 +57,7 @@ public class WoodenBotTele extends LinearOpMode {
         outtakeMotorR = hardwareMap.get(DcMotorEx.class, "outr");
             outtakeMotorR.setDirection(DcMotorSimple.Direction.REVERSE);
         outtakeMotorL = hardwareMap.get(DcMotorEx.class, "outl");
+        launcherTurn = hardwareMap.get(Servo.class, "turn");
 
         waitForStart();
         while (opModeIsActive()) {
@@ -56,7 +67,9 @@ public class WoodenBotTele extends LinearOpMode {
             longRangeBtn = gamepad2.right_trigger>0.05;
             //SpinIntake(1); // x for intake, a for flush
             //ToggleOuttaking();
-            odoteleop.odoAimTurret(true, true, false);
+
+            drive.localizer.update();
+            telemetry.addData("yurt", odoteleop.odoAimTurret(true, true, false, drive.localizer.getPose(), launcherTurn));
             SetMotorPowers(1);
             telemetry.update();
         }

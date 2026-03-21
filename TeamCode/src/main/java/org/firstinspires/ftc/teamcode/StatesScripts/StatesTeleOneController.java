@@ -27,7 +27,7 @@ public class StatesTeleOneController extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Hardware hardware = new Hardware(hardwareMap);
-        odoteleop odoteleop = new odoteleop(hardwareMap, true, false);
+        odoteleop odoteleop = new odoteleop(true, false);
         /// touch sensor stuff is temp, just for testing
         limitLeft = hardwareMap.touchSensor.get("limitLeft");
         limitRight = hardwareMap.touchSensor.get("limitRight");
@@ -96,7 +96,7 @@ public class StatesTeleOneController extends LinearOpMode {
                 //odo auto aiming
                 telemetry.addData("limelightpos", hardware.limelightTurn.getPosition());
                 //hardware.launchTimer.reset(); ///// THIS SINGLE LINE WAS WHY LAUNCHING DIDNT WORK :sob: :cool:
-                telemetry.addData("YURRRRR:    ", odoteleop.odoAimTurret(autoAim, true, false));
+                //telemetry.addData("YURRRRR:    ", odoteleop.odoAimTurret(autoAim, true, false));
                 //
 //
                 telemetry.addData("Sorter Position: ", hardware.sorter.getPosition());

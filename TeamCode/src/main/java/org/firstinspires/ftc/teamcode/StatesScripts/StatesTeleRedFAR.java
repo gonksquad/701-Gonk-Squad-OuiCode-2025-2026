@@ -28,7 +28,7 @@ public class StatesTeleRedFAR extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         Hardware hardware = new Hardware(hardwareMap);
-        odoteleop odoteleop = new odoteleop(hardwareMap, false, true);
+        odoteleop odoteleop = new odoteleop( false, true);
         /// touch sensor stuff is temp, just for testing
         limitLeft = hardwareMap.touchSensor.get("limitLeft");
         limitRight = hardwareMap.touchSensor.get("limitRight");
@@ -139,7 +139,7 @@ public class StatesTeleRedFAR extends LinearOpMode {
                 telemetry.addData("limelightpos", hardware.limelightTurn.getPosition());
                 //hardware.launchTimer.reset();
                 hardware.launcherTurn.setPosition(hardware.launcherTurn.getPosition()+gamepad2.left_stick_x/100f);
-                telemetry.addData("YURRRRR:    ", odoteleop.odoAimTurret(autoAim, false, false));
+                //telemetry.addData("YURRRRR:    ", odoteleop.odoAimTurret(autoAim, false, false));
                 //
 //
                 telemetry.addData("Sorter Position: ", hardware.sorter.getPosition());

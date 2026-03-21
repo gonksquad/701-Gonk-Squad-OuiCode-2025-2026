@@ -1,22 +1,29 @@
 package org.firstinspires.ftc.teamcode.StatesScripts;
 
-import org.firstinspires.ftc.teamcode.MiscScripts.Hardware;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+
 import org.firstinspires.ftc.teamcode.WorldsScripts.AutoToTeleData;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import com.acmerobotics.roadrunner.Pose2d;
 
 public class odoteleop {
-    Hardware hardware;
-
     // ===== 100 DEGREE SERVO TUNING =====
 
-    private static double TURRET_CENTER = 0.47; // adjust until forward is perfect
-    private static double SERVO_TOTAL_DEGREES = 100.0;
-    private static double TURRET_MAX_DEGREES = 45.0; // safe turret swing each side
+   // private static double TURRET_CENTER = 0.47; // adjust until forward is perfect
+    //private static double SERVO_TOTAL_DEGREES = 100.0;
+   // private static double TURRET_MAX_DEGREES = 45.0; // safe turret swing each side
 
     // ==================================
 
@@ -32,23 +39,20 @@ public class odoteleop {
     private double currentHeading;
 
     // runs every update
-    String setOdoVariables(boolean isBlue) {
+    String setOdoVariables(boolean isBlue, Pose2d currentPose) {
 
-        Pose2d currentPose = hardware.getOdoPose();
-
-        currentX = currentPose.position.x;
-        currentY = currentPose.position.y;
-        currentHeading = currentPose.heading.toDouble();
+        //they're reversed for some reason
+        currentX = -currentPose.position.y;
+        currentY = currentPose.position.x;
+        angleOffset = currentPose.heading.toDouble();
 
         if(isBlue) {
-            TURRET_CENTER = 0.5;
             goalX = 0;
         } else {
             goalX = 144;
         }
-        angleOffset = currentHeading;
         if(isBlue) {
-            theta = Math.atan2(goalY - currentY, goalX - currentX) - angleOffset; //make sure atan isnt negative for blue
+            theta = Math.atan2((goalY - currentY), goalX - currentX) - angleOffset; //make sure atan isnt negative for blue
         } else {
             angleOffset += Math.toRadians(12.5);
             theta = Math.atan2(Math.abs(goalY - currentY), Math.abs(goalX - currentX)) - angleOffset; //make sure atan isnt negative for blue
@@ -57,10 +61,10 @@ public class odoteleop {
         theta = Math.toDegrees(theta);
         if(theta > 180) theta -= 360;
         if(theta < -180) theta += 360;
-        return "theta: " + theta + ", angleoffset: " + Math.toDegrees(angleOffset);
+        return "angle to goal: " + theta + ", angleoffset: " + Math.toDegrees(angleOffset);
     }
 
-    public odoteleop(HardwareMap hardwareMap, boolean onBlue, boolean startingFar) {
+    public odoteleop(boolean onBlue, boolean startingFar) {
         isBlue = onBlue;
         int x = 0;
         int y = 0;
@@ -82,34 +86,35 @@ public class odoteleop {
             y = 83;
             rot = 36;
         }
-        hardware = new Hardware(hardwareMap);
     }
 
-    public String odoAimTurret(boolean autoAim, boolean isBlue, boolean aimLimelight) {
+    public String odoAimTurret(boolean autoAim, boolean isBlue, boolean aimLimelight, Pose2d currentPose, Servo launcherTurn) {
         if (autoAim) {
-            String printStuff = setOdoVariables(isBlue) + ", ";
-            theta = Math.max(-TURRET_MAX_DEGREES, Math.min(TURRET_MAX_DEGREES, theta));
+            String printStuff = setOdoVariables(isBlue, currentPose) + ", ";
+            //theta = Math.max(-TURRET_MAX_DEGREES, Math.min(TURRET_MAX_DEGREES, theta));
 
 
             // Convert turret angle to servo position
-            double servoScale = TURRET_MAX_DEGREES / SERVO_TOTAL_DEGREES;
+            //double servoScale = TURRET_MAX_DEGREES / SERVO_TOTAL_DEGREES;
             if (!isBlue) {
                 //servoScale *= 0.9;
             }
 
-            double servoPos = TURRET_CENTER - (theta * servoScale / TURRET_MAX_DEGREES);
+            //double servoPos = TURRET_CENTER - (theta * servoScale / TURRET_MAX_DEGREES);
 
-            servoPos = Math.max(0, Math.min(1, servoPos));
+            //servoPos = Math.max(0, Math.min(1, servoPos));
+            double servoPos = (0.12f*theta/45) + 0.31f;
+
 //            if(!isBlue) {
 //                servoPos = 1 - servoPos;
 //            }
-            hardware.launcherTurn.setPosition(servoPos);
+            launcherTurn.setPosition(servoPos);
 
-            printStuff += "SP: " + servoPos;
-            printStuff += "Pose: (" + currentX + ", " + currentY + ", " + currentHeading + ")";
+            printStuff += " SP: " + servoPos;
+            printStuff += " Pose: (" + Math.round(currentX) + ", " + Math.round(currentY) + ", " + Math.round(currentHeading) + ")";
             return printStuff;//"heading: " + follower.getHeading()
         } else {
-            hardware.launcherTurn.setPosition(0.5f);
+            launcherTurn.setPosition(0.5f);
             return "no autoaim";
         }
     }
@@ -124,8 +129,8 @@ public class odoteleop {
         }
     }
 
-    public String getMotorPower(float powerOffset, Boolean isBlue) {
-        setOdoVariables(isBlue);
+    public String getMotorPower(float powerOffset, Boolean isBlue, Pose2d currentPose) {
+        setOdoVariables(isBlue, currentPose);
         double xDist = goalX - currentX;
         double yDist = goalY - currentY;
         double dist = yDist/Math.sin(theta);
