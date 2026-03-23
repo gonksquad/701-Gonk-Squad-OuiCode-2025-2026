@@ -30,7 +30,7 @@ public class odoteleop {
 
     // random odoaim vars
     private static int goalX = 144;
-    private static int goalY = 144;
+    private final int goalY = 144;
     private double angleOffset;
     private double theta;
     private boolean isBlue;
@@ -46,19 +46,14 @@ public class odoteleop {
         currentY = currentPose.position.x;
         angleOffset = currentPose.heading.toDouble();
 
-        if(isBlue) {
-            goalX = 0;
+        goalX = (isBlue) ? 0 : 144;
+        /*if(isBlue) {
+            theta = Math.atan2(goalY - currentY, goalX - currentX) - angleOffset; //make sure atan isnt negative for blue
         } else {
-            goalX = 144;
-        }
-        if(isBlue) {
-            theta = Math.atan2((goalY - currentY), goalX - currentX) - angleOffset; //make sure atan isnt negative for blue
-        } else {
-            angleOffset += Math.toRadians(12.5);
-            theta = Math.atan2(Math.abs(goalY - currentY), Math.abs(goalX - currentX)) - angleOffset; //make sure atan isnt negative for blue
-        }
+            theta = Math.atan2(goalY - currentY, goalX - currentX) - angleOffset; //make sure atan isnt negative for blue
+        }*/
 
-        theta = Math.toDegrees(theta);
+        theta = Math.toDegrees(Math.atan2(goalY-currentY, goalX-currentX) - angleOffset);
         if(theta > 180) theta -= 360;
         if(theta < -180) theta += 360;
         return "angle to goal: " + theta + ", angleoffset: " + Math.toDegrees(angleOffset);
@@ -88,26 +83,15 @@ public class odoteleop {
         }
     }
 
-    public String odoAimTurret(boolean autoAim, boolean isBlue, boolean aimLimelight, Pose2d currentPose, Servo launcherTurn) {
+    public String odoAimTurret(boolean autoAim, boolean isBlue, Pose2d currentPose, Servo launcherTurn) {
         if (autoAim) {
+            //set the odo variables and add stuff to print
             String printStuff = setOdoVariables(isBlue, currentPose) + ", ";
-            //theta = Math.max(-TURRET_MAX_DEGREES, Math.min(TURRET_MAX_DEGREES, theta));
 
-
-            // Convert turret angle to servo position
-            //double servoScale = TURRET_MAX_DEGREES / SERVO_TOTAL_DEGREES;
-            if (!isBlue) {
-                //servoScale *= 0.9;
-            }
-
-            //double servoPos = TURRET_CENTER - (theta * servoScale / TURRET_MAX_DEGREES);
-
-            //servoPos = Math.max(0, Math.min(1, servoPos));
+            //0.31 = 0deg, 0.43 = 45 deg, 0.55 = 90deg
             double servoPos = (0.12f*theta/45) + 0.31f;
 
-//            if(!isBlue) {
-//                servoPos = 1 - servoPos;
-//            }
+            //set launcher pos
             launcherTurn.setPosition(servoPos);
 
             printStuff += " SP: " + servoPos;
@@ -117,6 +101,11 @@ public class odoteleop {
             launcherTurn.setPosition(0.5f);
             return "no autoaim";
         }
+    }
+
+    public double getGoalDistance(boolean isBlue, Pose2d currentPose) {
+        setOdoVariables(isBlue, currentPose);
+        return Math.sqrt(Math.pow(goalX-currentX, 2)+Math.pow(goalY-currentY, 2));
     }
 
 
@@ -129,7 +118,7 @@ public class odoteleop {
         }
     }
 
-    public String getMotorPower(float powerOffset, Boolean isBlue, Pose2d currentPose) {
+    /*public String getMotorPower(float powerOffset, Boolean isBlue, Pose2d currentPose) {
         setOdoVariables(isBlue, currentPose);
         double xDist = goalX - currentX;
         double yDist = goalY - currentY;
@@ -137,5 +126,5 @@ public class odoteleop {
         double power = dist * powerOffset;
 
         return "calculated pwr: " + power + ", dist: (" + xDist + ", " + yDist + "), total dist: " + dist + ", ";
-    }
+    }*/
 }

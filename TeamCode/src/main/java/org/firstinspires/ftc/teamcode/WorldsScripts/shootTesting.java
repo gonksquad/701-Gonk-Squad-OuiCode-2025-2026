@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.WorldsScripts;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -11,53 +12,55 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.StatesScripts.odoteleop;
-//import com.acmerobotics.dashboard.config.Config;
 
 
 @TeleOp(name="WorldsWoodenTele")
-public class WoodenBotTele extends LinearOpMode {
+@Config
+public class shootTesting extends LinearOpMode {
 
-   /* public static class Params {
-        public double servoPos = 0;
+    public static class Params {
+        public double outtakeVelocity = 1200;
+        public double hoodPos = 0;
     }
 
-    public static WoodenBotTele.Params PARAMS = new WoodenBotTele.Params();*/
+    public static shootTesting.Params PARAMS = new shootTesting.Params();
 
     DcMotor driveFr, driveFl, driveBr, driveBl;
     DcMotor intakeMotorLeft, intakeMotorRight;
     DcMotorEx outtakeMotorR, outtakeMotorL;
-    Servo blocker, launcherTurn;
+    Servo blocker, launcherTurn, hood;
     //boolean isBlocking = false;
     boolean intakeBtn, flushBtn, blockBtn, longRangeBtn;
     MecanumDrive drive;
 
     public void runOpMode() {
 
-       odoteleop odoteleop = new odoteleop( true, true);
+        odoteleop odoteleop = new odoteleop( true, true);
         //fr =
         //
         //
         //
         drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
         driveFr = hardwareMap.get(DcMotor.class, "fr");
-            //driveFr.setDirection(DcMotorSimple.Direction.REVERSE);
+        //driveFr.setDirection(DcMotorSimple.Direction.REVERSE);
         driveFl = hardwareMap.get(DcMotor.class, "fl");
-            driveFl.setDirection(DcMotorSimple.Direction.REVERSE);
+        driveFl.setDirection(DcMotorSimple.Direction.REVERSE);
         driveBr = hardwareMap.get(DcMotor.class, "br");
-            //driveBr.setDirection(DcMotorSimple.Direction.REVERSE);
+        //driveBr.setDirection(DcMotorSimple.Direction.REVERSE);
         driveBl = hardwareMap.get(DcMotor.class, "bl");
-            driveBl.setDirection(DcMotorSimple.Direction.REVERSE);
+        driveBl.setDirection(DcMotorSimple.Direction.REVERSE);
 
         intakeMotorLeft = hardwareMap.get(DcMotor.class, "intakel");
-            intakeMotorLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        intakeMotorLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeMotorRight = hardwareMap.get(DcMotor.class, "intaker");
-            intakeMotorRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        intakeMotorRight.setDirection(DcMotorSimple.Direction.FORWARD);
         blocker = hardwareMap.get(Servo.class, "blocker");
 
         outtakeMotorR = hardwareMap.get(DcMotorEx.class, "outr");
-            outtakeMotorR.setDirection(DcMotorSimple.Direction.REVERSE);
+        outtakeMotorR.setDirection(DcMotorSimple.Direction.REVERSE);
         outtakeMotorL = hardwareMap.get(DcMotorEx.class, "outl");
         launcherTurn = hardwareMap.get(Servo.class, "turn");
+        hood = hardwareMap.get(Servo.class, "hood");
 
         waitForStart();
         while (opModeIsActive()) {
@@ -69,7 +72,11 @@ public class WoodenBotTele extends LinearOpMode {
             ToggleOuttaking();
 
             drive.localizer.update();
-            telemetry.addData("yurt", odoteleop.odoAimTurret(true, false, drive.localizer.getPose(), launcherTurn));
+            if(hood.getPosition() != PARAMS.hoodPos) {
+                hood.setPosition(PARAMS.hoodPos);
+            }
+            telemetry.addData("Dist to goal:", odoteleop.getGoalDistance(true, drive.localizer.getPose()));
+            telemetry.addData("", odoteleop.odoAimTurret(true, false, drive.localizer.getPose(), launcherTurn));
             SetMotorPowers(1);
             telemetry.update();
         }
@@ -81,8 +88,6 @@ public class WoodenBotTele extends LinearOpMode {
 
     }
     public void ToggleOuttaking() {
-        final int outtakeVelocityShort = 1200;
-        final int outtakeVelocityLong = 1400;
         final int outtakeVelocityIdle = 1050;
         blocker.setPosition(blockBtn ? 0 : 1);
         telemetry.addData("speedR", outtakeMotorR.getVelocity());
@@ -91,8 +96,8 @@ public class WoodenBotTele extends LinearOpMode {
         //sleep(100000000);
         //outtakeMotorR.setVelocity(blockBtn ? outtakeVelocityShort : outtakeVelocityShort);
         //outtakeMotorL.setVelocity(blockBtn ? outtakeVelocityShort : outtakeVelocityShort);
-        outtakeMotorR.setVelocity(blockBtn ? outtakeVelocityShort : outtakeVelocityIdle);
-        outtakeMotorL.setVelocity(blockBtn ? (!longRangeBtn ? outtakeVelocityShort : outtakeVelocityLong) : outtakeVelocityIdle);
+        outtakeMotorR.setVelocity(blockBtn ? PARAMS.outtakeVelocity : outtakeVelocityIdle);
+        outtakeMotorL.setVelocity(blockBtn ? PARAMS.outtakeVelocity : outtakeVelocityIdle);
     }
     public void SetMotorPowers(float maxSpeed) {
         double y = -gamepad1.left_stick_y*maxSpeed;
