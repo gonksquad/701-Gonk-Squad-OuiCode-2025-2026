@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.StatesScripts.odoteleop;
@@ -26,10 +27,13 @@ public class WoodenBotTele extends LinearOpMode {
     DcMotor driveFr, driveFl, driveBr, driveBl;
     DcMotor intakeMotorLeft, intakeMotorRight;
     DcMotorEx outtakeMotorR, outtakeMotorL;
-    Servo blocker, launcherTurn;
+    Servo blocker, launcherTurn, hood;
     //boolean isBlocking = false;
     boolean intakeBtn, flushBtn, blockBtn, longRangeBtn;
     MecanumDrive drive;
+    int outtakeVelocity;
+    final int outtakeVelocityIdle = 1200;
+    ElapsedTime velIncrementTimer = new ElapsedTime();
 
     public void runOpMode() {
 
@@ -59,17 +63,18 @@ public class WoodenBotTele extends LinearOpMode {
         outtakeMotorL = hardwareMap.get(DcMotorEx.class, "outl");
         launcherTurn = hardwareMap.get(Servo.class, "turn");
 
+        hood = hardwareMap.get(Servo.class, "hood");
         waitForStart();
         while (opModeIsActive()) {
-            blockBtn = gamepad2.a;
+            blockBtn = gamepad1.a;
             intakeBtn = gamepad2.x || blockBtn;
             flushBtn = gamepad2.b;
             longRangeBtn = gamepad2.right_trigger>0.05;
             SpinIntake(1); // x for intake, a for flush
             ToggleOuttaking();
-
             drive.localizer.update();
             telemetry.addData("yurt", odoteleop.odoAimTurret(true, false, drive.localizer.getPose(), launcherTurn));
+            distanceTracking(false, odoteleop);
             SetMotorPowers(1);
             telemetry.update();
         }
@@ -81,18 +86,21 @@ public class WoodenBotTele extends LinearOpMode {
 
     }
     public void ToggleOuttaking() {
-        final int outtakeVelocityShort = 1200;
-        final int outtakeVelocityLong = 1400;
-        final int outtakeVelocityIdle = 1050;
         blocker.setPosition(blockBtn ? 0 : 1);
         telemetry.addData("speedR", outtakeMotorR.getVelocity());
         telemetry.addData("speedL", outtakeMotorL.getVelocity());
+        telemetry.addData("OUTTAKEVEL:", outtakeVelocity + velIncrementTimer.milliseconds()/40);
+        telemetry.addData("hoodpos:", hood.getPosition());
+        //if not being held down, reset the velocity incrementer
+        if(!blockBtn) {
+            velIncrementTimer.reset();
+        }
         // sets the blocker position to open once motors are at certain speed (wont work but we'll have this evench)
         //sleep(100000000);
         //outtakeMotorR.setVelocity(blockBtn ? outtakeVelocityShort : outtakeVelocityShort);
         //outtakeMotorL.setVelocity(blockBtn ? outtakeVelocityShort : outtakeVelocityShort);
-        outtakeMotorR.setVelocity(blockBtn ? outtakeVelocityShort : outtakeVelocityIdle);
-        outtakeMotorL.setVelocity(blockBtn ? (!longRangeBtn ? outtakeVelocityShort : outtakeVelocityLong) : outtakeVelocityIdle);
+        outtakeMotorR.setVelocity(blockBtn ? outtakeVelocity + velIncrementTimer.milliseconds()/40 : outtakeVelocityIdle);
+        outtakeMotorL.setVelocity(blockBtn ? outtakeVelocity + velIncrementTimer.milliseconds()/40: outtakeVelocityIdle);
     }
     public void SetMotorPowers(float maxSpeed) {
         double y = -gamepad1.left_stick_y*maxSpeed;
@@ -115,5 +123,17 @@ public class WoodenBotTele extends LinearOpMode {
         driveFr.setPower(fr / denominator);
         driveBl.setPower(bl / denominator);
         driveBr.setPower(br / denominator);
+    }
+
+
+    public void distanceTracking(boolean isBlue, odoteleop odoteleop) {
+        double dist = odoteleop.getGoalDistance(isBlue, drive.localizer.getPose());
+        //formula from https://www.desmos.com/calculator/hnlvt45jvt
+        outtakeVelocity = (int)Math.round(-0.000310968*Math.pow(dist, 3)+0.0946642*Math.pow(dist, 2)-3.63154*dist+1030.63395);
+        if(dist > 73) {
+            hood.setPosition(-0.0000001086*Math.pow(dist,4) + 0.0000441*Math.pow(dist,3) - 0.006325*Math.pow(dist,2) + 0.3704*dist - 6.9);
+        } else {
+            hood.setPosition(0.000000121749*Math.pow(dist, 4) - 0.000063736*Math.pow(dist,3) +0.012192*Math.pow(dist, 2) -1.0071*dist +30.383);
+        }
     }
 }

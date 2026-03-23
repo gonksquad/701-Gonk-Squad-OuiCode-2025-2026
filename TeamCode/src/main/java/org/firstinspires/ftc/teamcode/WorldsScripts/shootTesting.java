@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.StatesScripts.odoteleop;
 
 
-@TeleOp(name="WorldsWoodenTele")
+@TeleOp(name="ZZZShoot Testing")
 @Config
 public class shootTesting extends LinearOpMode {
 
@@ -72,11 +72,12 @@ public class shootTesting extends LinearOpMode {
             ToggleOuttaking();
 
             drive.localizer.update();
-            if(hood.getPosition() != PARAMS.hoodPos) {
-                hood.setPosition(PARAMS.hoodPos);
-            }
+            hood.setPosition(PARAMS.hoodPos);
+
+            telemetry.addData("hood", hood.getPosition());
+
             telemetry.addData("Dist to goal:", odoteleop.getGoalDistance(true, drive.localizer.getPose()));
-            telemetry.addData("", odoteleop.odoAimTurret(true, false, drive.localizer.getPose(), launcherTurn));
+            telemetry.addData("", odoteleop.odoAimTurret(true, true, drive.localizer.getPose(), launcherTurn));
             SetMotorPowers(1);
             telemetry.update();
         }
@@ -88,7 +89,7 @@ public class shootTesting extends LinearOpMode {
 
     }
     public void ToggleOuttaking() {
-        final int outtakeVelocityIdle = 1050;
+        int outtakeVelocityIdle = (int)PARAMS.outtakeVelocity;
         blocker.setPosition(blockBtn ? 0 : 1);
         telemetry.addData("speedR", outtakeMotorR.getVelocity());
         telemetry.addData("speedL", outtakeMotorL.getVelocity());
