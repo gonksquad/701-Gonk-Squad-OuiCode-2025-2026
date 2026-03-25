@@ -27,12 +27,12 @@ public class WorldsAutoRedNear extends LinearOpMode {
                 .build();
 
         Action launchWait = drive.actionBuilder(new Pose2d(-24, 24, Math.toRadians(135)))
-                .waitSeconds(1.0)
+                .waitSeconds(3.0)
                 .build();
 
         Action pickup1 = drive.actionBuilder(new Pose2d(-24, 24, Math.toRadians(135)))
                 .setTangent(0)
-                .splineToLinearHeading(new Pose2d(-12, 24, Math.toRadians(90)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(-12, 18, Math.toRadians(90)), Math.toRadians(90))
                 .lineToY(48)
                 .setTangent(Math.toRadians(270))
                 .splineToLinearHeading(new Pose2d(-24, 24, Math.toRadians(135)), Math.toRadians(180))
@@ -40,7 +40,7 @@ public class WorldsAutoRedNear extends LinearOpMode {
 
         Action pickup2 = drive.actionBuilder(new Pose2d(-24, 24, Math.toRadians(135)))
                 .setTangent(0)
-                .splineToLinearHeading(new Pose2d(12, 24, Math.toRadians(90)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(12, 18, Math.toRadians(90)), Math.toRadians(90))
                 .lineToY(48)
                 .setTangent(Math.toRadians(270))
                 .splineToLinearHeading(new Pose2d(-24, 24, Math.toRadians(135)), Math.toRadians(180))
@@ -48,7 +48,7 @@ public class WorldsAutoRedNear extends LinearOpMode {
 
         Action pickup3 = drive.actionBuilder(new Pose2d(-24, 24, Math.toRadians(135)))
                 .setTangent(0)
-                .splineToLinearHeading(new Pose2d(36, 24, Math.toRadians(90)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(36, 18, Math.toRadians(90)), Math.toRadians(90))
                 .lineToY(48)
                 .setTangent(Math.toRadians(270))
                 .splineToLinearHeading(new Pose2d(-24, 24, Math.toRadians(135)), Math.toRadians(180))
@@ -60,18 +60,20 @@ public class WorldsAutoRedNear extends LinearOpMode {
         Actions.runBlocking(
                 new SequentialAction(
                         hardware.outtakeStart(1200),
+                        hardware.blockOuttake(),
+                        hardware.intakeStart(),
                         launch0,
                         hardware.launch(1200),
                         launchWait,
                         hardware.intakeStart(),
                         hardware.blockOuttake(),
                         pickup1,
-                        hardware.intakeStop(),
+                        //hardware.intakeStop(),
                         hardware.launch(1200),
                         launchWait,
                         hardware.intakeStart(),
-                        hardware.blockOuttake(),
-                        pickup2,
+                        hardware.blockOuttake()
+                        /*pickup2,
                         hardware.intakeStop(),
                         hardware.launch(1200),
                         launchWait,
@@ -83,7 +85,7 @@ public class WorldsAutoRedNear extends LinearOpMode {
                         launchWait,
                         hardware.outtakeStop(),
                         hardware.intakeStop(),
-                        hardware.blockOuttake()
+                        hardware.blockOuttake()*/
                 )
         );
     }

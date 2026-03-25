@@ -28,7 +28,6 @@ public class WorldsAutoHardware {
         inL.setDirection(DcMotorSimple.Direction.REVERSE);
         inR.setDirection(DcMotorSimple.Direction.FORWARD);
 
-
         blocker = hardwareMap.get(Servo.class, "blocker");
         outYaw = hardwareMap.get(Servo.class, "turn");
     }
@@ -73,7 +72,7 @@ public class WorldsAutoHardware {
         @Override
         public boolean run(@NotNull TelemetryPacket packet) {
             outL.setVelocity(launchSpeed);
-            outR.setPower(launchSpeed);
+            outR.setVelocity(launchSpeed);
 
             if (outL.getVelocity() < launchSpeed - 10.0 || outL.getVelocity() > launchSpeed + 10.0) {
                 return true;

@@ -19,8 +19,10 @@ import org.firstinspires.ftc.teamcode.StatesScripts.odoteleop;
 public class shootTesting extends LinearOpMode {
 
     public static class Params {
-        public double outtakeVelocity = 1200;
-        public double hoodPos = 0;
+        //public double outtakeVelocity = 1200;
+        //public double hoodPos = 0;
+        public double launchWait = 1;
+        public double speedIncrement = 1;
     }
 
     public static shootTesting.Params PARAMS = new shootTesting.Params();
@@ -72,7 +74,7 @@ public class shootTesting extends LinearOpMode {
             ToggleOuttaking();
 
             drive.localizer.update();
-            hood.setPosition(PARAMS.hoodPos);
+            //hood.setPosition(PARAMS.hoodPos);
 
             telemetry.addData("hood", hood.getPosition());
 
@@ -89,7 +91,7 @@ public class shootTesting extends LinearOpMode {
 
     }
     public void ToggleOuttaking() {
-        int outtakeVelocityIdle = (int)PARAMS.outtakeVelocity;
+       // int outtakeVelocityIdle = (int)PARAMS.outtakeVelocity;
         blocker.setPosition(blockBtn ? 0 : 1);
         telemetry.addData("speedR", outtakeMotorR.getVelocity());
         telemetry.addData("speedL", outtakeMotorL.getVelocity());
@@ -97,8 +99,8 @@ public class shootTesting extends LinearOpMode {
         //sleep(100000000);
         //outtakeMotorR.setVelocity(blockBtn ? outtakeVelocityShort : outtakeVelocityShort);
         //outtakeMotorL.setVelocity(blockBtn ? outtakeVelocityShort : outtakeVelocityShort);
-        outtakeMotorR.setVelocity(blockBtn ? PARAMS.outtakeVelocity : outtakeVelocityIdle);
-        outtakeMotorL.setVelocity(blockBtn ? PARAMS.outtakeVelocity : outtakeVelocityIdle);
+        //outtakeMotorR.setVelocity(blockBtn ? PARAMS.outtakeVelocity : outtakeVelocityIdle);
+        //outtakeMotorL.setVelocity(blockBtn ? PARAMS.outtakeVelocity : outtakeVelocityIdle);
     }
     public void SetMotorPowers(float maxSpeed) {
         double y = -gamepad1.left_stick_y*maxSpeed;
