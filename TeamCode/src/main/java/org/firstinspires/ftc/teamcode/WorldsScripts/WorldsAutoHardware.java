@@ -2,11 +2,13 @@ package org.firstinspires.ftc.teamcode.WorldsScripts;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+
 
 import org.jetbrains.annotations.NotNull;
 
@@ -16,6 +18,8 @@ public class WorldsAutoHardware {
     public Servo blocker, outYaw;
 
     public double launchSpeed;
+    boolean isBlue;
+    double currentYawAngle;
 
     public WorldsAutoHardware(HardwareMap hardwareMap) {
         outL = hardwareMap.get(DcMotorEx.class, "outl");
@@ -28,8 +32,10 @@ public class WorldsAutoHardware {
         inL.setDirection(DcMotorSimple.Direction.REVERSE);
         inR.setDirection(DcMotorSimple.Direction.FORWARD);
 
+
         blocker = hardwareMap.get(Servo.class, "blocker");
         outYaw = hardwareMap.get(Servo.class, "turn");
+
     }
 
     public class IntakeStart implements Action {
@@ -74,7 +80,7 @@ public class WorldsAutoHardware {
             outL.setVelocity(launchSpeed);
             outR.setVelocity(launchSpeed);
 
-            if (outL.getVelocity() < launchSpeed - 10.0 || outL.getVelocity() > launchSpeed + 10.0) {
+            if (Math.abs(outL.getVelocity() - launchSpeed) < 40) {
                 return true;
             } else {
                 blocker.setPosition(0);
@@ -101,6 +107,36 @@ public class WorldsAutoHardware {
         }
     }
 
+    public class SetYawAngle implements Action {
+        @Override
+        public boolean run(@NotNull TelemetryPacket packet) {
+            //0.43 = -45deg, 0.55 = 0deg 0.67 = 45deg
+            outYaw.setPosition(0.55 + 0.12*currentYawAngle/45);
+            return false;
+        }
+    }
+
+    /*public class odoAimTurret implements Action {
+        @Override
+        public boolean run(@NotNull TelemetryPacket packet) {
+            //get pose
+                drive.localizer.update();
+                double currentX = -drive.localizer.getPose().position.y;
+                double currentY = drive.localizer.getPose().position.x;
+                double currentHeading =  drive.localizer.getPose().heading.toDouble();
+                final int goalY = 65;
+                final int goalX = -65;
+
+            //set turret rot
+                double theta = Math.toDegrees(Math.atan2(goalY-currentY, goalX-currentX) - currentHeading);
+                //0.31 = 0deg, 0.43 = 45 deg, 0.55 = 90deg
+                double servoPos = (0.12f*theta/45) + 0.31f;
+                //set launcher pos
+                outYaw.setPosition(servoPos);
+                return true;
+        }
+    }*/
+
     public Action outtakeStart(double speed) {
         launchSpeed = speed;
         return new OuttakeStart();
@@ -118,4 +154,15 @@ public class WorldsAutoHardware {
     public Action blockOuttake() {
         return new BlockOuttake();
     }
+
+    public Action setYawAngle(double angle) {
+        currentYawAngle = angle;
+        return new SetYawAngle();
+    }
+
+    /*public Action odoAimTurret(boolean onBlue) {
+         isBlue = onBlue;
+        return new odoAimTurret();
+    }*/
+
 }

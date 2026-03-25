@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.WorldsScripts;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -11,7 +13,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Autonomous
+@Config
 public class WorldsAutoRedNear extends LinearOpMode {
+    public static class Params {
+        public double servoAngle = 0;
+    }
+    public static WorldsAutoRedNear.Params PARAMS = new WorldsAutoRedNear.Params();
+
     MecanumDrive drive;
     WorldsAutoHardware hardware;
     Pose2d initialPose;
@@ -58,35 +66,40 @@ public class WorldsAutoRedNear extends LinearOpMode {
         waitForStart();
 
         Actions.runBlocking(
-                new SequentialAction(
-                        hardware.outtakeStart(1200),
-                        hardware.blockOuttake(),
-                        hardware.intakeStart(),
-                        launch0,
-                        hardware.launch(1200),
-                        launchWait,
-                        hardware.intakeStart(),
-                        hardware.blockOuttake(),
-                        pickup1,
-                        //hardware.intakeStop(),
-                        hardware.launch(1200),
-                        launchWait,
-                        hardware.intakeStart(),
-                        hardware.blockOuttake()
-                        /*pickup2,
-                        hardware.intakeStop(),
-                        hardware.launch(1200),
-                        launchWait,
-                        hardware.intakeStart(),
-                        hardware.blockOuttake(),
-                        pickup3,
-                        hardware.intakeStop(),
-                        hardware.launch(1200),
-                        launchWait,
-                        hardware.outtakeStop(),
-                        hardware.intakeStop(),
-                        hardware.blockOuttake()*/
-                )
-        );
+                    new SequentialAction(
+                            new ParallelAction(
+                                hardware.outtakeStart(1200),
+                                hardware.blockOuttake(),
+                                hardware.intakeStart(),
+                                hardware.setYawAngle(PARAMS.servoAngle)
+                            ),
+                            launch0,
+                            hardware.launch(1200),
+                            launchWait,
+                            hardware.intakeStart(),
+                            hardware.blockOuttake(),
+                            //new ParallelAction(
+                                pickup1,
+                            //    hardware.launch(1200)
+                            //),
+                            hardware.launch(1200),
+                            hardware.intakeStart(),
+                            launchWait,
+                            hardware.blockOuttake()
+                            /*pickup2,
+                            hardware.intakeStop(),
+                            hardware.launch(1200),
+                            launchWait,
+                            hardware.intakeStart(),
+                            hardware.blockOuttake(),
+                            pickup3,
+                            hardware.intakeStop(),
+                            hardware.launch(1200),
+                            launchWait,
+                            hardware.outtakeStop(),
+                            hardware.intakeStop(),
+                            hardware.blockOuttake()*/
+                    )
+            );
     }
 }
