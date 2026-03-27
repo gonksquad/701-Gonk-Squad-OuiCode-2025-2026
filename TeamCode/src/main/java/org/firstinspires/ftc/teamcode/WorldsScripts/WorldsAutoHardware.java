@@ -1,7 +1,10 @@
 package org.firstinspires.ftc.teamcode.WorldsScripts;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -10,16 +13,17 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.jetbrains.annotations.NotNull;
 
 public class WorldsAutoHardware {
     public DcMotorEx outL, outR;
     public DcMotor inL, inR;
-    public Servo blocker, outYaw;
+    public Servo blocker, outYaw, hood;
 
-    public double launchSpeed;
+    public double launchSpeed = 1100;
     boolean isBlue;
-    double currentYawAngle;
+    double currentYawAngle, hoodPos;
 
     public WorldsAutoHardware(HardwareMap hardwareMap) {
         outL = hardwareMap.get(DcMotorEx.class, "outl");
@@ -35,6 +39,7 @@ public class WorldsAutoHardware {
 
         blocker = hardwareMap.get(Servo.class, "blocker");
         outYaw = hardwareMap.get(Servo.class, "turn");
+        hood = hardwareMap.get(Servo.class, "hood");
 
     }
 
@@ -79,8 +84,8 @@ public class WorldsAutoHardware {
         public boolean run(@NotNull TelemetryPacket packet) {
             outL.setVelocity(launchSpeed);
             outR.setVelocity(launchSpeed);
-
-            if (Math.abs(outL.getVelocity() - launchSpeed) < 40) {
+            hood.setPosition(hoodPos);
+            if (Math.abs(outL.getVelocity() - launchSpeed) < 20) {
                 return true;
             } else {
                 blocker.setPosition(0);
@@ -106,7 +111,13 @@ public class WorldsAutoHardware {
             return false;
         }
     }
-
+    public class UnblockOuttake implements  Action {
+        @Override
+        public boolean run(@NotNull TelemetryPacket packet) {
+            blocker.setPosition(0);
+            return false;
+        }
+    }
     public class SetYawAngle implements Action {
         @Override
         public boolean run(@NotNull TelemetryPacket packet) {
@@ -142,8 +153,9 @@ public class WorldsAutoHardware {
         return new OuttakeStart();
     }
 
-    public Action launch(double speed) {
+    public Action launch(double speed, double newHoodPos) {
         launchSpeed = speed;
+        hoodPos = newHoodPos;
         return new Launch();
     }
 
@@ -154,10 +166,24 @@ public class WorldsAutoHardware {
     public Action blockOuttake() {
         return new BlockOuttake();
     }
+    public Action unblockOuttake() {
+        return new UnblockOuttake();
+    }
 
     public Action setYawAngle(double angle) {
         currentYawAngle = angle;
         return new SetYawAngle();
+    }
+
+    //made cause the start wasn't settin to the correct velocity and if it aint broke and stuff
+    public Action setOuttakeVelStart() {
+        return new InstantAction(() -> SetVel());
+        //return new VArmDump();
+    }
+
+    void SetVel() {
+        outL.setVelocity(650);
+        outR.setVelocity(650);
     }
 
     /*public Action odoAimTurret(boolean onBlue) {
