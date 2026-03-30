@@ -9,31 +9,22 @@ import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
 public class MeepMeepTest {
     public static void main(String[] args) {
-        MeepMeep meepMeep = new MeepMeep(800);
+        MeepMeep meepMeep = new MeepMeep(700);
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 10)
                 .build();
+        Pose2d launchPos = new Pose2d(-19, 19, Math.toRadians(90));
+        myBot.runAction(myBot.getDrive().actionBuilder(launchPos/*new Pose2d(-50, 50, Math.toRadians(125))*/)
 
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-50, 50, Math.toRadians(125)))
-                .strafeToLinearHeading(new Vector2d(-24, 24), Math.toRadians(135))
-                .setTangent(0)
-                .splineToLinearHeading(new Pose2d(-12, 24, Math.toRadians(90)), Math.toRadians(90))
-                .lineToY(48)
-                .setTangent(Math.toRadians(270))
-                .splineToLinearHeading(new Pose2d(-24, 24, Math.toRadians(135)), Math.toRadians(180))
-                .setTangent(0)
-                .splineToLinearHeading(new Pose2d(12, 24, Math.toRadians(90)), Math.toRadians(90))
-                .lineToY(48)
-                .setTangent(Math.toRadians(270))
-                .splineToLinearHeading(new Pose2d(-24, 24, Math.toRadians(135)), Math.toRadians(180))
-                .setTangent(0)
-                .splineToLinearHeading(new Pose2d(36, 24, Math.toRadians(90)), Math.toRadians(90))
-                .lineToY(48)
-                .setTangent(Math.toRadians(270))
-                .splineToLinearHeading(new Pose2d(-24, 24, Math.toRadians(135)), Math.toRadians(180))
+                .setTangent(Math.toRadians(0))
+                //.splineToSplineHeading(new Pose2d(12, 64, Math.toRadians(92.5)), Math.toRadians(95))
+                .splineToSplineHeading(new Pose2d(12, 64, Math.toRadians(85)), Math.toRadians(95))
+                .setTangent(Math.toRadians(315))
+                .splineToSplineHeading(launchPos, Math.toRadians(180))
                 .build());
+
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_DECODE_JUICE_DARK)
                 .setDarkMode(true)

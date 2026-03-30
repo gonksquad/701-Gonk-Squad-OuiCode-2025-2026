@@ -176,14 +176,18 @@ public class WorldsAutoHardware {
     }
 
     //made cause the start wasn't settin to the correct velocity and if it aint broke and stuff
-    public Action setOuttakeVelStart() {
-        return new InstantAction(() -> SetVel());
+    public Action setOuttakeVelStart(double speed) {
+        return new InstantAction(() -> SetVel(speed));
         //return new VArmDump();
     }
 
-    void SetVel() {
-        outL.setVelocity(650);
-        outR.setVelocity(650);
+    public Action setHoodPos(double position) {
+        return new InstantAction(() -> hood.setPosition(position));
+    }
+
+    void SetVel(double speed) {
+        outL.setVelocity(speed);
+        outR.setVelocity(speed);
     }
 
     /*public Action odoAimTurret(boolean onBlue) {
