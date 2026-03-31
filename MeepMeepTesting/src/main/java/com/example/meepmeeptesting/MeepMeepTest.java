@@ -15,14 +15,21 @@ public class MeepMeepTest {
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 10)
                 .build();
-        Pose2d launchPos = new Pose2d(-19, 19, Math.toRadians(90));
+        Pose2d launchPos = new Pose2d(61, 30, Math.toRadians(180));
         myBot.runAction(myBot.getDrive().actionBuilder(launchPos/*new Pose2d(-50, 50, Math.toRadians(125))*/)
 
-                .setTangent(Math.toRadians(0))
-                //.splineToSplineHeading(new Pose2d(12, 64, Math.toRadians(92.5)), Math.toRadians(95))
-                .splineToSplineHeading(new Pose2d(12, 64, Math.toRadians(85)), Math.toRadians(95))
-                .setTangent(Math.toRadians(315))
-                .splineToSplineHeading(launchPos, Math.toRadians(180))
+                .setTangent(Math.toRadians(210))
+                .splineToSplineHeading(new Pose2d(35, 63, Math.toRadians(90)), Math.toRadians(90))
+                .waitSeconds(0.5)
+                .setTangent(Math.toRadians(225))
+                .splineToConstantHeading(launchPos.position, Math.toRadians(45))
+
+                .setTangent(Math.toRadians(90))
+                .lineToY(61)
+                .lineToY(launchPos.position.y)
+  //.splineToSplineHeading(new Pose2d(61, 61, Math.toRadians(90)), Math.toRadians(45))
+
+
                 .build());
 
 

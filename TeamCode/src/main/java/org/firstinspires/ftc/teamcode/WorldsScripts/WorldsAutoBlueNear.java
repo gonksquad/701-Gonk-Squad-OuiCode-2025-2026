@@ -31,19 +31,19 @@ public class WorldsAutoBlueNear extends LinearOpMode {
         drive = new MecanumDrive(hardwareMap, initialPose);
         hardware = new WorldsAutoHardware(hardwareMap);
 
-        Action launch0 = drive.actionBuilder(initialPose)
+        Action launch0 = drive.actionBuilderBlue(initialPose)
                 .strafeToLinearHeading(new Vector2d(-19, 19), Math.toRadians(90))
                 .build();
 
 
-        Action pickup1 = drive.actionBuilder(launchPos)
+        Action pickup1 = drive.actionBuilderBlue(launchPos)
                 .setTangent(0)
                 .splineToLinearHeading(new Pose2d(-16, 54, Math.toRadians(90)), launchPos.heading)
                 .setTangent(Math.toRadians(180))
                 .splineToLinearHeading(launchPos, Math.toRadians(90))
                 .build();
 
-        Action pickup2 = drive.actionBuilder(launchPos)
+        Action pickup2 = drive.actionBuilderBlue(launchPos)
                 .setTangent(Math.toRadians(0))
                 //.splineToSplineHeading(new Pose2d(12, 64, Math.toRadians(92.5)), Math.toRadians(95))
                 .splineToSplineHeading(new Pose2d(12, 64, Math.toRadians(85)), Math.toRadians(95))
@@ -51,7 +51,7 @@ public class WorldsAutoBlueNear extends LinearOpMode {
                 .splineToSplineHeading(launchPos, Math.toRadians(180))
                 .build();
 
-        Action flushPickup = drive.actionBuilder(launchPos)
+        Action flushPickup = drive.actionBuilderBlue(launchPos)
                 .setTangent(0)
                 .splineToLinearHeading(new Pose2d(6, 64, Math.toRadians(135)), launchPos.heading)
                 .strafeToConstantHeading(new Vector2d(14, 66))
@@ -60,7 +60,7 @@ public class WorldsAutoBlueNear extends LinearOpMode {
                 .splineToLinearHeading(launchPos, Math.toRadians(165))
                 .build();
 
-        Action endPark = drive.actionBuilder(launchPos)
+        Action endPark = drive.actionBuilderBlue(launchPos)
                 .strafeToLinearHeading(new Vector2d(-16, 34), Math.toRadians(135))
                 .build();
 
