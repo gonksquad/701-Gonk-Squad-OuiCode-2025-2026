@@ -28,7 +28,7 @@ public class WorldsAutoRedFar extends LinearOpMode {
         hardware = new WorldsAutoHardware(hardwareMap);
         Action pickup3 = drive.actionBuilder(launchPos)
                 .setTangent(Math.toRadians(210))
-                .splineToSplineHeading(new Pose2d(34, 43, Math.toRadians(90)), Math.toRadians(90))
+                .splineToSplineHeading(new Pose2d(36, 43, Math.toRadians(90)), Math.toRadians(90))
                 .lineToY(63)
                 .setReversed(true)
                 .splineToLinearHeading(launchPos2, Math.toRadians(45))
@@ -38,7 +38,10 @@ public class WorldsAutoRedFar extends LinearOpMode {
         Action flushPickup = drive.actionBuilder(launchPos2)
                 .setReversed(false)
                 .setTangent(Math.toRadians(90))
-                .strafeToLinearHeading(new Vector2d(launchPos.position.x-2,55), Math.toRadians(90))
+                .strafeToLinearHeading(new Vector2d(launchPos.position.x-2,56), Math.toRadians(75))
+                .waitSeconds(0.2)
+                .lineToY(52)
+                .lineToY(58)
                 .strafeToLinearHeading(launchPos2.position, launchPos2.heading)
                 .build();
 
@@ -54,25 +57,28 @@ public class WorldsAutoRedFar extends LinearOpMode {
                         new ParallelAction(
                             hardware.blockOuttake(),
                             hardware.setYawAngle(-20),
-                            hardware.setOuttakeVelStart(600),
+                            hardware.setOuttakeVelStart(400),
                             hardware.intakeStart()
                         ),
                         hardware.blockOuttake(),
                         //Turn turret, shoot 3, turn on intake, block turret
-                        hardware.launch(1450, 0.3, 0.2, 500),
+                        hardware.setHoodPos(0.3),
+                        hardware.launch(100, 0.65, 0.45, 800),
                         new SleepAction(1.5),
                         hardware.blockOuttake(),
                         new ParallelAction(
-                            hardware.setYawAngle(20),
+                            hardware.setYawAngle(15),
                             pickup3
                         ),
-                        hardware.launch(1650, 0.4, 0.1, 500),
+                        hardware.setHoodPos(0.4),
+                        hardware.launch(1750, 0.3, 0.1, 400),
                         new SleepAction(1.5),
                         hardware.blockOuttake(),
                         //turn turret, shoot 3, block turret
-                        hardware.setYawAngle(25),
+                        hardware.setYawAngle(21),
                         flushPickup,
-                        hardware.launch(1650, 0.4, 0.1, 500),
+                        hardware.setHoodPos(0.4),
+                        hardware.launch(1650, 0.4, 0.25, 500),
                         new SleepAction(1.5),
                         //shoot 3, block turret
                         endPark

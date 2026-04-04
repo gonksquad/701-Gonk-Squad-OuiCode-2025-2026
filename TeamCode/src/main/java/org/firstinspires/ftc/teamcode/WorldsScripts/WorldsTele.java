@@ -32,11 +32,11 @@ public class WorldsTele extends LinearOpMode {
     boolean intakeBtn, flushBtn, blockBtn, longRangeBtn;
     MecanumDrive drive;
     int outtakeVelocity;
-    double trueOuttakeVel;
     final int outtakeVelocityIdle = 1200;
-    ElapsedTime velIncrementTimer = new ElapsedTime();
+    ElapsedTime hoodIncrementTimer = new ElapsedTime();
     double distanceToGoal;
     boolean isBlue = AutoToTeleData.side == 0;
+    double hoodPos;
 
     public void runOpMode() {
 
@@ -91,26 +91,26 @@ public class WorldsTele extends LinearOpMode {
     }
 
     public void SpinIntake(float intakeSpeed) {
-        intakeMotorLeft.setPower(intakeBtn ? intakeSpeed : flushBtn ? -intakeSpeed : 0);
+        intakeMotorLeft.setPower(intakeBtn ? intakeSpeed*0.8 : flushBtn ? -intakeSpeed : 0);
         intakeMotorRight.setPower(intakeBtn ? intakeSpeed : flushBtn ? -intakeSpeed : 0);
-
     }
     public void ToggleOuttaking() {
-        trueOuttakeVel = Math.min(2000, outtakeVelocity /*+ (0.75f*velIncrementTimer.milliseconds()-distanceToGoal*PARAMS.speedIncrement)/40*/);
-        blocker.setPosition(blockBtn & (velIncrementTimer.milliseconds() > 3000 || outtakeMotorL.getVelocity() - 25 <  trueOuttakeVel)? 0 : 1);
+        blocker.setPosition(blockBtn && (/*velIncrementTimer.milliseconds() > 3000 || */outtakeMotorL.getVelocity() - 150 >  Math.min(outtakeVelocity, 2000))? 0 : 1);
+        if(blocker.getPosition() == 1)
+        {
+            //if blocking
+            hoodIncrementTimer.reset();
+        }
 
         telemetry.addData("speedR", outtakeMotorR.getVelocity());
         telemetry.addData("speedL", outtakeMotorL.getVelocity());
-        telemetry.addData("OUTTAKEVEL:", trueOuttakeVel);
+        telemetry.addData("OUTTAKEVEL:", outtakeVelocity);
         telemetry.addData("hoodpos:", hood.getPosition());
         //if not being held down, reset the velocity incrementer
-        if(!blockBtn) {
-            velIncrementTimer.reset();
-        }
         // sets the blocker position to open once motors are at certain speed (wont work but we'll have this evench)
         if(PARAMS.outtakevel <= 0) {
-            outtakeMotorR.setVelocity(blockBtn ? trueOuttakeVel : outtakeVelocityIdle);
-            outtakeMotorL.setVelocity(blockBtn ? trueOuttakeVel : outtakeVelocityIdle);
+            outtakeMotorR.setVelocity(blockBtn ? outtakeVelocity : outtakeVelocityIdle);
+            outtakeMotorL.setVelocity(blockBtn ? outtakeVelocity : outtakeVelocityIdle);
         } else {
             outtakeMotorR.setVelocity(blockBtn ? PARAMS.outtakevel : outtakeVelocityIdle);
             outtakeMotorL.setVelocity(blockBtn ? PARAMS.outtakevel : outtakeVelocityIdle);
@@ -146,13 +146,12 @@ public class WorldsTele extends LinearOpMode {
     public void distanceTracking(boolean onBlue, odoteleop odoteleop) {
          distanceToGoal = odoteleop.getGoalDistance(onBlue, drive.localizer.getPose());
         //formula from https://www.desmos.com/calculator/hnlvt45jvt
-        outtakeVelocity = (int)Math.round(0.000314673*Math.pow(distanceToGoal, 3)-0.0479308*Math.pow(distanceToGoal, 2)+6.70251*distanceToGoal+791.79);
-        //if(distanceToGoal > 73) {
-        //    hood.setPosition((0.0000123126*Math.pow(distanceToGoal,2))-(0.00720119*distanceToGoal)+0.976098);
-            //hood.setPosition(-0.0000001086*Math.pow(distanceToGoal,4) + 0.0000441*Math.pow(distanceToGoal,3) - 0.006325*Math.pow(distanceToGoal,2) + 0.3704*distanceToGoal - 6.9);
-        //} else {
-            hood.setPosition((0.0000123126*Math.pow(distanceToGoal,2))-(0.00720119*distanceToGoal)+0.976098);
-            //hood.setPosition(0.000000121749*Math.pow(distanceToGoal, 4) - 0.000063736*Math.pow(distanceToGoal,3) +0.012192*Math.pow(distanceToGoal, 2) -1.0071*distanceToGoal +30.383);
+        outtakeVelocity = (int)Math.round(0.000314673*Math.pow(distanceToGoal, 3)-0.0479308*Math.pow(distanceToGoal, 2)+6.70251*distanceToGoal+791.79-150);
+        hoodPos = (0.0000123126*Math.pow(distanceToGoal,2))-(0.00720119*distanceToGoal)+0.976098;
+        hood.setPosition(hoodPos);
+        if(distanceToGoal > 120) {
+            hood.setPosition(hood.getPosition() - Math.min(500, hoodIncrementTimer.milliseconds())/2500);
+        }
         telemetry.addData("Sistance to gaol", distanceToGoal);
        // }
     }

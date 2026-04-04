@@ -49,7 +49,7 @@ public class WorldsAutoHardware {
     public class IntakeStart implements Action {
         @Override
         public boolean run(@NotNull TelemetryPacket packet) {
-            inL.setPower(1.0);
+            inL.setPower(0.8);
             inR.setPower(1.0);
             return false;
         }
@@ -88,7 +88,7 @@ public class WorldsAutoHardware {
             outL.setVelocity(launchSpeed);
             outR.setVelocity(launchSpeed);
             hood.setPosition(hoodStart);
-            while (Math.abs(outL.getVelocity() - launchSpeed) > 20) {
+            while(outL.getVelocity() + 40 < launchSpeed) {
                 blocker.setPosition(1);
             }
             blocker.setPosition(0);

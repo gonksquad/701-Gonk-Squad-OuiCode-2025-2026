@@ -51,17 +51,26 @@ public class WorldsAutoRedNear extends LinearOpMode {
         Action pickup2 = drive.actionBuilder(launchPos)
                 .setTangent(Math.toRadians(0))
                 //.splineToSplineHeading(new Pose2d(12, 64, Math.toRadians(92.5)), Math.toRadians(95))
-                .splineToSplineHeading(new Pose2d(12, 64, Math.toRadians(85)), Math.toRadians(95))
+                .splineToSplineHeading(new Pose2d(10, 60, Math.toRadians(85)), Math.toRadians(95))
                 .setTangent(Math.toRadians(315))
                 .splineToSplineHeading(launchPos, Math.toRadians(180))
                 .build();
 
         Action flushPickup = drive.actionBuilder(launchPos)
                 .setTangent(0)
-                .splineToLinearHeading(new Pose2d(6, 64, Math.toRadians(135)), launchPos.heading)
+                .splineToLinearHeading(new Pose2d(6, 63, Math.toRadians(135)), launchPos.heading)
                 .strafeToConstantHeading(new Vector2d(14, 66))
-                .waitSeconds(1)
-                .setTangent(Math.toRadians(325))
+                .waitSeconds(0.5)
+                .setTangent(Math.toRadians(315))
+                .splineToLinearHeading(launchPos, Math.toRadians(165))
+                .build();
+
+        Action flushPickup2 = drive.actionBuilder(launchPos)
+                .setTangent(0)
+                .splineToLinearHeading(new Pose2d(6, 63, Math.toRadians(135)), launchPos.heading)
+                .strafeToConstantHeading(new Vector2d(14, 66))
+                .waitSeconds(0.5)
+                .setTangent(Math.toRadians(315))
                 .splineToLinearHeading(launchPos, Math.toRadians(165))
                 .build();
 
@@ -77,43 +86,65 @@ public class WorldsAutoRedNear extends LinearOpMode {
                         hardware.intakeStart(),
                         hardware.setHoodPos(0.1),
                         hardware.setYawAngle(41),
-                        hardware.setOuttakeVelStart(700),
+                        hardware.setOuttakeVelStart(950),
                         hardware.blockOuttake(),
 
                         launch0,
-                        //hardware.launch(1100, 0.1),
+                        new SleepAction(0.3),
+                        hardware.unblockOuttake(),
+                        hardware.setOuttakeVelStart(1350),
+
+
+                        //hardware.launch(100, 0.6, 0.67, 300),
                         // h(100, 0.8f),
-                        new SleepAction(1),
+                        new SleepAction(0.2),
+                        hardware.setHoodPos(0.2),
+                        new SleepAction(0.2),
                         hardware.blockOuttake(),
+                        new SleepAction(0.2),
                         hardware.setYawAngle(39),
 
                         pickup2,
                         new ParallelAction(
-                                //hardware.launch(1000, 0.1),
+                                hardware.launch(1100, 0.1, 0.15, 300),
                                 hardware.intakeStart(),
-                                new SleepAction(1.5)
+                                new SleepAction(0.3)
                         ),
                         hardware.blockOuttake(),
+                        new SleepAction(0.2),
 
                         flushPickup,
-                        hardware.setYawAngle(39),
+                        hardware.setYawAngle(35),
                         hardware.blockOuttake(),
                         hardware.intakeStart(),
                         new ParallelAction(
-                                //hardware.launch(1150, 0.1),
-                                new SleepAction(1.5)
+                                hardware.launch(1050, 0.1, 0.15, 300),
+                                new SleepAction(0.25)
                         ),
-                        hardware.setYawAngle(39),
-
                         hardware.blockOuttake(),
+                        new SleepAction(0.1),
+                        hardware.setYawAngle(40),
+
+                        flushPickup2,
+                        hardware.setYawAngle(35),
+                        hardware.blockOuttake(),
+                        hardware.intakeStart(),
+                        new ParallelAction(
+                                hardware.launch(1050, 0.1, 0.15, 300),
+                                new SleepAction(0.2)
+                        ),
+                        hardware.blockOuttake(),
+                        new SleepAction(0.1),
+                        hardware.setYawAngle(38),
 
                         pickup1,
                         new ParallelAction(
-                                //hardware.launch(1100, 0.1),
+                                hardware.launch(1250, 0.1, 0.15, 300),
                                 hardware.intakeStart(),
-                                new SleepAction(1.5)
+                                new SleepAction(0.3)
                         ),
                         hardware.blockOuttake(),
+                        new SleepAction(0.2),
                         endPark,
                         updatePose(),
                         hardware.sendDataToTele(drive.localizer.getPose().position, drive.localizer.getPose().heading, (byte)1)
