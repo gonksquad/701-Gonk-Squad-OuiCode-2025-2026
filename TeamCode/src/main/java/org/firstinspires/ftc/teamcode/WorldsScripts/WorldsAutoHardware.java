@@ -1,19 +1,18 @@
 package org.firstinspires.ftc.teamcode.WorldsScripts;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
-
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
-import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Rotation2d;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.jetbrains.annotations.NotNull;
 
 public class WorldsAutoHardware {
@@ -23,7 +22,10 @@ public class WorldsAutoHardware {
 
     public double launchSpeed = 1100;
     boolean isBlue;
-    double currentYawAngle, hoodPos;
+    double currentYawAngle, hoodStart;
+    ElapsedTime hoodTimer;
+    double hoodEnd;
+    double hoodTime;
 
     public WorldsAutoHardware(HardwareMap hardwareMap) {
         outL = hardwareMap.get(DcMotorEx.class, "outl");
@@ -35,6 +37,7 @@ public class WorldsAutoHardware {
         outR.setDirection(DcMotorSimple.Direction.REVERSE);
         inL.setDirection(DcMotorSimple.Direction.REVERSE);
         inR.setDirection(DcMotorSimple.Direction.FORWARD);
+        hoodTimer = new ElapsedTime();
 
 
         blocker = hardwareMap.get(Servo.class, "blocker");
@@ -84,13 +87,17 @@ public class WorldsAutoHardware {
         public boolean run(@NotNull TelemetryPacket packet) {
             outL.setVelocity(launchSpeed);
             outR.setVelocity(launchSpeed);
-            hood.setPosition(hoodPos);
-            if (Math.abs(outL.getVelocity() - launchSpeed) < 20) {
-                return true;
-            } else {
-                blocker.setPosition(0);
-                return false;
+            hood.setPosition(hoodStart);
+            while (Math.abs(outL.getVelocity() - launchSpeed) > 20) {
+                blocker.setPosition(1);
             }
+            blocker.setPosition(0);
+            hoodTimer.reset();
+            while(hoodTimer.milliseconds() < hoodTime) {
+                hood.setPosition(hoodStart + ((hoodEnd-hoodStart)*(hoodTimer.milliseconds()/hoodTime)));
+            }
+            return false;
+
         }
     }
 
@@ -118,14 +125,7 @@ public class WorldsAutoHardware {
             return false;
         }
     }
-    public class SetYawAngle implements Action {
-        @Override
-        public boolean run(@NotNull TelemetryPacket packet) {
-            //0.43 = -45deg, 0.55 = 0deg 0.67 = 45deg
-            outYaw.setPosition(0.55 + 0.12*currentYawAngle/45);
-            return false;
-        }
-    }
+
 
     /*public class odoAimTurret implements Action {
         @Override
@@ -153,9 +153,11 @@ public class WorldsAutoHardware {
         return new OuttakeStart();
     }
 
-    public Action launch(double speed, double newHoodPos) {
+    public Action launch(double speed, double startHoodPos, double hoodEndPos, double HoodTime) {
         launchSpeed = speed;
-        hoodPos = newHoodPos;
+        hoodStart = startHoodPos;
+        hoodEnd = hoodEndPos;
+        hoodTime = HoodTime;
         return new Launch();
     }
 
@@ -171,8 +173,7 @@ public class WorldsAutoHardware {
     }
 
     public Action setYawAngle(double angle) {
-        currentYawAngle = angle;
-        return new SetYawAngle();
+        return new InstantAction(() -> outYaw.setPosition(0.55 + 0.12*angle/45));
     }
 
     //made cause the start wasn't settin to the correct velocity and if it aint broke and stuff
@@ -184,11 +185,20 @@ public class WorldsAutoHardware {
     public Action setHoodPos(double position) {
         return new InstantAction(() -> hood.setPosition(position));
     }
-
+    public Action sendDataToTele(Vector2d pose, Rotation2d heading, byte side){
+        return new InstantAction(() -> SendDataToTele(pose, heading.toDouble(), side));
+    }
     void SetVel(double speed) {
         outL.setVelocity(speed);
         outR.setVelocity(speed);
     }
+    public void SendDataToTele(Vector2d pose, double heading, byte side){
+        AutoToTeleData.AutoX = pose.y+72;
+        AutoToTeleData.AutoY = 72-pose.x;
+        AutoToTeleData.AutoRot = heading;//-Math.toRadians(90);
+        AutoToTeleData.side = side;
+    }
+
 
     /*public Action odoAimTurret(boolean onBlue) {
          isBlue = onBlue;

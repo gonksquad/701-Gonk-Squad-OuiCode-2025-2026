@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.WorldsScripts;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,18 +14,15 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.StatesScripts.odoteleop;
 
 
-@TeleOp(name="WorldsWoodenTele")
+@TeleOp(name="AAAWorldsTele")
 @Config
-public class WoodenBotTele extends LinearOpMode {
+public class WorldsTele extends LinearOpMode {
 
     public static class Params {
-        //public double outtakeVelocity = 1200;
-        //public double hoodPos = 0;
-        public double launchWait = 300;
-        public double speedIncrement = 10;
+        public double outtakevel;
     }
 
-    public static WoodenBotTele.Params PARAMS = new WoodenBotTele.Params();
+    public static WorldsTele.Params PARAMS = new WorldsTele.Params();
 
     DcMotor driveFr, driveFl, driveBr, driveBl;
     DcMotor intakeMotorLeft, intakeMotorRight;
@@ -36,10 +32,11 @@ public class WoodenBotTele extends LinearOpMode {
     boolean intakeBtn, flushBtn, blockBtn, longRangeBtn;
     MecanumDrive drive;
     int outtakeVelocity;
+    double trueOuttakeVel;
     final int outtakeVelocityIdle = 1200;
     ElapsedTime velIncrementTimer = new ElapsedTime();
     double distanceToGoal;
-    boolean isBlue =false;
+    boolean isBlue = AutoToTeleData.side == 0;
 
     public void runOpMode() {
 
@@ -48,7 +45,7 @@ public class WoodenBotTele extends LinearOpMode {
         //
         //
         //
-        drive = new MecanumDrive(hardwareMap, new Pose2d(7, -5, 0));
+        drive = new MecanumDrive(hardwareMap, new Pose2d(AutoToTeleData.AutoX, AutoToTeleData.AutoY, AutoToTeleData.AutoRot));//new Pose2d(7, -5, 0));
         driveFr = hardwareMap.get(DcMotor.class, "fr");
             //driveFr.setDirection(DcMotorSimple.Direction.REVERSE);
         driveFl = hardwareMap.get(DcMotor.class, "fl");
@@ -72,15 +69,19 @@ public class WoodenBotTele extends LinearOpMode {
         hood = hardwareMap.get(Servo.class, "hood");
         waitForStart();
         while (opModeIsActive()) {
-            blockBtn = gamepad1.a;
-            intakeBtn = gamepad1.x || blockBtn;
-            flushBtn = gamepad2.b;
-            longRangeBtn = gamepad2.right_trigger>0.05;
-            distanceTracking(false, odoteleop);
+            blockBtn = gamepad1.a || gamepad2.a;
+            intakeBtn = gamepad1.x || blockBtn || gamepad2.x;
+            flushBtn = gamepad1.b || gamepad2.b;
+            //longRangeBtn = gamepad2.right_trigger>0.05;
+            distanceTracking(isBlue, odoteleop);
             SpinIntake(1); // x for intake, a for flush
             ToggleOuttaking();
             drive.localizer.update();
-            telemetry.addData("yurt", odoteleop.odoAimTurret(true, isBlue, drive.localizer.getPose(), launcherTurn));
+            telemetry.addLine(odoteleop.odoAimTurret(true, isBlue, drive.localizer.getPose(), launcherTurn));
+            telemetry.addData("X", AutoToTeleData.AutoX);
+            telemetry.addData("Y", AutoToTeleData.AutoY);
+            telemetry.addData("Rot", Math.toDegrees(AutoToTeleData.AutoRot));
+            telemetry.addData("Side", Math.toDegrees(AutoToTeleData.side));
             SetMotorPowers(1);
             if(gamepad1.yWasPressed()) {
                 resetOdoPos();
@@ -95,22 +96,28 @@ public class WoodenBotTele extends LinearOpMode {
 
     }
     public void ToggleOuttaking() {
-        blocker.setPosition(blockBtn & (velIncrementTimer.milliseconds() > (4.5f*distanceToGoal+PARAMS.launchWait))? 0 : 1);
+        trueOuttakeVel = Math.min(2000, outtakeVelocity /*+ (0.75f*velIncrementTimer.milliseconds()-distanceToGoal*PARAMS.speedIncrement)/40*/);
+        blocker.setPosition(blockBtn & (velIncrementTimer.milliseconds() > 3000 || outtakeMotorL.getVelocity() - 25 <  trueOuttakeVel)? 0 : 1);
 
         telemetry.addData("speedR", outtakeMotorR.getVelocity());
         telemetry.addData("speedL", outtakeMotorL.getVelocity());
-        telemetry.addData("OUTTAKEVEL:", outtakeVelocity + PARAMS.speedIncrement*velIncrementTimer.milliseconds()/40);
+        telemetry.addData("OUTTAKEVEL:", trueOuttakeVel);
         telemetry.addData("hoodpos:", hood.getPosition());
         //if not being held down, reset the velocity incrementer
         if(!blockBtn) {
             velIncrementTimer.reset();
         }
         // sets the blocker position to open once motors are at certain speed (wont work but we'll have this evench)
-        //sleep(100000000);
-        //outtakeMotorR.setVelocity(blockBtn ? outtakeVelocityShort : outtakeVelocityShort);
-        //outtakeMotorL.setVelocity(blockBtn ? outtakeVelocityShort : outtakeVelocityShort);
-        outtakeMotorR.setVelocity(blockBtn ? Math.min(1800, outtakeVelocity + (0.75f*velIncrementTimer.milliseconds()-distanceToGoal*PARAMS.speedIncrement)/40) : outtakeVelocityIdle);
-        outtakeMotorL.setVelocity(blockBtn ? Math.min(1800, outtakeVelocity + (0.75f*velIncrementTimer.milliseconds()-distanceToGoal*PARAMS.speedIncrement)/40): outtakeVelocityIdle);
+        if(PARAMS.outtakevel <= 0) {
+            outtakeMotorR.setVelocity(blockBtn ? trueOuttakeVel : outtakeVelocityIdle);
+            outtakeMotorL.setVelocity(blockBtn ? trueOuttakeVel : outtakeVelocityIdle);
+        } else {
+            outtakeMotorR.setVelocity(blockBtn ? PARAMS.outtakevel : outtakeVelocityIdle);
+            outtakeMotorL.setVelocity(blockBtn ? PARAMS.outtakevel : outtakeVelocityIdle);
+        }
+
+        //outtakeMotorR.setVelocity(blockBtn ? PARAMS.outtakevel : outtakeVelocityIdle);
+        //outtakeMotorL.setVelocity(blockBtn ? PARAMS.outtakevel : outtakeVelocityIdle);
     }
     public void SetMotorPowers(float maxSpeed) {
         double y = -gamepad1.left_stick_y*maxSpeed;
@@ -139,12 +146,15 @@ public class WoodenBotTele extends LinearOpMode {
     public void distanceTracking(boolean onBlue, odoteleop odoteleop) {
          distanceToGoal = odoteleop.getGoalDistance(onBlue, drive.localizer.getPose());
         //formula from https://www.desmos.com/calculator/hnlvt45jvt
-        outtakeVelocity = (int)Math.round(-0.000310968*Math.pow(distanceToGoal, 3)+0.0946642*Math.pow(distanceToGoal, 2)-3.63154*distanceToGoal+1030.63395);
-        if(distanceToGoal > 73) {
-            hood.setPosition(-0.0000001086*Math.pow(distanceToGoal,4) + 0.0000441*Math.pow(distanceToGoal,3) - 0.006325*Math.pow(distanceToGoal,2) + 0.3704*distanceToGoal - 6.9);
-        } else {
-            hood.setPosition(0.000000121749*Math.pow(distanceToGoal, 4) - 0.000063736*Math.pow(distanceToGoal,3) +0.012192*Math.pow(distanceToGoal, 2) -1.0071*distanceToGoal +30.383);
-        }
+        outtakeVelocity = (int)Math.round(0.000314673*Math.pow(distanceToGoal, 3)-0.0479308*Math.pow(distanceToGoal, 2)+6.70251*distanceToGoal+791.79);
+        //if(distanceToGoal > 73) {
+        //    hood.setPosition((0.0000123126*Math.pow(distanceToGoal,2))-(0.00720119*distanceToGoal)+0.976098);
+            //hood.setPosition(-0.0000001086*Math.pow(distanceToGoal,4) + 0.0000441*Math.pow(distanceToGoal,3) - 0.006325*Math.pow(distanceToGoal,2) + 0.3704*distanceToGoal - 6.9);
+        //} else {
+            hood.setPosition((0.0000123126*Math.pow(distanceToGoal,2))-(0.00720119*distanceToGoal)+0.976098);
+            //hood.setPosition(0.000000121749*Math.pow(distanceToGoal, 4) - 0.000063736*Math.pow(distanceToGoal,3) +0.012192*Math.pow(distanceToGoal, 2) -1.0071*distanceToGoal +30.383);
+        telemetry.addData("Sistance to gaol", distanceToGoal);
+       // }
     }
 
     void resetOdoPos() {
@@ -152,7 +162,7 @@ public class WoodenBotTele extends LinearOpMode {
             drive.localizer.setPose(new Pose2d(118, -13, Math.toRadians(50)));
         } else {
             drive.localizer.setPose(new Pose2d(118, -118, Math.toRadians(-44)));
-
         }
+        //drive.localizer.setPose(new Pose2d(AutoToTeleData.AutoX, AutoToTeleData.AutoY, AutoToTeleData.AutoRot));
     }
 }

@@ -154,9 +154,7 @@ public class backendAutoBLUE extends LinearOpMode {
             panelsTelemetry.debug("Y", follower.getPose().getY());
             panelsTelemetry.debug("Heading", follower.getPose().getHeading());
             panelsTelemetry.debug("Obelisk Id", obeliskId);
-            AutoToTeleData.AutoX = follower.getPose().getX();
-            AutoToTeleData.AutoY = follower.getPose().getY();
-            AutoToTeleData.AutoRot = follower.getPose().getHeading();
+
             for (String str : log) {
                 panelsTelemetry.addLine(str);
             }

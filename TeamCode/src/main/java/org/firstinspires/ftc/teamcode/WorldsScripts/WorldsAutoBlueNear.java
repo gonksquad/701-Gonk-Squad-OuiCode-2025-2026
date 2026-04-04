@@ -77,7 +77,7 @@ public class WorldsAutoBlueNear extends LinearOpMode {
                         hardware.blockOuttake(),
 
                         launch0,
-                        hardware.launch(1100, 0.1),
+                        //hardware.launch(1100, 0.1),
                         // h(100, 0.8f),
                         new SleepAction(1),
                         hardware.blockOuttake(),
@@ -85,7 +85,7 @@ public class WorldsAutoBlueNear extends LinearOpMode {
 
                         pickup2,
                         new ParallelAction(
-                                hardware.launch(1000, 0.1),
+                                //hardware.launch(1000, 0.1),
                                 hardware.intakeStart(),
                                 new SleepAction(1.5)
                         ),
@@ -96,7 +96,7 @@ public class WorldsAutoBlueNear extends LinearOpMode {
                         hardware.blockOuttake(),
                         hardware.intakeStart(),
                         new ParallelAction(
-                                hardware.launch(1150, 0.1),
+                                //hardware.launch(1150, 0.1),
                                 new SleepAction(1.5)
                         ),
                         hardware.setYawAngle(39),
@@ -105,7 +105,7 @@ public class WorldsAutoBlueNear extends LinearOpMode {
 
                         pickup1,
                         new ParallelAction(
-                                hardware.launch(1100, 0.1),
+                               // hardware.launch(1100, 0.1),
                                 hardware.intakeStart(),
                                 new SleepAction(1.5)
                         ),

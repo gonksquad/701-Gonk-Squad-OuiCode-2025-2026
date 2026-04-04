@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.WorldsScripts;
 //import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
@@ -40,7 +41,6 @@ public class WorldsAutoRedNear extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(-19, 19), Math.toRadians(90))
                 .build();
 
-
         Action pickup1 = drive.actionBuilder(launchPos)
                 .setTangent(0)
                 .splineToLinearHeading(new Pose2d(-16, 54, Math.toRadians(90)), launchPos.heading)
@@ -69,7 +69,6 @@ public class WorldsAutoRedNear extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(-16, 34), Math.toRadians(135))
                 .build();
 
-
         waitForStart();
 
         Actions.runBlocking(
@@ -82,7 +81,7 @@ public class WorldsAutoRedNear extends LinearOpMode {
                         hardware.blockOuttake(),
 
                         launch0,
-                        hardware.launch(1100, 0.1),
+                        //hardware.launch(1100, 0.1),
                         // h(100, 0.8f),
                         new SleepAction(1),
                         hardware.blockOuttake(),
@@ -90,7 +89,7 @@ public class WorldsAutoRedNear extends LinearOpMode {
 
                         pickup2,
                         new ParallelAction(
-                                hardware.launch(1000, 0.1),
+                                //hardware.launch(1000, 0.1),
                                 hardware.intakeStart(),
                                 new SleepAction(1.5)
                         ),
@@ -101,7 +100,7 @@ public class WorldsAutoRedNear extends LinearOpMode {
                         hardware.blockOuttake(),
                         hardware.intakeStart(),
                         new ParallelAction(
-                                hardware.launch(1150, 0.1),
+                                //hardware.launch(1150, 0.1),
                                 new SleepAction(1.5)
                         ),
                         hardware.setYawAngle(39),
@@ -110,12 +109,14 @@ public class WorldsAutoRedNear extends LinearOpMode {
 
                         pickup1,
                         new ParallelAction(
-                                hardware.launch(1100, 0.1),
+                                //hardware.launch(1100, 0.1),
                                 hardware.intakeStart(),
                                 new SleepAction(1.5)
                         ),
                         hardware.blockOuttake(),
-                        endPark
+                        endPark,
+                        updatePose(),
+                        hardware.sendDataToTele(drive.localizer.getPose().position, drive.localizer.getPose().heading, (byte)1)
                             /*pickup3,
                             hardware.intakeStop(),
                             hardware.launch(750, 0.55f),
@@ -125,5 +126,11 @@ public class WorldsAutoRedNear extends LinearOpMode {
                             hardware.blockOuttake()*/
                 )
         );
+    }
+    public Action updatePose(){
+        drive.updatePoseEstimate();
+        telemetry.addData("pose", drive.localizer.getPose());
+        telemetry.update();
+        return new InstantAction(() -> drive.updatePoseEstimate());
     }
 }

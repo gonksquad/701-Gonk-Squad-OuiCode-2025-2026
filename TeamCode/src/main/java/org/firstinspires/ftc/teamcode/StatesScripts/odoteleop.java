@@ -29,7 +29,7 @@ public class odoteleop {
 
 
     // random odoaim vars
-    private static int goalX = 144;
+    private static int goalX;
     private final int goalY = 144;
     private double angleOffset;
     private double theta;
@@ -46,7 +46,7 @@ public class odoteleop {
         currentY = currentPose.position.x;
         angleOffset = currentPose.heading.toDouble();
 
-        goalX = (isBlue) ? 0 : 144;
+        goalX = (isBlue) ? -9 : 135;
         /*if(isBlue) {
             theta = Math.atan2(goalY - currentY, goalX - currentX) - angleOffset; //make sure atan isnt negative for blue
         } else {
