@@ -90,15 +90,6 @@ public final class MecanumDrive {
         public double axialVelGain = 0.0;
         public double lateralVelGain = 0.0;
         public double headingVelGain = 0.0; // shared with turn
-
-
-
-
-
-
-        public float x;
-        public float y;
-        public float rot;
     }
 
     public static Params PARAMS = new Params();

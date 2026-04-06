@@ -26,7 +26,7 @@ public class WorldsAutoBlueNear extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        initialPose = new Pose2d(-50, 50, Math.toRadians(135));
+        initialPose = new Pose2d(-50, -50, Math.toRadians(-135));
         drive = new MecanumDrive(hardwareMap, initialPose);
         hardware = new WorldsAutoHardware(hardwareMap);
 
@@ -140,7 +140,7 @@ public class WorldsAutoBlueNear extends LinearOpMode {
                         hardware.blockOuttake(),
                         new SleepAction(0.2),
                         endPark,
-                        updatePose(), 
+                        updatePose(),
                         hardware.sendDataToTele(drive.localizer.getPose().position, drive.localizer.getPose().heading, (byte)1)
                 )
         );
