@@ -16,13 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Autonomous
-@Config
 public class WorldsAutoBlueNear extends LinearOpMode {
-
-    public static class Params {
-        public float[] yawangle = {-47, -54, -50, -55, -50, -50};
-    }
-public static WorldsAutoBlueNear.Params PARAMS = new WorldsAutoBlueNear.Params();
 
     MecanumDrive drive;
     WorldsAutoHardware hardware;
@@ -86,8 +80,8 @@ public static WorldsAutoBlueNear.Params PARAMS = new WorldsAutoBlueNear.Params()
                         hardware.blockOuttake(),
                         hardware.intakeStart(),
                         hardware.setHoodPos(0.2),
-                        hardware.setYawAngle(PARAMS.yawangle[0]),
-                        hardware.setOuttakeVelStart(1000),
+                        hardware.setYawAngle(-47),
+                        hardware.setOuttakeVelStart(1050),
                         hardware.blockOuttake(),
 
                         launch0,
@@ -104,7 +98,7 @@ public static WorldsAutoBlueNear.Params PARAMS = new WorldsAutoBlueNear.Params()
                         hardware.blockOuttake(),
                         //hardware.setOuttakeVelStart(1000),
                         //new SleepAction(0.2),
-                        hardware.setYawAngle(PARAMS.yawangle[1]),
+                        hardware.setYawAngle(-54),
 
                         pickup2,
                         hardware.setOuttakeVelStart(950),
@@ -118,7 +112,7 @@ public static WorldsAutoBlueNear.Params PARAMS = new WorldsAutoBlueNear.Params()
 
                         flushPickup,
                         hardware.setOuttakeVelStart(650),
-                        hardware.setYawAngle(PARAMS.yawangle[2]),
+                        hardware.setYawAngle(-50),
                         hardware.blockOuttake(),
                         hardware.intakeStart(),
                         new ParallelAction(
@@ -127,11 +121,11 @@ public static WorldsAutoBlueNear.Params PARAMS = new WorldsAutoBlueNear.Params()
                         ),
                         hardware.blockOuttake(),
                         new SleepAction(0.1),
-                        hardware.setYawAngle(PARAMS.yawangle[3]),
+                        hardware.setYawAngle(-55),
 
                         flushPickup2,
                         hardware.setOuttakeVelStart(650),
-                        hardware.setYawAngle(PARAMS.yawangle[4]),
+                        hardware.setYawAngle(-50),
                         hardware.blockOuttake(),
                         hardware.intakeStart(),
                         new ParallelAction(
@@ -140,7 +134,7 @@ public static WorldsAutoBlueNear.Params PARAMS = new WorldsAutoBlueNear.Params()
                         ),
                         hardware.blockOuttake(),
                         new SleepAction(0.1),
-                        hardware.setYawAngle(PARAMS.yawangle[5]),
+                        hardware.setYawAngle(-50),
 
                         pickup1,
                         hardware.setOuttakeVelStart(1250),
