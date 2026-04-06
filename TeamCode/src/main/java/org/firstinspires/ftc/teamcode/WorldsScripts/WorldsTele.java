@@ -15,14 +15,14 @@ import org.firstinspires.ftc.teamcode.StatesScripts.odoteleop;
 
 
 @TeleOp(name="AAAWorldsTele")
-@Config
+//@Config
 public class WorldsTele extends LinearOpMode {
 
-    public static class Params {
+   /* public static class Params {
         public double outtakevel;
     }
 
-    public static WorldsTele.Params PARAMS = new WorldsTele.Params();
+    public static WorldsTele.Params PARAMS = new WorldsTele.Params();*/
 
     DcMotor driveFr, driveFl, driveBr, driveBl;
     DcMotor intakeMotorLeft, intakeMotorRight;
@@ -70,7 +70,7 @@ public class WorldsTele extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
             blockBtn = gamepad1.a || gamepad2.a;
-            intakeBtn = gamepad1.x || blockBtn || gamepad2.x;
+            intakeBtn = gamepad1.x || gamepad2.x;
             flushBtn = gamepad1.b || gamepad2.b;
             //longRangeBtn = gamepad2.right_trigger>0.05;
             distanceTracking(isBlue, odoteleop);
@@ -91,8 +91,8 @@ public class WorldsTele extends LinearOpMode {
     }
 
     public void SpinIntake(float intakeSpeed) {
-        intakeMotorLeft.setPower(intakeBtn ? intakeSpeed*0.8 : flushBtn ? -intakeSpeed : 0);
-        intakeMotorRight.setPower(intakeBtn ? intakeSpeed : flushBtn ? -intakeSpeed : 0);
+        intakeMotorLeft.setPower(intakeBtn || blocker.getPosition() == 0 ? intakeSpeed*0.8 : flushBtn ? -intakeSpeed : 0);
+        intakeMotorRight.setPower(intakeBtn || blocker.getPosition() == 0 ? intakeSpeed : flushBtn ? -intakeSpeed : 0);
     }
     public void ToggleOuttaking() {
         blocker.setPosition(blockBtn && (/*velIncrementTimer.milliseconds() > 3000 || */outtakeMotorL.getVelocity() - 150 >  Math.min(outtakeVelocity, 2000))? 0 : 1);
@@ -108,13 +108,14 @@ public class WorldsTele extends LinearOpMode {
         telemetry.addData("hoodpos:", hood.getPosition());
         //if not being held down, reset the velocity incrementer
         // sets the blocker position to open once motors are at certain speed (wont work but we'll have this evench)
-        if(PARAMS.outtakevel <= 0) {
+        //if(PARAMS.outtakevel <= 0) {
             outtakeMotorR.setVelocity(blockBtn ? outtakeVelocity : outtakeVelocityIdle);
             outtakeMotorL.setVelocity(blockBtn ? outtakeVelocity : outtakeVelocityIdle);
-        } else {
-            outtakeMotorR.setVelocity(blockBtn ? PARAMS.outtakevel : outtakeVelocityIdle);
-            outtakeMotorL.setVelocity(blockBtn ? PARAMS.outtakevel : outtakeVelocityIdle);
-        }
+
+        //} else {
+        //    outtakeMotorR.setVelocity(blockBtn ? PARAMS.outtakevel : outtakeVelocityIdle);
+        //    outtakeMotorL.setVelocity(blockBtn ? PARAMS.outtakevel : outtakeVelocityIdle);
+        //}
 
         //outtakeMotorR.setVelocity(blockBtn ? PARAMS.outtakevel : outtakeVelocityIdle);
         //outtakeMotorL.setVelocity(blockBtn ? PARAMS.outtakevel : outtakeVelocityIdle);

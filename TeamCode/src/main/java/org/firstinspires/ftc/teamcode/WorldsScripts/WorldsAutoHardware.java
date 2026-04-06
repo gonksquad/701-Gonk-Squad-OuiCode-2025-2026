@@ -85,6 +85,7 @@ public class WorldsAutoHardware {
     public class Launch implements Action {
         @Override
         public boolean run(@NotNull TelemetryPacket packet) {
+            intakeStop();
             outL.setVelocity(launchSpeed);
             outR.setVelocity(launchSpeed);
             hood.setPosition(hoodStart);
@@ -92,6 +93,7 @@ public class WorldsAutoHardware {
                 blocker.setPosition(1);
             }
             blocker.setPosition(0);
+            intakeStart();
             hoodTimer.reset();
             while(hoodTimer.milliseconds() < hoodTime) {
                 hood.setPosition(hoodStart + ((hoodEnd-hoodStart)*(hoodTimer.milliseconds()/hoodTime)));

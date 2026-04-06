@@ -18,13 +18,13 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 @Autonomous
 @Config
 public class WorldsAutoRedNear extends LinearOpMode {
-    public static class Params {
+    /*public static class Params {
 
 
 
     }
     public static WorldsAutoRedNear.Params PARAMS = new WorldsAutoRedNear.Params();
-
+    */
     MecanumDrive drive;
     WorldsAutoHardware hardware;
     Pose2d initialPose;
