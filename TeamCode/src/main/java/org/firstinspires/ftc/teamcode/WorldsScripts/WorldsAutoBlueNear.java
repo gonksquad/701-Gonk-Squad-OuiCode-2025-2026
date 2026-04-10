@@ -147,7 +147,7 @@ public class WorldsAutoBlueNear extends LinearOpMode {
                         new SleepAction(0.2),
                         endPark,
                         updatePose(),
-                        hardware.sendDataToTele(drive.localizer.getPose().position, drive.localizer.getPose().heading, (byte)1)
+                        hardware.sendDataToTele(drive.localizer.getPose().position, drive.localizer.getPose().heading, (byte)0)
                 )
         );
     }

@@ -70,7 +70,7 @@ public class WorldsTele extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
             blockBtn = gamepad1.a || gamepad2.a;
-            intakeBtn = gamepad1.x || gamepad2.x;
+            intakeBtn = gamepad1.x || gamepad1.a || gamepad2.x;
             flushBtn = gamepad1.b || gamepad2.b;
             //longRangeBtn = gamepad2.right_trigger>0.05;
             distanceTracking(isBlue, odoteleop);
@@ -91,11 +91,11 @@ public class WorldsTele extends LinearOpMode {
     }
 
     public void SpinIntake(float intakeSpeed) {
-        intakeMotorLeft.setPower(intakeBtn || blocker.getPosition() == 0 ? intakeSpeed*0.8 : flushBtn ? -intakeSpeed : 0);
-        intakeMotorRight.setPower(intakeBtn || blocker.getPosition() == 0 ? intakeSpeed : flushBtn ? -intakeSpeed : 0);
+        intakeMotorLeft.setPower(intakeBtn /*|| blocker.getPosition() == 0*/ ? intakeSpeed*0.8 : flushBtn ? -intakeSpeed : 0);
+        intakeMotorRight.setPower(intakeBtn /*|| blocker.getPosition() == 0*/ ? intakeSpeed : flushBtn ? -intakeSpeed : 0);
     }
     public void ToggleOuttaking() {
-        blocker.setPosition(blockBtn && (/*velIncrementTimer.milliseconds() > 3000 || */outtakeMotorL.getVelocity() - 150 >  Math.min(outtakeVelocity, 2000))? 0 : 1);
+        blocker.setPosition(blockBtn && (outtakeMotorL.getVelocity() - 150 >  Math.min(outtakeVelocity, 2000))? 0 : 1);
         if(blocker.getPosition() == 1)
         {
             //if blocking
