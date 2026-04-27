@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.MiscScripts.Hardware;
 
-@TeleOp(name="Ms. Shields Drive")
+@TeleOp(name="Ms. Shields Drivet")
 public class OldSlowWheels extends LinearOpMode {
     public Hardware hardware;
 
@@ -16,7 +16,7 @@ public class OldSlowWheels extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            hardware.doDrive(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x, 0.5, 0.5, 0.5);
+            hardware.doDrive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, -gamepad1.right_stick_x, 0.5, 0.5, 0.5);
 
             hardware.tryIntake(gamepad1.a);
 

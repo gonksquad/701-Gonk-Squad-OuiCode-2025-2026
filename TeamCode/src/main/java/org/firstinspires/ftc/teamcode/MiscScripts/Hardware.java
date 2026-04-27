@@ -87,8 +87,8 @@ public class Hardware {
         launcherLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         launcherLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        frontRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        backRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
     }
@@ -191,7 +191,7 @@ public class Hardware {
                 }
             }
         }
-        if ((launchingPurple || launchingGreen) && launcherLeft.getVelocity() > targetTps && outtakeTransferLeft.getPosition() != liftPos[1] && launchTimer.milliseconds() > 600) {
+        if ((launchingPurple || launchingGreen) && ((launcherLeft.getVelocity() > targetTps && outtakeTransferLeft.getPosition() != liftPos[1]) || launchTimer.milliseconds() > 2000)) {
             outtakeTransferLeft.setPosition(liftPos[1]);
             outtakeTransferRight.setPosition(1-liftPos[1]);
             recentLaunch = currentPos | ((sorterContents[currentPos] - 1) << 2);
