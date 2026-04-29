@@ -5,21 +5,28 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 
 @TeleOp(name="Testing")
 public class TestingScript extends LinearOpMode {
-    DcMotor launcherL, launcherR;
+    //DcMotor launcherL, launcherR;
+    Servo blocker;
     boolean settingPowers = false;
 
     public void runOpMode() {
-        launcherL = hardwareMap.get(DcMotor.class, "LauncherL");
+       /*launcherL = hardwareMap.get(DcMotor.class, "LauncherL");
             launcherL.setDirection(DcMotorSimple.Direction.FORWARD);
         launcherR = hardwareMap.get(DcMotor.class, "LauncherR");
             launcherR.setDirection(DcMotorSimple.Direction.REVERSE);
+        */blocker = hardwareMap.get(Servo.class, "blocker");
+
         waitForStart();
         while (opModeIsActive()){
-            SetPowers(1, false, 1150, launcherL, launcherR);
+            //SetPowers(1, false, 1150, launcherL, launcherR);
+            blocker.setPosition(gamepad1.a ?  1 : 0);
+            telemetry.addData("block pos", blocker.getPosition());
+            telemetry.update();
         }
     }
 

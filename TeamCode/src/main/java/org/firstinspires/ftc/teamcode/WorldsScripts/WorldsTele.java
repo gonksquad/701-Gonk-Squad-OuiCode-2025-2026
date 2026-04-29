@@ -95,7 +95,7 @@ public class WorldsTele extends LinearOpMode {
         intakeMotorRight.setPower(intakeBtn /*|| blocker.getPosition() == 0*/ ? intakeSpeed : flushBtn ? -intakeSpeed : 0);
     }
     public void ToggleOuttaking() {
-        blocker.setPosition(blockBtn && (outtakeMotorL.getVelocity() - 150 >  Math.min(outtakeVelocity, 2000))? 0 : 1);
+        blocker.setPosition((blockBtn && (outtakeMotorL.getVelocity() >  Math.min(outtakeVelocity, 2000)-150)) ? 0 : 1);
         if(blocker.getPosition() == 1)
         {
             //if blocking
