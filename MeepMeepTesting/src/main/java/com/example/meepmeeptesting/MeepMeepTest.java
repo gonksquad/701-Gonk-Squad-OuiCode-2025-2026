@@ -20,12 +20,12 @@ public class MeepMeepTest {
                 .build();
         Pose2d launchPos = new Pose2d(61, -15, Math.toRadians(-180));
         Pose2d launchPos2 = new Pose2d(55, -10, Math.toRadians(-135));
-
+        Pose2d attemptIntake = new Pose2d(36, -43, Math.toRadians(-90));
         Pose2d initialPose = new Pose2d(-50, -50, Math.toRadians(-135));
         myBot.runAction(myBot.getDrive().actionBuilder(launchPos/*new Pose2d(-50, 50, Math.toRadians(125))*/)
 
                 .setTangent(Math.toRadians(210))
-                .splineToSplineHeading(new Pose2d(36, -43, Math.toRadians(-90)), Math.toRadians(90))
+                .splineToSplineHeading(new Pose2d(36, -43, Math.toRadians(-90)), Math.toRadians(-90))
                 .lineToY(-63)
                 .setReversed(true)
                 .splineToLinearHeading(launchPos2, Math.toRadians(45))

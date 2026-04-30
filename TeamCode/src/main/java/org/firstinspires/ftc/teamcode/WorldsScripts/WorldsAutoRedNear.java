@@ -84,8 +84,8 @@ public class WorldsAutoRedNear extends LinearOpMode {
                 new SequentialAction(
                         hardware.blockOuttake(),
                         hardware.intakeStart(),
-                        hardware.setHoodPos(0.1),
-                        hardware.setYawAngle(41),
+                        hardware.setHoodPos(0.35),
+                        hardware.setYawAngle(46),
                         hardware.setOuttakeVelStart(950),
                         hardware.blockOuttake(),
 
@@ -98,11 +98,11 @@ public class WorldsAutoRedNear extends LinearOpMode {
                         //hardware.launch(100, 0.6, 0.67, 300),
                         // h(100, 0.8f),
                         new SleepAction(0.2),
-                        hardware.setHoodPos(0.2),
+                        hardware.setHoodPos(0.45),
                         new SleepAction(0.2),
                         hardware.blockOuttake(),
                         new SleepAction(0.2),
-                        hardware.setYawAngle(39),
+                        hardware.setYawAngle(44),
 
                         pickup2,
                         new ParallelAction(
@@ -114,32 +114,32 @@ public class WorldsAutoRedNear extends LinearOpMode {
                         new SleepAction(0.2),
 
                         flushPickup,
-                        hardware.setYawAngle(35),
+                        hardware.setYawAngle(40),
                         hardware.blockOuttake(),
                         hardware.intakeStart(),
                         new ParallelAction(
-                                hardware.launch(1050, 0.1, 0.15, 300),
+                                hardware.launch(900, 0.1, 0.15, 300),
                                 new SleepAction(0.25)
                         ),
                         hardware.blockOuttake(),
                         new SleepAction(0.1),
-                        hardware.setYawAngle(40),
+                        hardware.setYawAngle(45),
 
                         flushPickup2,
-                        hardware.setYawAngle(35),
+                        hardware.setYawAngle(40),
                         hardware.blockOuttake(),
                         hardware.intakeStart(),
                         new ParallelAction(
-                                hardware.launch(1050, 0.1, 0.15, 300),
+                                hardware.launch(900, 0.1, 0.15, 300),
                                 new SleepAction(0.2)
                         ),
                         hardware.blockOuttake(),
                         new SleepAction(0.1),
-                        hardware.setYawAngle(38),
+                        hardware.setYawAngle(42),
 
                         pickup1,
                         new ParallelAction(
-                                hardware.launch(1250, 0.1, 0.15, 300),
+                                hardware.launch(1150, 0.1, 0.15, 300),
                                 hardware.intakeStart(),
                                 new SleepAction(0.3)
                         ),

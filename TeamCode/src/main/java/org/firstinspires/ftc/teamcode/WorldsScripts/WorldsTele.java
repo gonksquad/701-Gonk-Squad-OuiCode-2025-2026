@@ -160,6 +160,11 @@ public class WorldsTele extends LinearOpMode {
          distanceToGoal = odoteleop.getGoalDistance(onBlue, drive.localizer.getPose());
         //formula from https://www.desmos.com/calculator/hnlvt45jvt
         outtakeVelocity = (int)Math.round(0.000314673*Math.pow(distanceToGoal, 3)-0.0479308*Math.pow(distanceToGoal, 2)+6.70251*distanceToGoal+791.79-150);
+        if(distanceToGoal < 85) {
+            //increase speed 4 close zone
+            outtakeVelocity += 200;
+        }
+        //outtakeVelocity = (int)Math.round(0.000593771*Math.pow(distanceToGoal, 3)-0.13443*Math.pow(distanceToGoal, 2)+12.49113+distanceToGoal+837.70897);
         hoodPos = (0.0000123126*Math.pow(distanceToGoal,2))-(0.00720119*distanceToGoal)+0.976098;
         hood.setPosition(hoodPos);
         if(distanceToGoal > 120) {

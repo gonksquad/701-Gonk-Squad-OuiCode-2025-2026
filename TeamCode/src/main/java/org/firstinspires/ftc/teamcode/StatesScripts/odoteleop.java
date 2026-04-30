@@ -98,7 +98,7 @@ public class odoteleop {
             printStuff += " Pose: (" + Math.round(currentX) + ", " + Math.round(currentY) + ", " + Math.round(currentHeading) + ")";
             return printStuff;//"heading: " + follower.getHeading()
         } else {
-            launcherTurn.setPosition(0.5f);
+            launcherTurn.setPosition(0.55f);
             return "no autoaim";
         }
     }
