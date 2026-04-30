@@ -29,7 +29,8 @@ public class WorldsTele extends LinearOpMode {
     DcMotorEx outtakeMotorR, outtakeMotorL;
     Servo blocker, launcherTurn, hood;
     //boolean isBlocking = false;
-    boolean intakeBtn, flushBtn, blockBtn, longRangeBtn;
+    boolean intakeBtn, flushBtn, blockBtn, longRangeBtn, autoAimToggleBtn;
+    boolean autoAim = true;
     MecanumDrive drive;
     int outtakeVelocity;
     final int outtakeVelocityIdle = 1200;
@@ -70,14 +71,25 @@ public class WorldsTele extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
             blockBtn = gamepad1.a || gamepad2.a;
-            intakeBtn = gamepad1.x || gamepad1.a || gamepad2.x;
+            intakeBtn = gamepad1.x || /*gamepad1.a ||*/ gamepad2.x;
             flushBtn = gamepad1.b || gamepad2.b;
+            autoAimToggleBtn = gamepad1.dpadUpWasPressed() || gamepad2.dpadUpWasPressed();
             //longRangeBtn = gamepad2.right_trigger>0.05;
-            distanceTracking(isBlue, odoteleop);
             SpinIntake(1); // x for intake, a for flush
             ToggleOuttaking();
             drive.localizer.update();
-            telemetry.addLine(odoteleop.odoAimTurret(true, isBlue, drive.localizer.getPose(), launcherTurn));
+            // vvvvvvv ODOAIM RUNS IN THIS TELE vvvvvvv
+            telemetry.addLine(odoteleop.odoAimTurret(autoAim, isBlue, drive.localizer.getPose(), launcherTurn));
+            if(autoAimToggleBtn) {
+                autoAim = !autoAim;
+            }
+            if(autoAim) {
+                distanceTracking(isBlue, odoteleop);
+            } else {
+                hood.setPosition(0.2);
+                outtakeVelocity=1300;
+            }
+
             telemetry.addData("X", AutoToTeleData.AutoX);
             telemetry.addData("Y", AutoToTeleData.AutoY);
             telemetry.addData("Rot", Math.toDegrees(AutoToTeleData.AutoRot));
@@ -91,8 +103,8 @@ public class WorldsTele extends LinearOpMode {
     }
 
     public void SpinIntake(float intakeSpeed) {
-        intakeMotorLeft.setPower(intakeBtn /*|| blocker.getPosition() == 0*/ ? intakeSpeed*0.8 : flushBtn ? -intakeSpeed : 0);
-        intakeMotorRight.setPower(intakeBtn /*|| blocker.getPosition() == 0*/ ? intakeSpeed : flushBtn ? -intakeSpeed : 0);
+        intakeMotorLeft.setPower(intakeBtn || blocker.getPosition() == 0 ? intakeSpeed*0.8 : flushBtn ? -intakeSpeed : 0);
+        intakeMotorRight.setPower(intakeBtn || blocker.getPosition() == 0 ? intakeSpeed : flushBtn ? -intakeSpeed : 0);
     }
     public void ToggleOuttaking() {
         blocker.setPosition((blockBtn && (outtakeMotorL.getVelocity() >  Math.min(outtakeVelocity, 2000)-150)) ? 0 : 1);

@@ -11,16 +11,15 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Autonomous
-public class WorldsAutoRedFar extends LinearOpMode {
+public class WorldsAutoBlueFar extends LinearOpMode {
     MecanumDrive drive;
     WorldsAutoHardware hardware;
-    Pose2d launchPos = new Pose2d(61, 15, Math.toRadians(180));
-    Pose2d launchPos2 = new Pose2d(55, 10, Math.toRadians(135));
+    Pose2d launchPos = new Pose2d(61, -15, Math.toRadians(-180));
+    Pose2d launchPos2 = new Pose2d(55, -10, Math.toRadians(-135));
 
     @Override
     public void runOpMode() {
@@ -28,25 +27,19 @@ public class WorldsAutoRedFar extends LinearOpMode {
         hardware = new WorldsAutoHardware(hardwareMap);
         Action pickup3 = drive.actionBuilder(launchPos)
                 .setTangent(Math.toRadians(210))
-                .splineToSplineHeading(new Pose2d(36, 43, Math.toRadians(90)), Math.toRadians(90))
-                .lineToY(63)
+                .splineToSplineHeading(new Pose2d(36, -43, Math.toRadians(-90)), Math.toRadians(90))
+                .lineToY(-63)
                 .setReversed(true)
                 .splineToLinearHeading(launchPos2, Math.toRadians(45))
                 .build();
 
 
         Action flushPickup = drive.actionBuilder(launchPos2)
-                .setReversed(false)
-                .setTangent(Math.toRadians(90))
-                .strafeToLinearHeading(new Vector2d(launchPos.position.x-2,-56), Math.toRadians(-75))
-                .waitSeconds(0.2)
-                .lineToY(-52)
-                .lineToY(-58)
-                .strafeToLinearHeading(launchPos2.position, launchPos2.heading)
+
                 .build();
 
         Action endPark = drive.actionBuilder(launchPos2)
-                .strafeToLinearHeading(new Vector2d(41, -34), Math.toRadians(-180))
+                .strafeToLinearHeading(new Vector2d(41, 34), Math.toRadians(180))
                 .build();
 
 
@@ -56,7 +49,7 @@ public class WorldsAutoRedFar extends LinearOpMode {
                 new SequentialAction(
                         new ParallelAction(
                             hardware.blockOuttake(),
-                            hardware.setYawAngle(20),
+                            hardware.setYawAngle(-20),
                             hardware.setOuttakeVelStart(400),
                             hardware.intakeStart()
                         ),
@@ -67,7 +60,7 @@ public class WorldsAutoRedFar extends LinearOpMode {
                         new SleepAction(1.5),
                         hardware.blockOuttake(),
                         new ParallelAction(
-                            hardware.setYawAngle(-15),
+                            hardware.setYawAngle(15),
                             pickup3
                         ),
                         hardware.setHoodPos(0.4),
@@ -75,7 +68,7 @@ public class WorldsAutoRedFar extends LinearOpMode {
                         new SleepAction(1.5),
                         hardware.blockOuttake(),
                         //turn turret, shoot 3, block turret
-                        hardware.setYawAngle(-21),
+                        hardware.setYawAngle(21),
                         flushPickup,
                         hardware.setHoodPos(0.4),
                         hardware.launch(1650, 0.4, 0.25, 500),
@@ -85,7 +78,7 @@ public class WorldsAutoRedFar extends LinearOpMode {
 
                         hardware.blockOuttake(),
                         //turn turret, shoot 3, block turret
-                        hardware.setYawAngle(-21),
+                        hardware.setYawAngle(21),
                         flushPickup,
                         hardware.setHoodPos(0.4),
                         hardware.launch(1650, 0.4, 0.25, 500),
@@ -94,7 +87,7 @@ public class WorldsAutoRedFar extends LinearOpMode {
 
                         hardware.blockOuttake(),
                         //turn turret, shoot 3, block turret
-                        hardware.setYawAngle(-21),
+                        hardware.setYawAngle(21),
                         flushPickup,
                         hardware.setHoodPos(0.4),
                         hardware.launch(1650, 0.4, 0.25, 500),
@@ -102,7 +95,7 @@ public class WorldsAutoRedFar extends LinearOpMode {
 
                         hardware.blockOuttake(),
                         //turn turret, shoot 3, block turret
-                        hardware.setYawAngle(-21),
+                        hardware.setYawAngle(21),
                         flushPickup,
                         hardware.setHoodPos(0.4),
                         hardware.launch(1650, 0.4, 0.25, 500),
