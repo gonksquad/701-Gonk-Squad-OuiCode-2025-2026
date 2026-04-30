@@ -89,7 +89,7 @@ public class WorldsAutoHardware {
             outL.setVelocity(launchSpeed);
             outR.setVelocity(launchSpeed);
             hood.setPosition(hoodStart);
-            while(outL.getVelocity() + 40 < launchSpeed) {
+            while(outL.getVelocity() < launchSpeed - 20 || outL.getVelocity() > launchSpeed + 20) {
                 blocker.setPosition(1);
             }
             blocker.setPosition(0);
