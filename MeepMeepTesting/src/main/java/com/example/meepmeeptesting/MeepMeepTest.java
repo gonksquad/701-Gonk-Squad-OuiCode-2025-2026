@@ -24,21 +24,15 @@ public class MeepMeepTest {
         Pose2d initialPose = new Pose2d(-50, -50, Math.toRadians(-135));
         myBot.runAction(myBot.getDrive().actionBuilder(launchPos/*new Pose2d(-50, 50, Math.toRadians(125))*/)
 
-                .setTangent(Math.toRadians(210))
-                .splineToSplineHeading(new Pose2d(36, -43, Math.toRadians(-90)), Math.toRadians(-90))
-                .lineToY(-63)
-                .setReversed(true)
-                .splineToLinearHeading(launchPos2, Math.toRadians(45))
 
-                .setReversed(false)
+                .setTangent(20)
+                .splineToLinearHeading(new Pose2d(5, -61, Math.toRadians(-135)), launchPos.heading)
+                .strafeToConstantHeading(new Vector2d(14, -67))
+                .waitSeconds(0.5)
                 .setTangent(Math.toRadians(90))
-                .strafeToLinearHeading(new Vector2d(launchPos.position.x-2,-56), Math.toRadians(-75))
-                .waitSeconds(0.2)
-                .lineToY(-52)
-                .lineToY(-58)
-                .strafeToLinearHeading(launchPos2.position, launchPos2.heading)
+                .splineToLinearHeading(launchPos, Math.toRadians(-165))
 
-                .strafeToLinearHeading(new Vector2d(41, -34), Math.toRadians(180))
+
 
                 .build());
 

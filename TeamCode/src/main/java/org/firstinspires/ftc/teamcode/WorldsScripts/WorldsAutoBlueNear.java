@@ -51,12 +51,19 @@ public class WorldsAutoBlueNear extends LinearOpMode {
                 .build();
 
         Action flushPickup = drive.actionBuilder(launchPos)
+//                .setTangent(20)
+//                .splineToLinearHeading(new Pose2d(5, -61, Math.toRadians(-135)), launchPos.heading)
+//                .strafeToConstantHeading(new Vector2d(14, -67))
+//                .waitSeconds(0.5)
+//                .setTangent(Math.toRadians(90))
+//                .splineToLinearHeading(launchPos, Math.toRadians(-165))
                 .setTangent(20)
                 .splineToLinearHeading(new Pose2d(5, -61, Math.toRadians(-135)), launchPos.heading)
                 .strafeToConstantHeading(new Vector2d(14, -67))
                 .waitSeconds(0.5)
                 .setTangent(Math.toRadians(90))
                 .splineToLinearHeading(launchPos, Math.toRadians(-165))
+
                 .build();
 
         Action flushPickup2 = drive.actionBuilder(launchPos)
@@ -103,7 +110,7 @@ public class WorldsAutoBlueNear extends LinearOpMode {
                         pickup2,
                         hardware.setOuttakeVelStart(950),
                         new ParallelAction(
-                                hardware.launch(950, 0.15, 0.2, 300),
+                                hardware.launch(950, 0.35, 0.4, 300),//.15 .2
                                 hardware.intakeStart(),
                                 new SleepAction(0.3)
                         ),
@@ -116,7 +123,7 @@ public class WorldsAutoBlueNear extends LinearOpMode {
                         hardware.blockOuttake(),
                         hardware.intakeStart(),
                         new ParallelAction(
-                                hardware.launch(650, 0.1, 0.15, 300),
+                                hardware.launch(650, 0.3, 0.35, 300),
                                 new SleepAction(0.25)
                         ),
                         hardware.blockOuttake(),
@@ -129,7 +136,7 @@ public class WorldsAutoBlueNear extends LinearOpMode {
                         hardware.blockOuttake(),
                         hardware.intakeStart(),
                         new ParallelAction(
-                                hardware.launch(650, 0.1, 0.15, 300),
+                                hardware.launch(650, 0.3, 0.35, 300),
                                 new SleepAction(0.2)
                         ),
                         hardware.blockOuttake(),
@@ -139,7 +146,7 @@ public class WorldsAutoBlueNear extends LinearOpMode {
                         pickup1,
                         hardware.setOuttakeVelStart(1250),
                         new ParallelAction(
-                                hardware.launch(1250, 0.15, 0.2, 300),
+                                hardware.launch(1250, 0.35, 0.4, 300),
                                 hardware.intakeStart(),
                                 new SleepAction(0.3)
                         ),
