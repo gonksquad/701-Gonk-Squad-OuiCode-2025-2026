@@ -84,7 +84,7 @@ public class WorldsAutoBlueFar extends LinearOpMode {
                 new SequentialAction(
                         new ParallelAction(
                             hardware.blockOuttake(),
-                            hardware.setYawAngle(20),
+                            hardware.setYawAngle(-20),
                             hardware.setOuttakeVelStart(50), //so much lower
                             hardware.intakeStart()
                         ),
@@ -95,7 +95,7 @@ public class WorldsAutoBlueFar extends LinearOpMode {
                         new SleepAction(1.5),
                         hardware.blockOuttake(),
                         new ParallelAction(
-                            hardware.setYawAngle(-25),
+                            hardware.setYawAngle(25),
                             pickup3
                         ),
                         hardware.setHoodPos(0.4),
@@ -103,7 +103,7 @@ public class WorldsAutoBlueFar extends LinearOpMode {
                         new SleepAction(1.5),
                         hardware.blockOuttake(),
                         //turn turret, shoot 3, block turret
-                        hardware.setYawAngle(-10),
+                        hardware.setYawAngle(10),
                         flushPickup,
                         hardware.setHoodPos(0.4),
                         hardware.launch(1600, 0.4, 0.25, 500),
@@ -113,7 +113,7 @@ public class WorldsAutoBlueFar extends LinearOpMode {
 
                         hardware.blockOuttake(),
                         //turn turret, shoot 3, block turret
-                        hardware.setYawAngle(-10),
+                        hardware.setYawAngle(10),
                         flushPickup2,
                         hardware.setHoodPos(0.4),
                         hardware.launch(1400, 0.4, 0.25, 500),
@@ -122,7 +122,7 @@ public class WorldsAutoBlueFar extends LinearOpMode {
 
                         hardware.blockOuttake(),
                         //turn turret, shoot 3, block turret
-                        hardware.setYawAngle(-10), //26
+                        hardware.setYawAngle(10), //26
                         flushPickup3,
                         hardware.setHoodPos(0.4),
                         hardware.launch(1400, 0.4, 0.25, 500),
@@ -130,7 +130,7 @@ public class WorldsAutoBlueFar extends LinearOpMode {
 
                         hardware.blockOuttake(),
                         //turn turret, shoot 3, block turret
-                        hardware.setYawAngle(-10),
+                        hardware.setYawAngle(10),
                         flushPickup4,
                         hardware.setHoodPos(0.4),
                         hardware.launch(1400, 0.4, 0.25, 500),

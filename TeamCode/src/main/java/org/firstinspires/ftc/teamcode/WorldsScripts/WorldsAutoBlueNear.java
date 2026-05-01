@@ -79,13 +79,13 @@ public class WorldsAutoBlueNear extends LinearOpMode {
 
                         hardware.blockOuttake(),
                         hardware.intakeStart(),
-                        hardware.setHoodPos(0.2),
+                        hardware.setHoodPos(0.25),
                         hardware.setYawAngle(-47),
                         hardware.setOuttakeVelStart(1050),
                         hardware.blockOuttake(),
 
                         launch0,
-                        new SleepAction(0.3),
+                        new SleepAction(0.25),
                         hardware.unblockOuttake(),
 
                         hardware.setOuttakeVelStart(1150),
