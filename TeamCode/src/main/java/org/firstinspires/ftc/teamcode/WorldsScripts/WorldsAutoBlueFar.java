@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.WorldsScripts;
 //import com.acmerobotics.dashboard.config.Config;
 
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -18,60 +19,61 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 public class WorldsAutoBlueFar extends LinearOpMode {
     MecanumDrive drive;
     WorldsAutoHardware hardware;
-    Pose2d launchPos = new Pose2d(61, -15, Math.toRadians(-180));
-    Pose2d launchPos2 = new Pose2d(55, -10, Math.toRadians(-135));
+    Pose2d launchPos = new Pose2d(58, -15, Math.toRadians(-180));
+    Pose2d launchPos2 = new Pose2d(48, -10, Math.toRadians(-135));
 
     @Override
     public void runOpMode() {
         drive = new MecanumDrive(hardwareMap, launchPos);
         hardware = new WorldsAutoHardware(hardwareMap);
         Action pickup3 = drive.actionBuilder(launchPos)
-                .setTangent(Math.toRadians(210))
-                .splineToSplineHeading(new Pose2d(23, -43, Math.toRadians(-90)), Math.toRadians(90))
+                .setTangent(Math.toRadians(-210))
+                .splineToSplineHeading(new Pose2d(18, -43, Math.toRadians(-90)), Math.toRadians(-90))
                 .lineToY(-63)
                 .setReversed(true)
-                .splineToLinearHeading(launchPos2, Math.toRadians(45))
+                .splineToLinearHeading(launchPos2, Math.toRadians(-45))
                 .build();
 
 
         Action flushPickup = drive.actionBuilder(launchPos2)
                 .setReversed(false)
-                .setTangent(Math.toRadians(90))
-                .strafeToLinearHeading(new Vector2d(launchPos.position.x-2,-56), Math.toRadians(-75))
+                .setTangent(Math.toRadians(-90))
+                .strafeToLinearHeading(new Vector2d(launchPos.position.x-6,-56), Math.toRadians(-75))
                 .waitSeconds(0.2)
-                .lineToY(-52)
-                .lineToY(-58)
+                .lineToY(-50)
+                .lineToY(-54)
                 .strafeToLinearHeading(launchPos2.position, launchPos2.heading)
                 .build();
 
-        Action flushPickup2 =  drive.actionBuilder(launchPos2)
+        Action flushPickup2 = drive.actionBuilder(launchPos2)
                 .setReversed(false)
-                .setTangent(Math.toRadians(90))
-                .strafeToLinearHeading(new Vector2d(launchPos.position.x-2,-56), Math.toRadians(-75))
+                .setTangent(Math.toRadians(-90))
+                .strafeToLinearHeading(new Vector2d(launchPos.position.x-6,-56), Math.toRadians(-75))
                 .waitSeconds(0.2)
-                .lineToY(-52)
-                .lineToY(-58)
+                .lineToY(-50)
+                .lineToY(-54)
                 .strafeToLinearHeading(launchPos2.position, launchPos2.heading)
                 .build();
+
         Action flushPickup3 = drive.actionBuilder(launchPos2)
                 .setReversed(false)
-                .setTangent(Math.toRadians(90))
-                .strafeToLinearHeading(new Vector2d(launchPos.position.x-2,-56), Math.toRadians(-75))
+                .setTangent(Math.toRadians(-90))
+                .strafeToLinearHeading(new Vector2d(launchPos.position.x-6,-56), Math.toRadians(-75))
                 .waitSeconds(0.2)
-                .lineToY(-52)
-                .lineToY(-58)
-                .strafeToLinearHeading(launchPos2.position, launchPos2.heading)
-                .build();
-        Action flushPickup4 = drive.actionBuilder(launchPos2)
-                .setReversed(false)
-                .setTangent(Math.toRadians(90))
-                .strafeToLinearHeading(new Vector2d(launchPos.position.x-2,-56), Math.toRadians(-75))
-                .waitSeconds(0.2)
-                .lineToY(-52)
-                .lineToY(-58)
+                .lineToY(-50)
+                .lineToY(-54)
                 .strafeToLinearHeading(launchPos2.position, launchPos2.heading)
                 .build();
 
+        Action flushPickup4 = drive.actionBuilder(launchPos2)
+                .setReversed(false)
+                .setTangent(Math.toRadians(-90))
+                .strafeToLinearHeading(new Vector2d(launchPos.position.x-6,-56), Math.toRadians(-75))
+                .waitSeconds(0.2)
+                .lineToY(-50)
+                .lineToY(-54)
+                .strafeToLinearHeading(launchPos2.position, launchPos2.heading)
+                .build();
 
         Action endPark = drive.actionBuilder(launchPos2)
                 .strafeToLinearHeading(new Vector2d(41, -34), Math.toRadians(180))
@@ -82,63 +84,77 @@ public class WorldsAutoBlueFar extends LinearOpMode {
 
         Actions.runBlocking(
                 new SequentialAction(
-                        new ParallelAction(
-                            hardware.blockOuttake(),
-                            hardware.setYawAngle(20),
-                            hardware.setOuttakeVelStart(50),
-                            hardware.intakeStart()
+                        updatePose(),
+                        hardware.sendDataToTele(drive.localizer.getPose().position, drive.localizer.getPose().heading, (byte)0),
+
+                    new ParallelAction(
+                                hardware.setHoodPos(0.1),
+                                hardware.blockOuttake(),
+                                hardware.setYawAngle(17),
+                                hardware.setOuttakeVelStart(1500),
+                                hardware.intakeStart()
                         ),
-                        hardware.blockOuttake(),
+                        new SleepAction(1),
+                        hardware.unblockOuttake(),
+                        hardware.setOuttakeVelStart(1450),
                         //Turn turret, shoot 3, turn on intake, block turret
-                        hardware.setHoodPos(0.3),
-                        hardware.launch(1, 0.65, 0.7, 80),
+                        hardware.setHoodPos(0.1),
                         new SleepAction(1.5),
                         hardware.blockOuttake(),
                         new ParallelAction(
-                            hardware.setYawAngle(-25),
-                            pickup3
+                                hardware.setYawAngle(-25),
+                                pickup3
                         ),
-                        hardware.setHoodPos(0.4),
-                        hardware.launch(1600, 0.3, 0.1, 400),
+                        hardware.setHoodPos(0.1),
+                        hardware.launch(1400, 0.1, 0.1, 1),
                         new SleepAction(1.5),
                         hardware.blockOuttake(),
                         //turn turret, shoot 3, block turret
-                        hardware.setYawAngle(-10),
+                        hardware.setYawAngle(-27),
                         flushPickup,
-                        hardware.setHoodPos(0.4),
-                        hardware.launch(1600, 0.4, 0.25, 500),
+                        hardware.setHoodPos(0.1),
+                        hardware.launch(1400, 0.1, 0.1, 1),
                         new SleepAction(1.5),
 
                         //flush pickups
 
                         hardware.blockOuttake(),
                         //turn turret, shoot 3, block turret
-                        hardware.setYawAngle(-10),
+                        hardware.setYawAngle(-27),
                         flushPickup2,
-                        hardware.setHoodPos(0.4),
-                        hardware.launch(1400, 0.4, 0.25, 500),
+                        hardware.setHoodPos(0.1),
+                        hardware.launch(1400, 0.1, 0.1, 1),
                         new SleepAction(1.5),
                         //shoot 3, block turret
 
                         hardware.blockOuttake(),
                         //turn turret, shoot 3, block turret
-                        hardware.setYawAngle(-10), //26
+                        hardware.setYawAngle(-27),
                         flushPickup3,
-                        hardware.setHoodPos(0.4),
-                        hardware.launch(1400, 0.4, 0.25, 500),
+                        hardware.setHoodPos(0.1),
+                        hardware.launch(1400, 0.1, 0.1, 1),
                         new SleepAction(1.5),
 
                         hardware.blockOuttake(),
                         //turn turret, shoot 3, block turret
-                        hardware.setYawAngle(-10),
+                        hardware.setYawAngle(-27),
                         flushPickup4,
-                        hardware.setHoodPos(0.4),
-                        hardware.launch(1400, 0.4, 0.25, 500),
+                        hardware.setHoodPos(0.1),
+                        hardware.launch(1400, 0.1, 0.1, 1),
                         new SleepAction(1.5),
 
-                        endPark
+                        endPark,
+                        updatePose(),
+                        hardware.sendDataToTele(drive.localizer.getPose().position, drive.localizer.getPose().heading, (byte)0)
+
 
                 )
         );
+    }
+    public Action updatePose(){
+        drive.updatePoseEstimate();
+        telemetry.addData("pose", drive.localizer.getPose());
+        telemetry.update();
+        return new InstantAction(() -> drive.updatePoseEstimate());
     }
 }

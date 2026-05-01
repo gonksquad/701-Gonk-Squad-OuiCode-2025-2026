@@ -76,7 +76,8 @@ public class WorldsAutoBlueNear extends LinearOpMode {
 
         Actions.runBlocking(
                 new SequentialAction(
-
+                        updatePose(),
+                        hardware.sendDataToTele(drive.localizer.getPose().position, drive.localizer.getPose().heading, (byte)0),
                         hardware.blockOuttake(),
                         hardware.intakeStart(),
                         hardware.setHoodPos(0.2),
