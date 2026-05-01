@@ -19,7 +19,11 @@ import org.firstinspires.ftc.teamcode.StatesScripts.odoteleop;
 public class WorldsTele extends LinearOpMode {
 
    /* public static class Params {
-        public double outtakevel;
+        public double farInc = 0;
+        public double closeInc = 0;
+        public int farStart = 1500;
+        public int closeStart = 1300;
+        public double hoodPos = 0.2;
     }
 
     public static WorldsTele.Params PARAMS = new WorldsTele.Params();*/
@@ -158,20 +162,22 @@ public class WorldsTele extends LinearOpMode {
 
     public void distanceTracking(boolean onBlue, odoteleop odoteleop) {
          distanceToGoal = odoteleop.getGoalDistance(onBlue, drive.localizer.getPose());
-        //formula from https://www.desmos.com/calculator/hnlvt45jvt
-        outtakeVelocity = (int)Math.round(0.000314673*Math.pow(distanceToGoal, 3)-0.0479308*Math.pow(distanceToGoal, 2)+6.70251*distanceToGoal+791.79-150);
-        if(distanceToGoal < 85) {
-            //increase speed 4 close zone
-            outtakeVelocity += 200;
-        }
-        //outtakeVelocity = (int)Math.round(0.000593771*Math.pow(distanceToGoal, 3)-0.13443*Math.pow(distanceToGoal, 2)+12.49113+distanceToGoal+837.70897);
-        hoodPos = (0.0000123126*Math.pow(distanceToGoal,2))-(0.00720119*distanceToGoal)+0.976098;
+         boolean far = distanceToGoal > 125;
+         //formula from https://www.desmos.com/calculator/hnlvt45jvt
+        // outtakeVelocity = (int)Math.round(0.000314673*Math.pow(distanceToGoal, 3)-0.0479308*Math.pow(distanceToGoal, 2)+6.70251*distanceToGoal+791.79-150);
+
+        outtakeVelocity = far ? 1500 : 1200;
+        outtakeVelocity += (int) Math.min(300, hoodIncrementTimer.milliseconds()*(far ? 0: 0.5));
+
+        hood.setPosition(0.2);
+
+        /*hoodPos = (0.0000123126*Math.pow(distanceToGoal,2))-(0.00720119*distanceToGoal)+0.976098;
         hood.setPosition(hoodPos);
         if(distanceToGoal > 120) {
             hood.setPosition(hood.getPosition() - Math.min(500, hoodIncrementTimer.milliseconds())/2500);
         }
+        */
         telemetry.addData("Sistance to gaol", distanceToGoal);
-       // }
     }
 
     void resetOdoPos() {
