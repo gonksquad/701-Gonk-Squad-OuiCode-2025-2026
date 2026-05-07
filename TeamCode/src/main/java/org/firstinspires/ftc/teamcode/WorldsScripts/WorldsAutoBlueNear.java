@@ -80,7 +80,8 @@ public class WorldsAutoBlueNear extends LinearOpMode {
                         hardware.sendDataToTele(drive.localizer.getPose().position, drive.localizer.getPose().heading, (byte)0),
                         hardware.blockOuttake(),
                         hardware.intakeStart(),
-                        hardware.setHoodPos(0.2),
+                        //hardware.setHoodPos(0.2),
+                        hardware.setHoodPos(0.25),
                         hardware.setYawAngle(-47),
                         hardware.setOuttakeVelStart(1050),
                         hardware.blockOuttake(),
@@ -93,7 +94,7 @@ public class WorldsAutoBlueNear extends LinearOpMode {
 
                         //hardware.launch(100, 0.6, 0.67, 300),
                         // h(100, 0.8f),
-                        new SleepAction(0.2),
+                        new SleepAction(0.25),//.2
                         hardware.setHoodPos(0.5),
                         new SleepAction(0.2),
                         hardware.blockOuttake(),

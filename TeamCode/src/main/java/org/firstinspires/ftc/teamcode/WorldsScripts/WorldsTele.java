@@ -39,6 +39,7 @@ public class WorldsTele extends LinearOpMode {
     int outtakeVelocity;
     final int outtakeVelocityIdle = 1200;
     ElapsedTime hoodIncrementTimer = new ElapsedTime();
+    ElapsedTime velIncTimer = new ElapsedTime();
     double distanceToGoal;
     boolean isBlue = AutoToTeleData.side == 0;
     double hoodPos;
@@ -116,6 +117,7 @@ public class WorldsTele extends LinearOpMode {
         {
             //if blocking
             hoodIncrementTimer.reset();
+            velIncTimer.reset();
         }
 
         telemetry.addData("speedR", outtakeMotorR.getVelocity());
@@ -162,6 +164,7 @@ public class WorldsTele extends LinearOpMode {
 
     public void distanceTracking(boolean onBlue, odoteleop odoteleop) {
          distanceToGoal = odoteleop.getGoalDistance(onBlue, drive.localizer.getPose());
+<<<<<<< Updated upstream
          boolean far = distanceToGoal > 125;
          //formula from https://www.desmos.com/calculator/hnlvt45jvt
         // outtakeVelocity = (int)Math.round(0.000314673*Math.pow(distanceToGoal, 3)-0.0479308*Math.pow(distanceToGoal, 2)+6.70251*distanceToGoal+791.79-150);
@@ -172,6 +175,17 @@ public class WorldsTele extends LinearOpMode {
         hood.setPosition(0.2);
 
         /*hoodPos = (0.0000123126*Math.pow(distanceToGoal,2))-(0.00720119*distanceToGoal)+0.976098;
+=======
+        //formula from https://www.desmos.com/calculator/hnlvt45jvt
+        outtakeVelocity = (int)Math.round(0.000314673*Math.pow(distanceToGoal, 3)-0.0479308*Math.pow(distanceToGoal, 2)+6.70251*distanceToGoal+791.79-150);
+        if(distanceToGoal < 85) {
+            //increase speed 4 close zone
+            outtakeVelocity += 200;
+        }
+        //outtakeVelocity = (int)Math.min(outtakeVelocity + velIncTimer.milliseconds(),2000);
+        //outtakeVelocity = (int)Math.round(0.000593771*Math.pow(distanceToGoal, 3)-0.13443*Math.pow(distanceToGoal, 2)+12.49113+distanceToGoal+837.70897);
+        hoodPos = (0.0000123126*Math.pow(distanceToGoal,2))-(0.00720119*distanceToGoal)+0.976098;
+>>>>>>> Stashed changes
         hood.setPosition(hoodPos);
         if(distanceToGoal > 120) {
             hood.setPosition(hood.getPosition() - Math.min(500, hoodIncrementTimer.milliseconds())/2500);
